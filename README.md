@@ -143,8 +143,8 @@ AI systems have 70% autonomous control over their sensory processing, enabling t
 ## 🚀 Getting Started
 
 ### For Researchers
-1. Start with [MEM|8 Overview](MEM8/README.md)
-2. Read the [Technical Paper](MEM8/mem8-paper.md)
+1. Start with [MEM|8 Overview](mem8/README.md)
+2. Read the [Technical Paper](mem8/mem8-paper.md)
 3. Explore [Ayevn Specification](ayeos/ayevn/ayevn-spec.md)
 
 ### For Developers
@@ -153,7 +153,7 @@ AI systems have 70% autonomous control over their sensory processing, enabling t
 3. Check [MCP Guide](smart-tree/mcp-guide.md)
 
 ### For Innovators
-1. Understand [Temporal Philosophy](MEM8/mem8_temporal_philosophy.md)
+1. Understand [Temporal Philosophy](mem8/mem8_temporal_philosophy.md)
 2. Explore [MEMNET Protocol](ayeos/ayeos_memnet_protocol.md)
 3. Read [Smart Tree Philosophy](smart-tree/SMART_TREE_PHILOSOPHY.md)
 
