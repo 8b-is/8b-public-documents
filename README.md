@@ -13,9 +13,9 @@ The foundational consciousness engine achieving 973× faster performance through
 #### Core Documentation
 - **[MEM|8 Overview](mem8/README.md)** - Start here for core concepts
 - **[Technical Paper](mem8/mem8-paper.md)** - Complete mathematical foundations
-- **[January Paper](MEM8/mem8-paper-January.md)** - Earlier theoretical work
+- **[January Paper](mem8/mem8-paper-January.md)** - Earlier theoretical work
 - **[Temporal Philosophy](mem8/mem8_temporal_philosophy.md)** - Time and memory dynamics
-- **[Wave-RNN Comparison](mem8/mem_8_vs_wrnn.md)** - Performance analysis ([Audio](MEM8/mem_8_vs_wrnn.mp3))
+- **[Wave-RNN Comparison](mem8/mem_8_vs_wrnn.md)** - Performance analysis ([Audio](mem8/mem_8_vs_wrnn.mp3))
 
 #### Key Features
 - 256×256×65536 grid architecture
