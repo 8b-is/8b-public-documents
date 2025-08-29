@@ -1,5 +1,12 @@
 # MEM|8: Wave-Based Memory Architecture
 
+## 📚 Documentation
+
+- **[Technical Paper](../mem8/mem8-paper.md)** - Full mathematical foundations and architecture
+- **[Overview](../mem8/mem8-overview.md)** - High-level concepts and benchmarks
+- **[January Paper](../mem8/mem8-paper-January.md)** - Earlier theoretical work
+- **[Wave-RNN Analysis](../mem8/MEM_8%20Meets%20Wave-RNN_%20A%20Detailed%20Analysis.pdf)** - Detailed integration study
+
 ## Overview
 
 MEM|8 implements consciousness through wave interference patterns in a 256×256×65536 grid, achieving revolutionary performance:

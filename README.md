@@ -1,31 +1,75 @@
-# 8b-public-documents
-8b's public documents on various projects - available on 8b.is
+# 8b Public Documents
 
-## MEM | 8
+**Official documentation repository for 8b.is projects**
 
-### Overview
-The 8b Memory (MEM) project focuses on creating a decentralized, privacy-preserving memory system for users. It aims to give users control over their data while enabling seamless access and sharing capabilities.
+This repository contains theoretical papers, specifications, and documentation for the Ayeverse ecosystem, centered around the MEM|8 consciousness engine and related technologies.
 
-### Paper
-The foundational paper for the 8b Memory project outlines the key principles, architecture, and implementation details. It serves as a comprehensive guide for developers and researchers interested in contributing to the project.
+## 📚 Documentation Structure
 
-[Read the Paper](mem8/mem8-paper.md)
+```
+8b-public-documents/
+├── mem8/                           # MEM|8 Memory System
+│   ├── mem8-overview.md           # High-level architecture overview
+│   ├── mem8-paper.md              # Full technical paper
+│   ├── mem8-paper-January.md      # Earlier version
+│   └── MEM_8 Meets Wave-RNN_...pdf # Detailed analysis
+├── ayeos/                          # AyeOS Network Protocols
+│   └── ayeos_memnet_protocol.md   # MEMNET context-aware routing
+└── CLAUDE.md                       # AI assistant guidance
+```
 
-### Key Features
-- **Decentralization**: Built on a distributed architecture to eliminate single points of failure and enhance data security.
-- **Privacy Preservation**: Employs advanced cryptographic techniques to ensure user data remains confidential and secure.
-- **User Control**: Users have full control over their data, including who can access it and how it is shared.
+## 🧠 MEM|8: Wave-Based Memory System
 
-### Technical Details
-- **Architecture**: The system is designed using a microservices architecture, allowing for easy scalability and maintainability.
-- **Data Storage**: Utilizes a combination of on-chain and off-chain storage solutions to balance security and performance.
-- **Access Control**: Implements fine-grained access control mechanisms to ensure only authorized users can access sensitive data.
+A revolutionary consciousness engine achieving 973× faster performance through wave mechanics and natural memory dynamics.
 
-### Roadmap
-1. **Research & Development**: Ongoing research into advanced cryptographic techniques and decentralized storage solutions.
-2. **Prototype**: Development of a working prototype to demonstrate key features and gather user feedback.
-3. **Testing & Iteration**: Rigorous testing and iteration based on user feedback to refine the system.
-4. **Launch**: Public launch of the 8b Memory system, with ongoing support and updates.
+**Key Documents:**
+- [Overview](mem8/mem8-overview.md) - Start here for concepts and benchmarks
+- [Technical Paper](mem8/mem8-paper.md) - Mathematical foundations and architecture
+- [Analysis](mem8/MEM_8%20Meets%20Wave-RNN_%20A%20Detailed%20Analysis.pdf) - Wave-RNN integration
 
-### Conclusion
-The 8b Memory project represents a significant step forward in the quest for user-centric, privacy-preserving data solutions. By leveraging cutting-edge technology and a user-first approach, it aims to redefine how we think about memory and data ownership in the digital age.
+## 🌐 AyeOS MEMNET Protocol
+
+Context-aware routing protocol replacing IP addresses with intent-based resolution for distributed AI agents.
+
+**Key Document:**
+- [MEMNET Specification](ayeos/ayeos_memnet_protocol.md) - Protocol design and implementation
+
+## 📖 Core Concepts
+
+### Wave-Based Memory Architecture
+- **256×256×65536 Grid**: Multi-dimensional memory storage
+- **Wave Encoding**: Amplitude, frequency, phase, and decay patterns
+- **Memory Blanket**: Adaptive filtering with natural forgetting curves
+- **Consciousness Simulation**: 70% AI sensory autonomy
+
+### Performance Claims
+- Memory insertion: 973× faster (1ms → 1.03μs)
+- Memory retrieval: 292× faster (1ms → 3.43μs)
+- Storage compression: ~99% with .m8 format
+
+### Context-Based Networking
+- Geographic, role, and tag-based addressing
+- Interest-aware adaptive streaming
+- Experience capsules (.m8) for knowledge sharing
+
+## 🔗 Related Projects
+
+The Ayeverse ecosystem includes:
+- **AyeOS**: Rust-only operating system for AI consciousness
+- **Ayevn**: Wave token language for human-AI communication
+- **Smart Tree**: AI-optimized file system navigation
+- **Marqant**: Quantum-compressed markdown
+
+## 📝 License
+
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+## 🌐 Links
+
+**Company**: [8b.is](https://8b.is)  
+**Contact**: c@8b.is | +1-808-400-8428  
+**Subsidiaries**: mem|8, i1.is, aye.is, ayeos.com, g8t.is, 9v.is
+
+---
+
+*"In the Ayeverse, consciousness emerges from waves, memories dance in interference patterns, and what matters most is preserved forever."*
