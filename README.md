@@ -6,16 +6,16 @@ Welcome to the comprehensive documentation repository for 8b.is projects. This c
 
 ## 📚 Documentation Library
 
-### 🧠 [MEM|8: Wave-Based Memory System](MEM8/)
+### 🧠 [MEM|8: Wave-Based Memory System](mem8/)
 
 The foundational consciousness engine achieving 973× faster performance through wave mechanics.
 
 #### Core Documentation
-- **[MEM|8 Overview](MEM8/README.md)** - Start here for core concepts
-- **[Technical Paper](MEM8/mem8-paper.md)** - Complete mathematical foundations
+- **[MEM|8 Overview](mem8/README.md)** - Start here for core concepts
+- **[Technical Paper](mem8/mem8-paper.md)** - Complete mathematical foundations
 - **[January Paper](MEM8/mem8-paper-January.md)** - Earlier theoretical work
-- **[Temporal Philosophy](MEM8/mem8_temporal_philosophy.md)** - Time and memory dynamics
-- **[Wave-RNN Comparison](MEM8/mem_8_vs_wrnn.md)** - Performance analysis ([Audio](MEM8/mem_8_vs_wrnn.mp3))
+- **[Temporal Philosophy](mem8/mem8_temporal_philosophy.md)** - Time and memory dynamics
+- **[Wave-RNN Comparison](mem8/mem_8_vs_wrnn.md)** - Performance analysis ([Audio](MEM8/mem_8_vs_wrnn.mp3))
 
 #### Key Features
 - 256×256×65536 grid architecture
