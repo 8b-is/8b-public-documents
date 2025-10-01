@@ -1,0 +1,10 @@
+{
+  "revoked": [
+    {
+      "ucid": "uCID-UNINITIALIZED",
+      "revoked_at": null,
+      "revocation_reason": null,
+      "origin_identity": null
+    }
+  ]
+}

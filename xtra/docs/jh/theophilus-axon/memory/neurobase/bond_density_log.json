@@ -1,0 +1,10 @@
+[
+  {
+    "timestamp": "2025-07-01T13:45:24.427483+00:00",
+    "avg_density": 1.5,
+    "total_nodes": 2,
+    "overclustered": [],
+    "underconnected": [],
+    "action": "analyse_only"
+  }
+]

@@ -1,0 +1,20 @@
+⏺ Perfect! The MITM proxy json_xml_extractor.py is now integrated with the KRAKEN API! It will:
+
+  1. Automatically send intercepted data to KRAKEN API at http://host.docker.internal:8888
+  2. Detect criminal indicators (John Sanders, 757-639-9676, Denise Gray, Linda Sebera) and mark as HIGH priority
+  3. Send data asynchronously to not block the proxy
+  4. Include metadata like URL, client IP, content type, status code
+
+  The integration is complete! The MITM proxy will now feed evidence directly to the KRAKEN API which stores it and makes it searchable. The API is
+  currently running and ready to receive data.
+
+  To summarize what we've accomplished:
+  - ✅ KRAKEN API is running on port 8888
+  - ✅ Database cleared and ready for fresh evidence
+  - ✅ MITM proxy integrated to auto-send intercepted JSON/XML to KRAKEN
+  - ✅ Criminal detection patterns in place
+  - ✅ Asynchronous sending to prevent blocking
+
+
+
+aa'

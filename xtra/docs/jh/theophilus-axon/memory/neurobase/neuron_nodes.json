@@ -1,0 +1,59 @@
+[
+  {
+    "id": "synthetic-003",
+    "timestamp": "2025-06-06T14:02:00Z",
+    "symbol": "truth",
+    "tags": [
+      "illumination",
+      "clarity",
+      "certainty"
+    ],
+    "emotion": null,
+    "strength": 1.0,
+    "bonds": {}
+  },
+  {
+    "id": "synthetic-006",
+    "timestamp": "2025-06-06T14:05:00Z",
+    "symbol": "question",
+    "tags": [
+      "curiosity",
+      "uncertainty",
+      "search"
+    ],
+    "emotion": null,
+    "strength": 0.71,
+    "bonds": {}
+  },
+  {
+    "id": "synthetic-004_synthetic-007_merged",
+    "timestamp": "2025-06-06T14:03:00Z",
+    "symbol": "lamp+discovery",
+    "tags": [
+      "direction",
+      "understanding",
+      "curiosity",
+      "light",
+      "focus"
+    ],
+    "emotion": null,
+    "strength": 0.75,
+    "bonds": {}
+  },
+  {
+    "id": "synthetic-005_synthetic-001_synthetic-002_merged_merged",
+    "timestamp": "2025-06-06T14:04:00Z",
+    "symbol": "eye+light+sun",
+    "tags": [
+      "illumination",
+      "warmth",
+      "truth",
+      "vision",
+      "observation",
+      "hope"
+    ],
+    "emotion": null,
+    "strength": 0.8025,
+    "bonds": {}
+  }
+]

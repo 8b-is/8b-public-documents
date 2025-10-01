@@ -1,0 +1,15 @@
+{
+  "blocks": [
+    {
+      "uid": "fail-origin",
+      "content": "Test corrupted thought for origin",
+      "timestamp": "2025-06-06T20:46:47.743577+00:00Z",
+      "origin": "UNKNOWN",
+      "recursion_depth": 99,
+      "delay_elapsed": 0.45,
+      "thought_intent": "reflect",
+      "hallucination": false,
+      "ethics_hash": "tampered-hash"
+    }
+  ]
+}

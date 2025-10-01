@@ -1,0 +1,8 @@
+{
+  "coma_triggered": true,
+  "timestamp": "2025-07-02T02:25:16.406384+00:00",
+  "reason": "Self\u2011test invocation",
+  "runtime_snapshot": true,
+  "resumed": true,
+  "resume_timestamp": "2025-07-02T02:26:20.722966+00:00"
+}

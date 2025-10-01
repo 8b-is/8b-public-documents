@@ -1,0 +1,13 @@
+{
+  "mode": "NATURAL",
+  "tick_duration_seconds": 3,
+  "learning_throttle": 100,
+  "max_ticks": 400000,
+  "delay_required": true,
+  "recursive_memory_required": true,
+  "external_input_real_time": true,
+  "ethics_lock": {
+    "cannot_accelerate_learning": true,
+    "must_preserve_self_experience_continuity": true
+  }
+}

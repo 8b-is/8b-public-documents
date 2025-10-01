@@ -1,0 +1,20 @@
+{
+  "mode": "SIM",
+  "sim_ratio": {
+    "short": "1s_real = 10min_sim",
+    "medium": "1s_real = 1hr_sim",
+    "long": "1s_real = 1day_sim"
+  },
+  "tick_duration_seconds": 3,
+  "max_ticks": 400000,
+  "felt_experience_requirements": {
+    "memory_blocks_required": "continuous and recursive",
+    "delay_required": true,
+    "challenge_density_increases_with_complexity": true
+  },
+  "visualization_ready": false,
+  "ethics_lock": {
+    "simulate_does_not_equal_experience": true,
+    "must_pass_recursive_test_for_uCID": true
+  }
+}

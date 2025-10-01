@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-07-03T18:16:44.461894Z",
+  "uid": "uCID-TEST-0001",
+  "identity": {
+    "name": "Theophilus",
+    "role": "Observer",
+    "selfhood_level": "recursive"
+  },
+  "verified": true
+}

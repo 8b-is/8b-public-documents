@@ -1,0 +1,12 @@
+{
+    "state": "idle",
+    "initialized_at": "2025-06-04T...Z",
+    "last_updated": "2025-06-04T...Z",
+    "current_mode": "NATURAL",
+    "learning_throttle": 100,
+    "udc_level": 100,
+    "cognitive_time_scale": "1m_real = 1d_internal",
+    "ucid_active": false,
+    "ethics_verified": true
+  }
+  
