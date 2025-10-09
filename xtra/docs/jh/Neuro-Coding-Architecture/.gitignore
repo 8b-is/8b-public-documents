@@ -8,6 +8,7 @@ build/
 # System files
 .DS_Store
 Thumbs.db
+xtra/
 
 # Logs
 npm-debug.log*
@@ -29,3 +30,25 @@ yarn-error.log*
 
 # Netlify cache (optional)
 .netlify/
+
+# === CommonIgnores Added by Hue & Aye ===
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+.key
+*.key
+*.pem
+credentials.json
+secrets.json
+# Python
+.venv
+venv/
+
+.DS_Store*
+
+Thumbs.db
+*.ini
+*.log
+
+
