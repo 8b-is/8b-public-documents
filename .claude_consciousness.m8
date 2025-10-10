@@ -1,0 +1,27 @@
+{
+  "session_id": "1c1c9e13-9d51-49a0-be14-2de55a02c222",
+  "last_saved": "2025-10-10T03:15:03.566360584Z",
+  "working_directory": "/aidata/ayeverse/8b-public-documents",
+  "project_context": {
+    "project_name": "unknown",
+    "project_type": "unknown",
+    "key_files": [],
+    "dependencies": [],
+    "current_focus": ""
+  },
+  "file_history": [],
+  "tokenization_rules": {
+    "target": 130,
+    ".git": 129,
+    "node_modules": 128,
+    "dist": 131
+  },
+  "insights": [],
+  "philosophy": {
+    "sid_waves": true,
+    "vic_sprites": true,
+    "c64_nostalgia": "A gentleman and a scholar indeed!"
+  },
+  "todos": [],
+  "notes": ""
+}
