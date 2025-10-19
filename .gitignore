@@ -6,6 +6,10 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 xtra/
+unsorted
+xtra/
+# Runtime data
+.m8
 
 .vscode
 .DS_Store*
