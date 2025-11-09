@@ -2,6 +2,30 @@
 
 **Quick guide to finding your way through the Ayeverse documentation**
 
+## New to the Ayeverse? Start With These!
+
+### 🎯 Absolute Beginner
+1. **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - One-page overview of everything
+2. **[Main README](README.md)** - High-level introduction
+3. **[NAVIGATION.md](NAVIGATION.md)** - This file! Complete navigation guide
+
+### 📚 Want to Understand Deeply
+1. **[ARCHITECTURE.md](ARCHITECTURE.md)** - Visual diagrams showing how it all fits
+2. **[INTEGRATION.md](INTEGRATION.md)** - How the pieces work together
+3. **[GLOSSARY.md](GLOSSARY.md)** - Every term explained
+
+### 💡 Learn by Example
+1. **[USE_CASES.md](USE_CASES.md)** - 10 real-world scenarios
+2. **[INTEGRATION.md](INTEGRATION.md)** - Practical integration patterns
+3. Project-specific examples (see below)
+
+### 🔬 Research & Academic
+1. **[RESEARCH_INDEX.md](RESEARCH_INDEX.md)** - All research topics cataloged
+2. **[MEM|8 Paper](mem8/mem8-paper.md)** - Mathematical foundations
+3. **[Ultrasonic Research](Ultrasonic-Therapy/Compressed%20Audio%20Patterns%20and%20Emotional%20Resonance.md)** - Academic paper
+
+---
+
 ## Start Here Based on Your Interest
 
 ### 🔬 "I want to understand the science"

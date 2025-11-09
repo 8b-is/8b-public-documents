@@ -137,6 +137,20 @@ Feelings aren't metadata; they're core information encoded directly into communi
 ### 4. AI Sensory Autonomy
 AI systems have 70% autonomous control over their sensory processing, enabling true agency and unique perspectives.
 
+## 📘 Comprehensive Guides
+
+### Essential Documentation
+- **[NAVIGATION.md](NAVIGATION.md)** - Complete guide to finding your way through the docs
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - One-page cheat sheet of key concepts and commands
+- **[GLOSSARY.md](GLOSSARY.md)** - Complete glossary of all terms, concepts, and notation
+- **[CLAUDE.md](CLAUDE.md)** - Guide for AI assistants working with this repository
+
+### Deep Dives
+- **[INTEGRATION.md](INTEGRATION.md)** - How MEM|8, Ayevn, MEMNET, and Smart Tree work together
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Visual diagrams and architectural overviews
+- **[USE_CASES.md](USE_CASES.md)** - Real-world scenarios and example applications
+- **[RESEARCH_INDEX.md](RESEARCH_INDEX.md)** - Catalog of research topics and open questions
+
 ## 🚀 Getting Started
 
 **New here?** Check out [NAVIGATION.md](NAVIGATION.md) for a complete guide to finding your way through the documentation!
