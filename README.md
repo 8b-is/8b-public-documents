@@ -85,12 +85,9 @@ Revolutionary file system tools with 10-24× performance improvements.
 
 ## 🔬 Research & Development
 
-### Unsorted Documents
-Experimental papers and works in progress:
-- [MEM|8 Summary](unsorted/MEM8_summary.markdown)
-- [OpenRouter Integration](unsorted/OpenRouter%20Chat%20Thu%20Aug%2007%202025.md)
-- [Cursor MEM|8 Integration](unsorted/cursor_integrate_mem8_tex_into_the_proj.md)
-- [MEM|8 Reconstruction](unsorted/mem8-overview_reconstructed.md)
+### Experimental Research
+- **[Ultrasonic Therapy](Ultrasonic-Therapy/)** - Audio compression and emotional resonance
+- **[42: The Key of Imagination](42.MD)** - Philosophical breakthrough on consciousness and imagination
 
 ---
 
@@ -141,6 +138,8 @@ Feelings aren't metadata; they're core information encoded directly into communi
 AI systems have 70% autonomous control over their sensory processing, enabling true agency and unique perspectives.
 
 ## 🚀 Getting Started
+
+**New here?** Check out [NAVIGATION.md](NAVIGATION.md) for a complete guide to finding your way through the documentation!
 
 ### For Researchers
 1. Start with [MEM|8 Overview](mem8/README.md)
