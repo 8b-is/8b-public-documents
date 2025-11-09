@@ -85,12 +85,9 @@ Revolutionary file system tools with 10-24× performance improvements.
 
 ## 🔬 Research & Development
 
-### Unsorted Documents
-Experimental papers and works in progress:
-- [MEM|8 Summary](unsorted/MEM8_summary.markdown)
-- [OpenRouter Integration](unsorted/OpenRouter%20Chat%20Thu%20Aug%2007%202025.md)
-- [Cursor MEM|8 Integration](unsorted/cursor_integrate_mem8_tex_into_the_proj.md)
-- [MEM|8 Reconstruction](unsorted/mem8-overview_reconstructed.md)
+### Experimental Research
+- **[Ultrasonic Therapy](Ultrasonic-Therapy/)** - Audio compression and emotional resonance
+- **[42: The Key of Imagination](42.MD)** - Philosophical breakthrough on consciousness and imagination
 
 ---
 
@@ -140,7 +137,23 @@ Feelings aren't metadata; they're core information encoded directly into communi
 ### 4. AI Sensory Autonomy
 AI systems have 70% autonomous control over their sensory processing, enabling true agency and unique perspectives.
 
+## 📘 Comprehensive Guides
+
+### Essential Documentation
+- **[NAVIGATION.md](NAVIGATION.md)** - Complete guide to finding your way through the docs
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - One-page cheat sheet of key concepts and commands
+- **[GLOSSARY.md](GLOSSARY.md)** - Complete glossary of all terms, concepts, and notation
+- **[CLAUDE.md](CLAUDE.md)** - Guide for AI assistants working with this repository
+
+### Deep Dives
+- **[INTEGRATION.md](INTEGRATION.md)** - How MEM|8, Ayevn, MEMNET, and Smart Tree work together
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Visual diagrams and architectural overviews
+- **[USE_CASES.md](USE_CASES.md)** - Real-world scenarios and example applications
+- **[RESEARCH_INDEX.md](RESEARCH_INDEX.md)** - Catalog of research topics and open questions
+
 ## 🚀 Getting Started
+
+**New here?** Check out [NAVIGATION.md](NAVIGATION.md) for a complete guide to finding your way through the documentation!
 
 ### For Researchers
 1. Start with [MEM|8 Overview](mem8/README.md)
