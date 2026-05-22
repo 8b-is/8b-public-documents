@@ -1,0 +1,196 @@
+\chapter{Formal Specification of the RSVP Field System}
+\label{app:rsvp}
+
+\epigraph{The universe behaves less like a completed geometric sculpture and more
+like an ongoing constraint propagation process in which prior configurations
+continuously reshape future reachable manifolds.}{}
+
+\noindent The Relativistic Scalar-Vector Plenum (\RSVP) is a coupled field system
+providing the physical and mathematical substrate on which the Yarncrawler framework
+is grounded. This appendix develops the formal specification from first principles,
+states the seven governing axioms, presents the Lagrangian structure, and derives
+the field equations. Claim-status throughout: the cosmological applications are
+\textbf{[C]}; the field formalism as a modeling language for constraint propagation
+is \textbf{[H]}.
+
+\section{Field Definitions}
+
+\begin{definition}{RSVP Field Triple}
+The \RSVP field system is a triple $(\Phi, \mathbf{v}, S)$ of dynamical fields
+over a spacetime manifold $\mathcal{M}$:
+\begin{itemize}
+  \item $\Phi(\mathbf{x},t) \in \mathbb{R}$: the \emph{scalar density field},
+    encoding concentration, potential, legitimacy, or local capacity at each
+    spacetime point. High $\Phi$ corresponds to dense, stable, or energetically
+    accessible regions.
+  \item $\mathbf{v}(\mathbf{x},t) \in T_\mathbf{x}\mathcal{M}$: the \emph{vector
+    flow field}, encoding directed transport, trajectories, and causal propagation.
+    Flows along $\mathbf{v}$ define the admissible directions of system evolution.
+  \item $S(\mathbf{x},t) \in \mathbb{R}_{\geq 0}$: the \emph{entropy field},
+    encoding disorder, unresolved configurational accessibility, and complexity
+    budget. $S$ functions as the reservoir of unresolved structure available for
+    future reinterpretation.
+\end{itemize}
+\end{definition}
+
+\section{The Seven Axioms}
+
+\begin{axiom}{Non-negativity and Boundedness of Entropy}
+$S(\mathbf{x},t) \geq 0$ everywhere and for all $t$. Entropy cannot be negative.
+In regions of complete constraint satisfaction, $S \to 0$; in regions of maximal
+configurational uncertainty, $S$ is bounded by the local informational capacity
+of the field.
+\end{axiom}
+
+\begin{axiom}{Flow-Density Coupling}
+The vector field $\mathbf{v}$ is coupled to the scalar field $\Phi$ through
+the continuity relation:
+\[
+  \frac{\partial \Phi}{\partial t} + \nabla \cdot (\Phi\, \mathbf{v}) = \sigma_\Phi,
+\]
+where $\sigma_\Phi$ is a source/sink term encoding the creation or destruction of
+scalar density through constraint events. In the absence of constraint events,
+$\sigma_\Phi = 0$ and scalar density is conserved along flow lines.
+\end{axiom}
+
+\begin{axiom}{Entropy-Driven Flow}
+The vector field evolves under the influence of entropy gradients:
+\[
+  \frac{\partial \mathbf{v}}{\partial t} + (\mathbf{v}\cdot\nabla)\mathbf{v}
+  = -\nabla S + \mathbf{f}_{\rm ext},
+\]
+where $\mathbf{f}_{\rm ext}$ encodes external constraint forces. Flows are
+driven from high-entropy regions toward low-entropy regions: the system
+navigates toward configurations of greater constraint stability.
+\end{axiom}
+
+\begin{axiom}{Entropy Production and Relaxation}
+Entropy evolves through production and relaxation:
+\[
+  \frac{\partial S}{\partial t} + \nabla \cdot (S\,\mathbf{v})
+  = \Pi_S - \Lambda_S,
+\]
+where $\Pi_S \geq 0$ is the entropy production rate (irreversibility) and
+$\Lambda_S \geq 0$ is the entropy relaxation rate (constraint stabilization).
+The second law requires $\Pi_S \geq \Lambda_S$ globally, but local relaxation
+is possible at the cost of increased entropy elsewhere.
+\end{axiom}
+
+\begin{axiom}{Admissibility Constraint on Trajectories}
+A trajectory $\gamma(t)$ through the \RSVP field manifold is admissible if and
+only if it satisfies the local compatibility conditions imposed by all three
+fields simultaneously:
+\[
+  \mathbf{v}(\gamma(t),t) \cdot \nabla S(\gamma(t),t) \leq 0,
+\]
+that is, admissible trajectories do not move against the entropy gradient. They
+flow from higher to lower local entropy, or along isoentropic surfaces.
+\end{axiom}
+
+\begin{axiom}{Structural Residue Accumulation}
+The fields accumulate structural residue across time: prior field configurations
+influence future evolution through path-dependent coupling terms. Define the
+residue field:
+\[
+  \mathcal{R}(\mathbf{x},t) = \int_{-\infty}^{t} K(t-t')\,
+  \Phi(\mathbf{x},t')\,dt',
+\]
+where $K(t-t')$ is a memory kernel with $K(\tau) \to 0$ as $\tau \to \infty$.
+The residue field enters the Lagrangian as a history-dependent potential,
+ensuring that the present state inherits structure from prior configurations.
+\end{axiom}
+
+\begin{axiom}{Semantic Interpretability}
+Under the semantic interpretation developed in Chapter~\ref{ch:yarncrawler_formal},
+the \RSVP fields map to:
+\begin{itemize}
+  \item $\Phi$: semantic density, knowledge concentration, or accumulated
+    legitimacy in a representational system.
+  \item $\mathbf{v}$: recursive trajectories of meaning, directed inference
+    flows, or causal propagation of conceptual updates.
+  \item $S$: unresolved noise available for future reinterpretation; the
+    non-trivial cohomological residue of the sheaf-theoretic framework.
+\end{itemize}
+This semantic interpretation does not require the cosmological interpretation
+to be valid. The field formalism functions as a modeling language independently
+of its physical instantiation claims.
+\end{axiom}
+
+\section{The Lagrangian Structure}
+
+The \RSVP dynamics are generated by the Lagrangian density:
+\[
+  \mathcal{L}_{\rm RSVP} = \mathcal{L}_\Phi + \mathcal{L}_v + \mathcal{L}_S
+  + \mathcal{L}_{\rm int},
+\]
+where the component terms are:
+\begin{align}
+  \mathcal{L}_\Phi &= \frac{1}{2}(\partial_t \Phi)^2 - \frac{c_\Phi^2}{2}|\nabla\Phi|^2
+    - V(\Phi), \\
+  \mathcal{L}_v &= \frac{\rho_v}{2}|\partial_t \mathbf{v}|^2
+    - \frac{\mu_v}{2}|\nabla \times \mathbf{v}|^2, \\
+  \mathcal{L}_S &= -S\log S + \frac{\kappa_S}{2}|\nabla S|^2, \\
+  \mathcal{L}_{\rm int} &= -\lambda_{\Phi S}\,\Phi\,S
+    - \lambda_{vS}\,\mathbf{v}\cdot\nabla S
+    - \lambda_{\mathcal{R}}\,\mathcal{R}\,\Phi.
+\end{align}
+The coupling constants $\lambda_{\Phi S}$, $\lambda_{vS}$, $\lambda_{\mathcal{R}}$
+govern the interaction strengths between the three fields and the residue term.
+The potential $V(\Phi)$ may take various forms depending on the application
+domain; for the cosmological interpretation, $V(\Phi) = \frac{m^2}{2}\Phi^2 +
+\frac{\lambda}{4}\Phi^4$ is a symmetry-breaking potential.
+
+Variation of $\mathcal{L}_{\rm RSVP}$ with respect to each field yields the
+Euler-Lagrange equations, which reduce to the axiom-specified evolution equations
+under the appropriate coupling limits.
+
+\section{Cosmological Application}
+\label{app:rsvp:cosmo}
+
+\claimC Under the cosmological interpretation, expansion is replaced by entropic
+relaxation. The scalar field $\Phi$ encodes matter density; the entropy field $S$
+replaces the scale factor as the primary measure of cosmic evolution; and $\mathbf{v}$
+encodes the peculiar velocity field of matter.
+
+Cosmological redshift on this interpretation arises from photons traversing
+entropy gradients:
+\[
+  z_{\rm RSVP} \approx \int_0^L \kappa\,|\nabla S(\ell)|\,d\ell,
+\]
+where $\kappa$ is a coupling constant relating entropy gradient to energy loss
+and $L$ is the path length. This formula makes distinct observational predictions
+from $\Lambda$CDM at $k \gtrsim 0.1\,h/\text{Mpc}$ and at the Silk damping scale.
+
+\claimC Gravity on this interpretation emerges as entropy descent: the
+gravitational acceleration of a test body is proportional to $-\nabla S$ at
+leading order, so that matter falls toward entropy minima rather than toward
+mass concentrations in the conventional sense. The connection to the MOND
+phenomenological transition---the observed departure from Newtonian dynamics
+at low accelerations---is that the entropy gradient structure of the $S$ field
+exhibits a characteristic scale at which the gradient profile transitions from
+the high-acceleration regime (tracking baryonic density closely) to the
+low-acceleration regime (governed by the large-scale entropy field topology).
+
+All cosmological claims in this appendix carry status \textbf{[C]} and require
+independent observational validation. The field formalism itself is independent
+of these applications.
+
+\section{Derived Stacks and the Four Projection Modes}
+
+The companion paper \emph{Axioms for a Falling Universe} develops four derived
+stacks from the \RSVP Lagrangian, corresponding to four projection modes of the
+field system onto different observable domains:
+\begin{enumerate}
+  \item \textbf{Thermodynamic stack}: projection onto entropy production and
+    relaxation dynamics; yields predictions about large-scale structure formation
+    timescales.
+  \item \textbf{Kinetic stack}: projection onto flow field statistics; yields
+    predictions about peculiar velocity distributions.
+  \item \textbf{Informational stack}: projection onto the residue field; yields
+    predictions about persistence timescales and structural memory.
+  \item \textbf{Semantic stack}: projection onto the symbolic interpretation;
+    yields the Yarncrawler dynamics of Chapter~\ref{ch:yarncrawler_formal}.
+\end{enumerate}
+The four stacks are not independent theories but coordinate representations of
+the same underlying field system, related by the transition maps of the semantic
+atlas introduced in Chapter~\ref{ch:manifold}.

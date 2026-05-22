@@ -1,0 +1,124 @@
+\chapter{Obstruction Cohomology and Katz-Admissibility}
+\label{app:obstruction}
+
+\noindent This appendix develops the mathematical background for the
+sheaf-theoretic institutional failure analysis of
+Chapter~\ref{ch:social_institutional}. The central question is: under what
+conditions do locally consistent solutions resist extension to globally consistent
+ones? The answer is given by obstruction cohomology.
+
+\section{The Local-to-Global Extension Problem}
+
+Let $X$ be a topological space modeling an institutional domain (a regulatory
+jurisdiction, a multi-department organization, or a federated system of
+governance). Let $\mathcal{U} = \{U_i\}_{i \in I}$ be a cover of $X$ by
+overlapping local domains.
+
+\begin{definition}{Local Solution}
+A \emph{local solution} on $U_i$ is a section $s_i \in \mathcal{S}(U_i)$
+of a sheaf $\mathcal{S}$ that satisfies the operational requirements
+specified for domain $U_i$. A collection of local solutions $\{s_i\}_{i \in I}$
+is \emph{compatible} on overlaps if for all $i, j$:
+\[
+  \rho^{U_i}_{U_i \cap U_j}(s_i) = \rho^{U_j}_{U_i \cap U_j}(s_j),
+\]
+where $\rho$ denotes the restriction maps of the sheaf.
+\end{definition}
+
+A globally consistent solution is a global section $s \in \mathcal{S}(X)$
+restricting to each $s_i$. The central theorem is that compatible local solutions
+do not always extend to global sections: the obstruction is measured by the
+first cohomology group $H^1(X, \mathcal{S})$.
+
+\section{The Čech Cohomology Construction}
+
+For a cover $\mathcal{U}$, define the Čech cochain groups:
+\begin{align}
+  C^0(\mathcal{U}, \mathcal{S}) &= \prod_{i} \mathcal{S}(U_i), \\
+  C^1(\mathcal{U}, \mathcal{S}) &= \prod_{i < j} \mathcal{S}(U_i \cap U_j), \\
+  C^2(\mathcal{U}, \mathcal{S}) &= \prod_{i < j < k} \mathcal{S}(U_i \cap U_j \cap U_k).
+\end{align}
+
+The coboundary map $\delta: C^0 \to C^1$ is defined by:
+\[
+  (\delta s)_{ij} = \rho^{U_j}_{U_i \cap U_j}(s_j) - \rho^{U_i}_{U_i \cap U_j}(s_i).
+\]
+
+A collection of local solutions is compatible if and only if $\delta s = 0$,
+that is, it is a Čech 0-cocycle. The global extension exists if and only if
+the cocycle is also a coboundary: $s = \delta t$ for some $t \in C^{-1}$
+(which reduces to the condition that the collection arises from a global section).
+
+The obstruction group is:
+\[
+  H^1(\mathcal{U}, \mathcal{S}) = \ker(\delta: C^1 \to C^2) / \mathrm{im}(\delta: C^0 \to C^1).
+\]
+
+A non-trivial element of $H^1$ is a compatible family of local solutions that
+cannot be assembled into a global section. It is exactly a Katz-inadmissible
+configuration.
+
+\section{Katz-Admissibility Revisited}
+
+\begin{definition}{Katz-Admissibility (Formal)}
+An institutional configuration $\{s_i\}_{i \in I}$ is \emph{Katz-admissible}
+if its associated Čech 1-cocycle $[\delta s] \in H^1(\mathcal{U}, \mathcal{S})$
+is trivial. Equivalently, the local solutions extend to a global section of
+$\mathcal{S}$ over the entire institutional domain $X$.
+
+An institution is \emph{Katz-inadmissible} if $H^1(\mathcal{U}, \mathcal{S})$
+is non-trivial and the current configuration represents a non-trivial element
+of this group.
+\end{definition}
+
+\begin{proposition}{Persistence of Katz-Inadmissibility}
+If an institutional configuration is Katz-inadmissible, then no local reform
+within any single domain $U_i$ can resolve the obstruction. Resolution requires
+either: (i) modifying the sheaf $\mathcal{S}$ (changing the compatibility
+requirements themselves), (ii) refining the cover $\mathcal{U}$ (restructuring
+domain boundaries), or (iii) accepting that no globally consistent operation
+exists and managing the resulting incoherence explicitly.
+\end{proposition}
+
+\begin{proof}[Sketch]
+A non-trivial element of $H^1$ is by definition not in the image of $\delta:
+C^0 \to C^1$. Modifying $s_i$ within $U_i$ alone changes the $C^0$ element
+but does not change the cohomology class of the resulting 1-cocycle, since the
+class depends on the mismatch at overlaps, not on the individual sections.
+Local reform within $U_i$ can change $s_i$ but cannot change the compatibility
+structure at $U_i \cap U_j$ if $s_j$ is not simultaneously reformed. And if
+$s_j$ must also be reformed, the problem has escaped the domain of local reform.
+\end{proof}
+
+\section{Higher Obstructions}
+
+\claimC The higher cohomology groups $H^k$ for $k \geq 2$ encode deeper
+structural obstructions. A non-trivial $H^2$ class indicates that even after
+resolving all pairwise overlaps between domains, the triple overlaps
+$U_i \cap U_j \cap U_k$ impose additional compatibility requirements that
+resist satisfaction simultaneously.
+
+In institutional terms, $H^2$ obstructions correspond to cases where three
+departments can each be pairwise reconciled but cannot all three operate
+consistently simultaneously---coordination failures that appear only when
+three-way interaction is considered. Such obstructions can exist even when
+every pairwise conflict has been locally resolved.
+
+\section{Worked Example: A Three-Department Institution}
+
+\claimP Let $X$ be an institution with three departments $A$, $B$, $C$, each
+covering a domain $U_A$, $U_B$, $U_C$ with overlaps. Suppose:
+\begin{itemize}
+  \item $A$ and $B$ are compatible on $U_A \cap U_B$: their operational
+    procedures agree.
+  \item $B$ and $C$ are compatible on $U_B \cap U_C$.
+  \item $A$ and $C$ are compatible on $U_A \cap U_C$.
+\end{itemize}
+This appears to be a situation with no conflicts. Yet if the sheaf $\mathcal{S}$
+is non-abelian (if the order of operations matters), pairwise compatibility does
+not imply global consistency. The triple overlap $U_A \cap U_B \cap U_C$ may
+impose a consistency condition that the pairwise agreements jointly violate.
+
+The resulting $H^2$ obstruction explains why the institution experiences
+recurring coordination failures that no bilateral negotiation can resolve:
+the problem is topological, not interpersonal.

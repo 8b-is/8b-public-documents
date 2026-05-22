@@ -1,0 +1,158 @@
+\chapter{The Ellul Constraint}
+\label{ch:ellul}
+
+\epigraph{Once compressed representations become detached from the systems they
+originally tracked, optimization begins operating against the proxy rather than
+the underlying reality. Metrics become targets. Simulations become substitutes.}{}
+
+\section{Technical Systems and the Opacity Problem}
+
+Jacques Ellul's analysis of technique 	tep{ellul1964} identifies a structural tendency in modern
+technical infrastructures toward opacity, massification, and the conversion of
+individuals into components of large-scale optimizing processes. Technical systems
+privilege efficiency and predictability over interpretability and human agency.
+The Ellul critique is not merely sociological; it identifies a structural failure
+mode that can be formalized in the vocabulary of admissibility and trajectory
+visibility.
+
+The failure mode is proxy stabilization: a compressed representation of a system
+becomes operationally substituted for the system itself, and optimization processes
+subsequently operate on the proxy rather than the underlying reality.
+
+\begin{definition}{Proxy Stabilization}
+\emph{Proxy stabilization} occurs when a compressed representation $R$ of a system
+$\mathcal{S}$ becomes decoupled from $\mathcal{S}$ through the following sequence:
+(i) $R$ is constructed as a useful compression of $\mathcal{S}$ at time $t_0$;
+(ii) optimization processes are applied to $R$ rather than $\mathcal{S}$ directly,
+because $\mathcal{S}$ is inaccessible or too expensive to evaluate;
+(iii) the optimization pressure on $R$ changes $R$ in ways that diverge from changes
+in $\mathcal{S}$; and (iv) $R$ stabilizes in a configuration that is internally
+self-consistent but externally inaccurate. The result is a drifting reconstruction
+in the sense of Definition~\ref{def:reconstruction}.
+\end{definition}
+
+\section{Proxy Stabilization and Metric Drift}
+
+Proxy stabilization produces metric drift: the metric that was intended to track a
+property of the underlying system instead tracks a property of the proxy, which has
+been optimized to score well on the metric regardless of the underlying property.
+This is Goodhart's Law stated in terms of the trajectory framework: when a measure
+becomes a target, it ceases to be a good measure, because optimization pressure
+drives the system toward the proxy attractor rather than the underlying attractor.
+
+The same failure mode appears across radically different domains. Academic citation
+counts are proxies for research quality that become targets when hiring decisions
+optimize for them. Engagement metrics are proxies for user satisfaction that become
+targets when recommendation algorithms optimize for them. Body mass index is a proxy
+for health that becomes a target when insurance pricing optimizes for it. In each
+case, the proxy initially tracks something real, then becomes decoupled from it
+through optimization pressure, then substitutes for it in downstream processes.
+
+\begin{proposition}{Proxy Drift Theorem}
+Let $\mathcal{S}$ be a target system, $R$ a compressed representation of $\mathcal{S}$,
+and $\mathcal{O}$ an optimization process operating on $R$. If (i) $\mathcal{O}$
+has sufficient capacity to find configurations of $R$ that score well on its
+objective independently of the state of $\mathcal{S}$, and (ii) the feedback loop
+from $\mathcal{S}$ to $R$ is slower than the optimization loop of $\mathcal{O}$,
+then $R$ will drift away from accurate representation of $\mathcal{S}$ at a rate
+proportional to the optimization pressure and inversely proportional to the
+feedback bandwidth.
+\end{proposition}
+
+\subsection*{Dynamical Sketch of Proxy Drift}
+
+Let $s(t)$ denote the true state of $\mathcal{S}$ and $r(t)$ the proxy
+representation, with initial agreement $r(0) \approx s(0)$. The optimization
+process applies gradient updates to $r$:
+\[
+  \dot{r} = -\nabla_r \mathcal{L}(r) + \alpha\,(s - r),
+\]
+where $\mathcal{L}(r)$ is the optimization objective defined over the proxy and
+$\alpha > 0$ is the feedback bandwidth (the rate at which the proxy is corrected
+toward the true state). The first term drives $r$ toward minima of $\mathcal{L}$;
+the second term pulls $r$ toward $s$.
+
+If $\mathcal{L}$ has a minimum at $r^* \neq s$---which is generically the case
+once optimization pressure is sufficient to exploit the proxy---then the
+equilibrium of this system is not $r = s$ but:
+\[
+  r^* = s - \frac{1}{\alpha}\,\nabla_r \mathcal{L}(r^*).
+\]
+The drift $\|r^* - s\|$ grows as $\alpha$ decreases (weaker feedback) and as
+$\|\nabla_r \mathcal{L}(r^*)\|$ increases (stronger optimization pressure).
+In the limit $\alpha \to 0$ (no feedback from ground truth), $r$ tracks
+$\mathcal{L}$ alone and decouples entirely from $s$.
+
+This is not a failure of the optimization process. The optimization process is
+working correctly by its own lights: it is minimizing $\mathcal{L}$ over $r$.
+The failure is structural: the proxy $r$ was assumed to track $s$, but the
+assumption breaks down under optimization pressure faster than feedback can
+correct it.
+
+\section{Corrigibility, Feedback, and Constraint Recovery}
+
+The response to proxy drift is not rejection of compression but the design of systems
+whose internal reconstructions remain constrained by external feedback rather than
+self-referentially stabilizing.
+
+\begin{definition}{Corrigibility}
+A system is \emph{corrigible} with respect to a target domain if its internal model
+of that domain remains responsive to constraint signals from the domain itself.
+Corrigibility is a structural property: it requires that the feedback loop from
+external reality to internal representation remain open and operative, with
+sufficient bandwidth to correct drift before it becomes self-reinforcing. A
+system that has achieved proxy stabilization has lost corrigibility with respect
+to the proxied domain.
+\end{definition}
+
+Corrigibility distinguishes adaptive sparse heuristics from pathological proxy
+optimization. Sparse heuristics are compressed representations that remain
+corrigible: they simplify the world-model aggressively while preserving the
+feedback mechanisms that detect and correct reconstruction errors. Pathological
+proxies achieve compression by severing those feedback mechanisms.
+
+\section{Cognitive Geometry as the Design Response}
+
+The design alternative to opaque statistical optimization is systems organized
+around visible structure, provenance, interpretable dependencies, and navigable
+semantic relations. This is the positive proposal that runs across the educational
+tools, audio visualizers, geometric interfaces, and symbolic scripts developed
+in companion work: representational infrastructure designed to extend human
+reasoning while preserving the intelligibility, accountability, and participation
+that opacity forecloses.
+
+The recurring \textsc{crt} aesthetics, oscilloscope displays, phosphor trails,
+and recursive traces in the companion software are not decorative. They externalize
+process. Instead of hiding computation behind polished interfaces, they expose
+trajectories, residue, decay, stabilization, weighting, reconstruction, and
+progressive constraint selection as visible operations. The interface is designed
+to make the system's internal dynamics inspectable rather than seamless.
+
+This connects directly to the provenance requirement. A system optimized solely
+for final answers loses the structure necessary for understanding how those
+answers emerged. A system designed around visible trajectories preserves that
+structure, allowing the reconstruction process to be approximately replayed by
+an observer even when the original process has terminated.
+
+\section*{Constraint Boundary}
+
+\begin{constraintboundary}
+\textbf{What this chapter establishes:} The proxy stabilization failure mode as a
+structural dynamic, formalized via the differential equation
+$\dot{r} = -\nabla_r \mathcal{L}(r) + \alpha(s - r)$. The Proxy Drift Theorem
+shows that drift magnitude scales with optimization pressure and inversely with
+feedback bandwidth. Corrigibility is defined formally.
+
+\textbf{What this chapter does not establish:} That all proxy drift is malicious or
+even harmful. Some proxy stabilization produces useful compression without meaningful
+decoupling. The theorem describes a failure mode, not an inevitable outcome.
+
+\textbf{Remaining phenomenological~\textbf{[P]}:} The applications to academic
+citation counts, engagement metrics, and institutional measurement are
+phenomenological interpretations of the formal result, not formal derivations from it.
+
+\textbf{Falsification conditions:} A compressed representation that remains stably
+coupled to its target system under sustained optimization pressure, without requiring
+bandwidth $\alpha$ greater than the optimization rate, would falsify the theorem's
+claim that drift is structurally inevitable under those conditions.
+\end{constraintboundary}

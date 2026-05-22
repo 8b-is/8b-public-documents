@@ -1,0 +1,188 @@
+\chapter{Ecological, Cultural, and Computational Projections}
+\label{ch:ecological_cultural}
+
+\epigraph{Across ecological, cultural, and artificial domains, the invariant dynamic
+is stigmergic reinforcement coupled to Markov blanket repair.}{}
+
+\section{The Spectrum from Squirrel to Language Model}
+
+The Yarncrawler principle is that agents do not merely consume; they weave, cache, and
+repair. Each action leaves a trace that both satisfies immediate needs and sets the
+stage for recursive self-maintenance. This dynamic recurs across ecological, cultural,
+and computational scales. The invariants under this scale change are the \RSVP field
+correspondences: $\Phi$ measures accumulated deposits, $\mathbf{v}$ encodes recursive
+flows, and $S$ quantifies robustness.
+
+\section{Ecological Yarncrawlers}
+
+A squirrel does not carry a metric map of its forest. Its survival depends on weighted
+affordances: gradients of safety, concealment, and food density blurred across its
+perceptual field. When hungry, it follows Gaussian-blurred gradients toward likely
+caches rather than performing global optimization. Its over-provisioning of seeds is
+not an error but the creation of semantic attractors---distributed caches that stabilize
+its future viability.
+
+The perceived affordance field is $\psi(x) = (G_\sigma * u)(x)$ where $u(x)$ is the
+distribution of hidden resources and $G_\sigma$ is a Gaussian smoothing kernel.
+Foraging dynamics are $\dot{x}(t) = -\nabla\psi(x) + \eta(t)$. Each cache deposit
+increments $u(x_k)$, making the field the squirrel uses simultaneously a navigation
+tool and a stigmergic memory. The forest itself becomes a distributed memory field,
+with excess ensuring robustness against local failure.
+
+\section{Cultural Yarncrawlers}
+
+Cultural Yarncrawlers instantiate the same principles at a larger scale. In Amazonian
+communities, household waste was exported to boundary piles that grew fertile through
+microbial and chemical processes. Once above a critical threshold, these berms
+self-maintained, attracting further deposition and forming Voronoi-like tessellations
+of territory. The resulting terra preta soils persist for millennia.
+
+The governing dynamics are analyzed in the companion paper \emph{Yarncrawler in
+Action} through a system of reaction-advection-diffusion equations for berm biomass
+$B$, char matrix $C$, and nutrients $N$. The stigmergic threshold condition
+$\alpha_B \langle S \rangle_{A_\tau} > \delta_B \theta_{\rm eff}$ formalizes the
+transition from fragile deposition to self-maintaining growth.
+
+\section{Artificial Yarncrawlers}
+
+Mixture-of-Experts architectures and retrieval-augmented generation instantiate the
+Yarncrawler principle computationally. Each expert module functions as a local chart
+on the semantic manifold. Retrieval mechanisms act as stigmergic glue: a memory trace
+that is frequently retrieved becomes more salient, just as a cairn or berm attracts
+additional reinforcement. The global semantic field is assembled from local expert
+densities by $\Phi(x) = \sum_i w_i(x)\varphi_i(x)$.
+
+The key distinction from standard MoE/RAG architectures is that the repair mechanisms
+of a Yarncrawler reconfigure the modules themselves rather than only gating access to
+them. The semantic structure is continuous and trajectory-based, modeled by sheaf
+gluing and \RSVP fields, rather than discrete or static.
+
+\section{The Climate Response as Worked Example}
+
+The read-evaluate-write-move loop provides the clearest operational instantiation of
+the \KES map $\Omega_t \to H_{t+1}$ anywhere in the corpus. Consider a Yarncrawler
+deployed across a coastal region:
+
+\medskip
+\noindent\textbf{Node 1 (Seattle):} Reads rising sea levels and failing levees.
+Evaluates that current barriers are underfunded. Writes a plan to redirect local
+taxes to infrastructure. Moves to Node 2, carrying the tax-redirection strategy
+as a candidate fix for other urban nodes.
+
+\noindent\textbf{Node 2 (Olympic National Forest):} Reads increased wildfire risk.
+Evaluates that invasive species are worsening fire behavior. Writes a schedule for
+controlled burns and native replanting. Moves to Node 3.
+
+\noindent\textbf{Node 3 (Portland):} Reads heatwave data. Evaluates that cooling
+centers are overcrowded. Writes a policy to expand public cooling spaces, using
+lessons from Seattle's resource allocation. Moves to Node 4.
+\medskip
+
+The Yarncrawler learns that tax redirection from Seattle outperforms Portland's
+grant-based model and applies this to future urban nodes. It notes that controlled
+burns require longer monitoring cycles, refining its repair strategy for other
+forest nodes. The trail of fixes constitutes a semantic ledger of the reasoning
+trajectory---what the companion framework calls Chain of Memory.
+
+\section{Forests as Distributed Constraint Networks}
+\label{sec:forests}
+
+\claimP Forests may be understood not as collections of isolated organisms but as
+dynamically coupled systems in which constraint propagation occurs across multiple
+interacting substrates simultaneously. Nutrient flow, signaling gradients, fungal
+mediation, root competition, hydrological coupling, and atmospheric exchange
+together generate a distributed regulatory field whose structure evolves over time
+through repeated interaction.
+
+Large persistent trees function not as centrally intelligent agents issuing
+commands but as highly connected constraint hubs embedded within long-lived
+ecological trajectories. Their historical persistence grants them unusually large
+influence over local energetic accessibility conditions, nutrient distributions,
+and signaling pathways. The resulting forest architecture behaves less like a
+hierarchy of independent individuals and more like a partially shared admissibility
+manifold in which the actions of one region alter the reachable futures of
+neighboring regions.
+
+\subsection{Kin Recognition as Constraint Compatibility}
+
+Observed forms of kin recognition in forests need not imply anthropomorphic
+intentionality. They may instead be interpreted as local compatibility detection
+across coupled biochemical and structural histories. Root exudates act as
+persistent chemical signatures encoding developmental and metabolic history.
+
+\claimP Let $K(x_i,x_j)$ represent compatibility between organisms $x_i$ and
+$x_j$. Rather than functioning as symbolic recognition, compatibility emerges from
+overlap in biochemical trajectory structure:
+\[
+  K(x_i,x_j) = \exp\bigl(-\alpha D(H_i,H_j)\bigr),
+\]
+where $H_i$, $H_j$ denote historical biochemical configurations and $D$ measures
+divergence between developmental trajectories. High compatibility corresponds to
+reduced energetic conflict and increased exchange stability. Kin recognition
+becomes a consequence of reduced incompatibility across historically related
+developmental systems rather than explicit semantic identification.
+
+\subsection{Mycorrhizal Networks as Ecological Routing Structures}
+
+\claimP Mycorrhizal fungal systems may be interpreted as distributed transport
+and signaling infrastructures that dynamically route energetic and informational
+gradients throughout ecological space. The fungal substrate forms a continuously
+adapting conductive geometry whose topology evolves in response to nutrient
+pressure, environmental instability, and local metabolic demand.
+
+Let the ecological transport graph be $G = (V,E)$, where vertices represent
+organisms and edges represent fungal transport pathways. Resource transfer between
+nodes can be modeled as constrained diffusion:
+\[
+  \frac{dR_i}{dt} = \sum_j w_{ij}(R_j - R_i) - \lambda_i R_i,
+\]
+where $R_i$ denotes local resource density and $w_{ij}$ encodes effective
+conductive coupling strength. The network redistributes energetic accessibility
+according to dynamic structural conditions rather than fixed optimization targets.
+
+\subsection{Preferential Allocation and Developmental Stabilization}
+
+\claimP Preferential transfer of carbon and nutrients toward younger saplings may
+be interpreted as stabilization of nearby developmental trajectories. Young
+organisms occupy fragile regions of ecological state space characterized by high
+instability and low energetic accessibility. Transfers from persistent mature trees
+locally reduce developmental volatility by expanding the reachable future states
+available to saplings during early growth.
+
+Define developmental stability as $S_d(x,t) = 1/(1+\sigma(x,t))$ where
+$\sigma(x,t)$ measures local environmental volatility. Resource transfer functions
+then preferentially amplify trajectories with low stability:
+\[
+  T_{ij} = K(x_i,x_j) \cdot \frac{1}{S_d(x_j,t)+\epsilon}.
+\]
+Persistent ecological structures naturally redistribute resources toward unstable
+neighboring trajectories whose collapse would reduce overall network continuity.
+
+\subsection{Ecological Memory and Structural Residue}
+
+\claimP Forests accumulate persistent structural residue across timescales far
+beyond individual organisms. Nutrient pathways, fungal geometries, soil chemistry,
+canopy distributions, and hydrological routing collectively encode traces of prior
+ecological interaction. This is ecological memory physically embedded within
+evolving substrate---not symbolic or representational but infrastructural.
+Previous interactions reshape the future accessibility structure of the environment
+itself. Ecological intelligence, on this reading, emerges not from centralized
+cognition but from long-horizon stabilization across recursively interacting
+constraint systems.
+
+\begin{constraintboundary}
+\textbf{Status:~\textbf{[P]}} These interpretations are phenomenological
+applications of the trajectory-admissibility framework to ecological systems.
+They are supported by empirical forest ecology and mycorrhizal network research
+but are not derived from those fields.
+
+\textbf{Not claimed:} That forests possess consciousness, that kin recognition
+is semantic, or that mycorrhizal networks function as computational systems in
+the technical sense.
+
+\textbf{Falsification:} A demonstration that nutrient redistribution in forest
+networks is better explained by simple diffusion gradients without compatibility
+modulation would weaken the constraint-compatibility interpretation of kin
+recognition. Absence of preferential transfer toward low-stability saplings
+under controlled conditions would weaken the developmental stabilization claim.
+\end{constraintboundary}

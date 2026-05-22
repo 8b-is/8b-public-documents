@@ -1,0 +1,97 @@
+% ── Section titling ─────────────────────────────────────────
+
+% Part
+\titleformat{\part}[display]
+  {\centering\normalfont\huge\bfseries\color{Ortyx@rule}}
+  {\color{Ortyx@subtle}\rule{0.4\textwidth}{0.4pt}\\[6pt]
+   \normalfont\large\scshape\color{Ortyx@neutral}Part \thepart}
+  {12pt}{\vspace{4pt}}
+  [\vspace{8pt}\color{Ortyx@subtle}\rule{0.4\textwidth}{0.4pt}]
+
+% Chapter
+\titleformat{\chapter}[display]
+  {\normalfont\LARGE\bfseries\color{Ortyx@rule}}
+  {\color{Ortyx@neutral}\normalfont\small\scshape
+   \chaptertitlename\ \thechapter}
+  {8pt}
+  {\vspace{2pt}{\color{Ortyx@rule}\rule{\textwidth}{0.6pt}}\vspace{8pt}}
+  [{\color{Ortyx@subtle}\rule{\textwidth}{0.3pt}}]
+
+\titlespacing*{\chapter}{0pt}{-20pt}{30pt}
+
+% Section
+\titleformat{\section}
+  {\normalfont\large\bfseries\color{Ortyx@rule}}
+  {\thesection}{1em}{}
+
+% Subsection
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries\color{Ortyx@accent}}
+  {\thesubsection}{1em}{}
+
+% Subsubsection
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\itshape\color{Ortyx@neutral}}
+  {\thesubsubsection}{1em}{}
+
+\titlespacing*{\section}      {0pt}{18pt plus 4pt minus 2pt}{8pt plus 2pt}
+\titlespacing*{\subsection}   {0pt}{14pt plus 3pt minus 2pt}{6pt plus 1pt}
+\titlespacing*{\subsubsection}{0pt}{10pt plus 2pt minus 1pt}{4pt plus 1pt}
+
+% ── Headers and footers ─────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\color{Ortyx@neutral}\itshape The Ortyx Protocol}
+\fancyhead[RO]{\small\color{Ortyx@neutral}\itshape\nouppercase{\rightmark}}
+\fancyfoot[LE,RO]{\small\color{Ortyx@neutral}\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\headrule}{{\color{Ortyx@subtle}\hrule width\headwidth height\headrulewidth}}
+\renewcommand{\footrulewidth}{0pt}
+
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyfoot[LE,RO]{\small\color{Ortyx@neutral}\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+% ── Epigraphs ───────────────────────────────────────────────
+\setlength{\epigraphwidth}{0.72\textwidth}
+\setlength{\epigraphrule}{0.3pt}
+\renewcommand{\epigraphflush}{flushright}
+\renewcommand{\sourceflush}{flushright}
+\renewcommand{\textflush}{flushright}
+
+% ── Captions ────────────────────────────────────────────────
+\captionsetup{
+  font      = {small,color=Ortyx@neutral},
+  labelfont = {bf,color=Ortyx@rule},
+  labelsep  = period,
+  width     = 0.92\textwidth
+}
+
+% ── Lists ───────────────────────────────────────────────────
+\setlist{nosep,leftmargin=*,itemsep=3pt}
+\setlist[itemize,1]{label=\textcolor{Ortyx@accent}{---}}
+\setlist[enumerate,1]{label=\textcolor{Ortyx@neutral}{\arabic*.}}
+
+% ── Code listings ───────────────────────────────────────────
+\lstset{
+  basicstyle   = \ttfamily\small,
+  breaklines   = true,
+  keepspaces   = true,
+  frame        = single,
+  rulecolor    = \color{Ortyx@subtle},
+  commentstyle = \color{Ortyx@neutral}\itshape,
+  keywordstyle = \color{Ortyx@rule}\bfseries,
+  stringstyle  = \color{Ortyx@salvage},
+  numbers      = left,
+  numberstyle  = \tiny\color{Ortyx@neutral},
+  numbersep    = 8pt,
+  tabsize      = 2
+}
+
+% ── Widow/orphan control ────────────────────────────────────
+\widowpenalty        = 10000
+\clubpenalty         = 10000
+\brokenpenalty       = 4000
+\displaywidowpenalty = 10000

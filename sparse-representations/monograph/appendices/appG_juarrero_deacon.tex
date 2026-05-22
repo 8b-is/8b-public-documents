@@ -1,0 +1,138 @@
+\chapter{Juarrero and Deacon: Framework Comparisons}
+\label{app:juarrero_deacon}
+
+\noindent This appendix situates the process ontology of this monograph relative
+to two major contemporary accounts of emergence, constraint causation, and
+intentionality: Alicia Juarrero's constraint-based dynamics and Terrence Deacon's
+absential organization. Both influence the framework developed here; neither
+is adopted wholesale. The differences are philosophical load-bearing rather
+than terminological.
+
+\section{Juarrero: Context-Sensitive Constraints}
+
+Juarrero's central contribution in \emph{Dynamics in Action} \citep{juarrero1999} is the
+distinction between first-order and second-order constraints. First-order constraints
+are boundary conditions that limit the range of possible system states directly.
+Second-order constraints are context-sensitive: they alter the probability
+distribution over future states rather than eliminating possibilities outright.
+Juarrero argues that intentional behavior is best understood as second-order
+constraint causation: the meaning of an action is determined by the context that
+constrains which actions are admissible, not by the intrinsic properties of the
+action itself.
+
+\textbf{Points of convergence with the present framework:}
+
+The trajectory-admissibility framework is continuous with Juarrero's account.
+Admissible trajectories are exactly the states that survive the imposition of
+both first-order and second-order constraints. The historical accumulation of
+constraints---the decreasing filtration $\mathcal{A}(\mathcal{C}_0) \supseteq
+\mathcal{A}(\mathcal{C}_1) \supseteq \ldots$---is a formalization of what
+Juarrero means by context-sensitive constraint accumulation. The \RSVP entropy
+field $S$ functions as a measure of residual second-order constraint: regions
+of high $S$ are regions where the contextual constraints have not yet settled
+into a stable pattern.
+
+\textbf{Points of divergence:}
+
+Juarrero's account sometimes approaches a strong reading on which second-order
+constraints are themselves causally productive---on which the context does not
+merely filter but actively contributes causal force to the outcomes it shapes.
+The present framework takes a more deflationary position: constraints are
+eliminative rather than productive. They remove inadmissible trajectories but
+do not add new causal forces. Apparent goal-directedness is a consequence of
+what has been eliminated, not of any positive force directed toward a target.
+This is a subtle but important difference in the direction of causation.
+
+\section{Deacon: Absential Organization}
+
+Deacon's account in \emph{Incomplete Nature} \citep{deacon2011} introduces the concept of
+\emph{absence} as a causally efficacious feature of complex systems. The central
+claim is that teleodynamic organization---the kind that characterizes living
+systems and minds---is constituted by the causal influence of what is not present:
+potential states toward which the system is organized, constraints that do not
+currently exist but that the system's organization tends to produce.
+
+Deacon develops a hierarchy of emergent dynamics:
+\begin{itemize}
+  \item \textbf{Homeodynamics}: simple attractor dynamics in physical systems.
+  \item \textbf{Morphodynamics}: self-organizing systems that develop global
+    regularities from local interactions.
+  \item \textbf{Teleodynamics}: systems whose organization is constituted by
+    reference to absent or potential states.
+\end{itemize}
+
+\textbf{Points of convergence with the present framework:}
+
+The teleodynamics level is genuinely important for understanding the kind of
+coherence exhibited by living systems and minds. Deacon is right that adequate
+accounts of intentionality require more than simple homeodynamics or
+morphodynamics. The \KES map's successor hypothesis space $H_{t+1}$ is exactly
+an absent state that constrains present dynamics: the system's current trajectory
+is partly constituted by which future hypothesis spaces remain admissible.
+
+\textbf{Points of divergence:}
+
+The present framework declines to grant absence ontological primacy. On Deacon's
+strongest reading, not-yet-realized states exert genuine causal influence on
+current dynamics---there is a kind of backward causation or final causation
+operating through the organization of living systems. The present framework
+explains the same phenomena without this commitment. The \KES successor
+hypothesis space $H_{t+1}$ constrains current dynamics not because it is
+causally efficacious as an absence but because the current constraint set
+$\mathcal{C}_t$ has already eliminated the trajectories that would make
+$H_{t+1}$ unreachable. The direction of causation is entirely forward: prior
+constraints eliminate future possibilities; the future does not pull the present.
+
+Formally: the filtration $\mathcal{A}(\mathcal{C}_0) \supseteq
+\mathcal{A}(\mathcal{C}_1) \supseteq \ldots$ produces apparent goal-directedness
+through elimination alone. No backward causation is required. The system appears
+to be directed toward the configurations that survive the filtration because all
+alternatives have been progressively eliminated. This is sufficient to generate
+the phenomena Deacon attributes to teleodynamics without requiring absence to be
+causally efficacious.
+
+\section{The Constraint-Final Causation Distinction}
+
+The formal distinction between constraint causation and final causation is:
+
+\begin{definition}{Constraint Causation}
+A system exhibits \emph{constraint causation} if its directional structure
+is fully explained by the accumulation of prior constraints that eliminate
+inadmissible trajectories. The causal influence flows entirely forward:
+past constraint events eliminate future possibilities, producing a
+monotonically narrowing admissibility manifold.
+\end{definition}
+
+\begin{definition}{Final Causation}
+A system exhibits \emph{final causation} if a not-yet-realized future state
+$s^*$ exerts causal influence on current system dynamics, such that the
+dynamics would be different if $s^*$ were different, holding all prior
+history constant.
+\end{definition}
+
+The present framework adopts constraint causation throughout and declines final
+causation. \claimC This position is consistent with thermodynamics, bounded
+computation, and path dependence. It produces all the observed phenomena
+(apparent purposiveness, anticipatory behavior, structural persistence) without
+positing causation that runs backward through time or that requires future
+states to exist ontologically before they are realized.
+
+\section{Where Deacon's Framework Remains Valuable}
+
+Despite the divergence on final causation, Deacon's hierarchical emergence
+framework provides useful vocabulary for distinguishing levels of organization.
+The homeodynamic/morphodynamic/teleodynamic hierarchy maps onto the trajectory
+framework as follows:
+
+Homeodynamic systems navigate a fixed admissibility manifold whose topology
+is specified in advance. Morphodynamic systems modify their admissibility manifold
+through self-organization, but the modification rules are themselves fixed.
+Teleodynamic systems---and this is the genuinely novel level---modify both their
+admissibility manifold and their modification rules through ongoing interaction
+with the outcomes of their prior modifications.
+
+The Yarncrawler framework captures exactly this last level: the self-rewrite
+endofunctor $\mathsf{R}: \mathcal{M} \to \mathcal{M}$ modifies the manifold,
+while the RC-CLIO repair cycle modifies the repair rules themselves. This is
+teleodynamic organization in Deacon's sense, achieved through forward-only
+constraint causation rather than through final causation.

@@ -1,0 +1,80 @@
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+A level-1 auxiliary file: frontmatter/titlepage.aux
+A level-1 auxiliary file: frontmatter/prefatory.aux
+A level-1 auxiliary file: frontmatter/methodological.aux
+A level-1 auxiliary file: parts/part1.aux
+A level-1 auxiliary file: chapters/ch01_distributed_manifold.aux
+A level-1 auxiliary file: chapters/ch02_vocabulary.aux
+A level-1 auxiliary file: parts/part2.aux
+A level-1 auxiliary file: chapters/ch03_scaffolded_amplification.aux
+A level-1 auxiliary file: chapters/ch04_ellul_constraint.aux
+A level-1 auxiliary file: parts/part3.aux
+A level-1 auxiliary file: chapters/ch05_yarncrawler_formal.aux
+A level-1 auxiliary file: chapters/ch06_sheaf_repair.aux
+A level-1 auxiliary file: chapters/ch07_ecological_cultural_computational.aux
+A level-1 auxiliary file: parts/part4.aux
+A level-1 auxiliary file: chapters/ch08_cosmological.aux
+A level-1 auxiliary file: chapters/ch09_social_institutional.aux
+A level-1 auxiliary file: chapters/ch10_kes_spherepop.aux
+A level-1 auxiliary file: parts/part5.aux
+A level-1 auxiliary file: chapters/ch11_method_as_consequence.aux
+A level-1 auxiliary file: chapters/ch12_identity_bootstrapping.aux
+A level-1 auxiliary file: chapters/ch13_conclusion.aux
+A level-1 auxiliary file: appendices/appA_rsvp_formal.aux
+A level-1 auxiliary file: appendices/appB_kes_formal.aux
+A level-1 auxiliary file: appendices/appC_spherepop.aux
+A level-1 auxiliary file: appendices/appD_tartan.aux
+A level-1 auxiliary file: appendices/appE_clio.aux
+A level-1 auxiliary file: appendices/appF_obstruction.aux
+A level-1 auxiliary file: appendices/appG_juarrero_deacon.aux
+A level-1 auxiliary file: appendices/appH_stone_piano.aux
+A level-1 auxiliary file: appendices/appI_companion_index.aux
+A level-1 auxiliary file: appendices/appJ_perceptual.aux
+The style file: apalike.bst
+Database file #1: references.bib
+Warning--empty publisher in flyxion2026rsvp
+Warning--empty publisher in flyxion2026yarncrawler
+You've used 4 entries,
+            1935 wiz_defined-function locations,
+            523 strings with 5153 characters,
+and the built_in function-call counts, 1217 in all, are:
+= -- 112
+> -- 28
+< -- 4
++ -- 9
+- -- 8
+* -- 78
+:= -- 223
+add.period$ -- 14
+call.type$ -- 4
+change.case$ -- 22
+chr.to.int$ -- 3
+cite$ -- 6
+duplicate$ -- 64
+empty$ -- 109
+format.name$ -- 12
+if$ -- 243
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 6
+newline$ -- 25
+num.names$ -- 12
+pop$ -- 32
+preamble$ -- 1
+purify$ -- 24
+quote$ -- 0
+skip$ -- 38
+stack$ -- 0
+substring$ -- 48
+swap$ -- 4
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 20
+warning$ -- 2
+while$ -- 8
+width$ -- 0
+write$ -- 56
+(There were 2 warnings)

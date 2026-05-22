@@ -1,0 +1,129 @@
+% ── Mathematical audit operators ────────────────────────────
+\DeclareMathOperator{\AuditS}{\mathfrak{S}}   % Structural consistency
+\DeclareMathOperator{\AuditF}{\mathfrak{F}}   % Falsifiability
+\DeclareMathOperator{\AuditP}{\mathfrak{P}}   % Projection dependence
+\DeclareMathOperator{\AuditR}{\mathfrak{R}}   % Recursive closure
+
+% Epistemic stability functional
+\newcommand{\EpStab}{\Sigma}
+
+% Reinterpretation functor
+\newcommand{\RSVPfunctor}{\mathfrak{R}_{\mathrm{RSVP}}}
+
+% Projection defect
+\newcommand{\ProjDef}{\Delta_{\pi}}
+
+% Failure geometries
+\newcommand{\FailGeo}[1]{\mathcal{G}_{#1}}
+
+% System triple
+\newcommand{\SysTriple}{\Theta}
+
+% Survivable / unstable components
+\newcommand{\ThetaS}{\Theta_{\mathrm{s}}}
+\newcommand{\ThetaU}{\Theta_{\mathrm{u}}}
+\newcommand{\ThetaStar}{\Theta^{\ast}}
+
+% Ortyx operator and recursion
+\newcommand{\OrtOp}{\mathcal{O}}
+\newcommand{\AuditOp}{\mathcal{A}}
+
+% Salience functional
+\newcommand{\SalFunc}{S_{\mathrm{sal}}}
+
+% Accessibility entropy
+\newcommand{\AccEnt}{S_{\mathrm{acc}}}
+
+% Semantic closure metric
+\newcommand{\SemClose}{\chi}
+
+% Constraint operators
+\newcommand{\ConstrX}{\mathcal{C}_{X}}
+\newcommand{\ConstrM}{\mathcal{C}_{M}}
+
+% Admissible trajectory space
+\newcommand{\AdmTraj}{\Omega}
+
+% Salience manifold
+\newcommand{\SalMan}{\mathcal{M}_{S}}
+
+% Memory field
+\newcommand{\MemField}{\Psi}
+
+% Jitter quantities
+\newcommand{\Jp}{J_{p}}
+\newcommand{\Ja}{J_{a}}
+
+% Norms and absolute values
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\abs}[1]{\left|#1\right|}
+
+% ── Audit trace notation ────────────────────────────────────
+%  \audittrace{Θ₀}{Θ_s}{Θ_u}
+\newcommand{\audittrace}[3]{%
+  \[#1\;\xrightarrow{\;\AuditOp\;}\bigl(\,#2,\;#3\,\bigr)\]}
+
+%  \audittracelabel{Θ₀}{Θ_s}{Θ_u}{n}
+\newcommand{\audittracelabel}[4]{%
+  \[#1\;\xrightarrow{\;\AuditOp_{#4}\;}\bigl(\,#2,\;#3\,\bigr)\]}
+
+%  \reinterptrace{Θ_s}{Θ*}
+\newcommand{\reinterptrace}[2]{%
+  \[#1\;\xrightarrow{\;\RSVPfunctor\;}#2\]}
+
+% ── Audit score display ─────────────────────────────────────
+\newcommand{\auditscore}[3]{%
+  \begin{center}
+    \small\color{Ortyx@neutral}
+    \textsc{Audit Score}\(\bigl[\,\text{#1}\,\bigr]\):
+    \quad\(\EpStab(\SysTriple)=\mathbf{#2}\,/\,#3\)
+  \end{center}}
+
+% ── Claim level annotation ──────────────────────────────────
+%  \claimlabeltext{Level~II}{...}
+\newcommand{\claimlabeltext}[2]{%
+  \begin{quote}\small\color{Ortyx@neutral}%
+    \textsc{Claim (\textsc{#1}):}\enspace #2%
+  \end{quote}}
+
+% ── Part interlude title page ───────────────────────────────
+\newcommand{\partinterlude}[3]{%
+  \cleardoublepage\thispagestyle{empty}
+  \vspace*{0.18\textheight}
+  {\centering
+    \color{Ortyx@neutral}\small\scshape #1\par
+    \vspace{10pt}
+    \color{Ortyx@rule}\LARGE\bfseries #2\par
+    \vspace{16pt}
+    \color{Ortyx@subtle}\rule{0.35\textwidth}{0.4pt}\par
+    \vspace{16pt}
+    \begin{minipage}{0.82\textwidth}
+      \centering\color{Ortyx@neutral}\small\itshape #3
+    \end{minipage}\par
+  }
+  \vfill\cleardoublepage}
+
+% ── Chapter epigraph ────────────────────────────────────────
+\newcommand{\chapepigraph}[2]{%
+  \epigraph{\itshape #1}{--- #2}\vspace{18pt}}
+
+% ── Text shorthands ─────────────────────────────────────────
+\newcommand{\Phoenix}{Phoenix Protocol}
+\newcommand{\Marine}{Marine Salience Algorithm}
+\newcommand{\MEMeight}{MEM\textbar{}8}
+\newcommand{\HCFone}{HCF1}
+\newcommand{\Ortyx}{Ortyx Protocol}
+\newcommand{\RSVPfull}{RSVP (Relativistic Scalar-Vector Plenum)}
+\newcommand{\RSVP}{RSVP}
+
+% Four-level classification labels
+\newcommand{\LevelI}{\textsc{Level~I}}
+\newcommand{\LevelII}{\textsc{Level~II}}
+\newcommand{\LevelIII}{\textsc{Level~III}}
+\newcommand{\LevelIV}{\textsc{Level~IV}}
+
+% Failure geometry shorthands
+\newcommand{\DecFormal}{\(\FailGeo{1}\): Decorative Formalism}
+\newcommand{\DefClos}{\(\FailGeo{2}\): Definitional Closure}
+\newcommand{\SemUniv}{\(\FailGeo{3}\): Semantic Universality Collapse}
+\newcommand{\OpSev}{\(\FailGeo{4}\): Operational Severance}

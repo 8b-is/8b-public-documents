@@ -1,0 +1,294 @@
+\chapter{Computational Projection: KES, Spherepop, and Irreversible Event Calculi}
+\label{ch:kes_spherepop}
+
+\epigraph{The KES map formalizes the transition from current world-state to
+hypothesis space as the basic cognitive operation. The question is always which
+hypotheses remain admissible given what has already been committed.}{}
+
+\section{The KES Map as Cognitive Architecture}
+
+The Kinetic-Event Synthesis map $\Omega_t \to H_{t+1}$ formalizes the basic
+cognitive operation: given a current configuration of constraints, evidence, and
+prior commitments, what hypothesis spaces are admissible at the next step?
+
+This is not prediction in the statistical sense. A system predicting the next
+state must assign a probability distribution over all possible successors. A
+system navigating a KES map must determine which successor hypothesis spaces
+are admissible---which are consistent with the accumulated constraints---without
+necessarily assigning probabilities to any of them. The difference is between
+probabilistic modeling and admissibility filtering. Both are useful operations;
+they are not the same operation.
+
+\claimH The KES architecture is most useful as a heuristic framework for
+characterizing cognitive systems that must select among competing hypotheses under
+partial information and irreversibility constraints. It is not a complete
+computational model but a formal language for describing the structure of the
+selection problem.
+
+\section{Spherepop Operators in Practice}
+
+The four Spherepop operators constitute a minimal calculus for irreversible event
+processing. Their practical interpretation:
+
+\textbf{Pop} extracts committed events from possibility space. When a system
+commits to an interpretation---a perceptual categorization, a theoretical claim,
+a contractual obligation---it performs a Pop operation. The committed event
+becomes actual; the alternatives do not disappear from the world but become
+inaccessible to the committing system.
+
+\textbf{Refuse} eliminates inadmissible trajectories. Before commitment, a system
+may reject certain possibilities as inconsistent with its prior commitments,
+its constraint set, or its evidence. Refuse is the active filtering operation
+that produces the admissible trajectory space from the unconstrained space.
+
+\textbf{Bind} establishes structural dependencies between events. When an event
+$e_1$ is bound to an event $e_2$, the occurrence of $e_1$ constrains the
+admissibility conditions for $e_2$. Bind creates the dependency graph that
+constitutes the system's provenance structure.
+
+\textbf{Collapse} commits a possibility space to a definite configuration. Where
+Pop extracts a single event, Collapse resolves an entire horizon of possibilities
+into a committed configuration. Collapse is irreversible: the alternatives that
+were not selected are not merely deprioritized but structurally inaccessible
+within the same system-instance.
+
+\claimD All four operations are irreversible within a given system-instance. This
+is a design commitment rather than a limitation: systems that can always reverse
+their operations accumulate no structural residue and have no trajectory in the
+meaningful sense.
+
+\section{TARTAN and Trajectory-Aware Tiling}
+
+\claimH The TARTAN framework---Trajectory-Aware Recursive Tiling with Annotated
+Noise---provides a geometric interface between the abstract event calculus of
+Spherepop and concrete computational substrate. Recursive tiling under trajectory
+annotations preserves structural information that purely statistical approaches
+discard.
+
+The key feature is the annotated noise schema. Rather than discarding unresolved
+structure as noise to be filtered, TARTAN archives it as annotated residue
+available for future reinterpretation. This operationalizes the ``hallucination
+as normal'' principle: the unresolved structure is not an error to be eliminated
+but a resource to be managed. It constitutes exactly the non-trivial $H^1$ cocycles
+of Chapter~\ref{ch:sheaf}: ambiguity stored for potential future repair.
+
+\section{Gesture-First Symbolic Grounding}
+\label{sec:gesture_grounding}
+
+\claimP Sign language detection systems provide a particularly clean instantiation
+of the admissibility framework because the symbolic and sub-symbolic layers are
+architecturally separated and inspectable. A system trained to classify ASL gestures
+using a convolutional detection pipeline operates in three distinct stages that
+correspond directly to the vocabulary established in Chapter~\ref{ch:vocabulary}.
+
+In the first stage, raw video frames arrive as unconstrained sensory input. Each
+frame is a candidate world-state: a high-dimensional tensor encoding spatial and
+temporal structure that the system has not yet committed to any interpretation.
+
+In the second stage, a detection model applies learned spatial constraints to the
+frame, generating confidence scores for each candidate sign class. This is
+admissibility filtering: the model's learned weights encode the constraint set
+$\mathcal{C}$ that determines which visual configurations are compatible with each
+symbolic label. A confidence threshold (typically 0.5) operates as the formal
+Refuse criterion---frames producing no detection above the threshold are excluded
+from the symbolic trajectory without any label being committed.
+
+In the third stage, detections above the threshold are committed via Pop: the
+symbolic label enters the actuality set $\mathcal{E}$ and can propagate into
+downstream systems (translators, interfaces, assistants).
+
+\subsection{Gesture Before Symbol}
+
+The architectural separation between detection and classification in these systems
+formalizes a claim that runs across the companion work on gesture-first input theory:
+that symbolic meaning is grounded in gestural trajectories rather than in static
+symbolic configurations. The label ``hello'' does not exist independently in the
+system's representational space; it exists only as a compression of a family of
+admissible hand configurations, orientations, and spatial positions. The symbol is
+a compressed attractor over a continuous gestural manifold.
+
+\claimH This is a concrete computational implementation of Axiom~1 (Local Action
+Only) from the Yarncrawler framework. The detection model operates locally: it
+classifies the current frame without global access to conversational history,
+intent, or semantic context. The symbolic output is generated from local spatial
+constraints alone. Higher-order meaning---the pragmatic force of ``yes'' versus
+``I love you'' in context---must be assembled by downstream layers that have access
+to episodic and procedural context.
+
+\subsection{The Label Set as Pragmatic Primitive}
+
+The five signs chosen in a typical minimal ASL detection system---hello, yes, no,
+thank you, I love you---are not chosen for semantic richness but for pragmatic
+coverage. They are the primitives of social coordination and consent: acknowledgment,
+affirmation, negation, gratitude, and affiliation. A system that can detect these
+five signs can participate in the most basic structure of cooperative interaction,
+even without any propositional content.
+
+\claimP This connects to the admissibility geometry of social systems analyzed in
+Chapter~\ref{ch:social_institutional}. The pragmatic primitives are exactly the
+signs that regulate the admissibility of subsequent interaction: ``yes'' and ``no''
+open and close trajectories; ``hello'' initializes the interaction state; ``thank
+you'' signals trajectory completion; ``I love you'' establishes a binding that
+constrains all subsequent exchange. The label set is a minimal Spherepop vocabulary
+for social coordination.
+
+\subsection{Transfer Learning as Boot Sequence}
+
+The pipeline's use of transfer learning---initializing from SSD MobileNet weights
+pretrained on COCO and fine-tuning on a small domain-specific dataset---is a
+computational instance of the boot sequence concept from Chapter~\ref{ch:identity}.
+The pretrained weights encode a lower-level constraint layer: the detection of
+spatial features, edges, textures, and object-like configurations in natural images.
+Fine-tuning on ASL gesture images adds a domain-specific constraint layer on top of
+this foundation.
+
+The fine-tuning layer is only meaningful because the pretrained layer has already
+been initialized. A model trained from scratch on 75 gesture images (15 per class)
+would fail to generalize; the same number of examples produces a functional
+classifier when the lower layers have already been bootstrapped from millions of
+natural images. The boot sequence is explicit in the configuration: the pipeline
+specifies \texttt{fine\_tune\_checkpoint\_type = "detection"}, distinguishing the
+pretrained lower layers (not updated) from the domain-specific upper layers (updated
+from the small ASL dataset).
+
+\begin{constraintboundary}
+\textbf{Status:~\textbf{[P/H]}} The admissibility filtering and Spherepop
+interpretations of the detection pipeline are phenomenological. The gesture-before-symbol
+claim is a heuristic framework for understanding the grounding relationship,
+not a derived result.
+
+\textbf{Design implication:} Systems that ground symbolic output in gesture
+trajectories (rather than in static image classification) naturally implement a
+form of temporal qualification: the gesture unfolds over time, and the detection
+system must integrate spatial constraints across frames to produce a stable
+symbolic commitment. This is the temporal residue mechanism of Section~\ref{sec:marine}
+applied to the sign recognition domain.
+
+\textbf{Not claimed:} That the SSD MobileNet architecture is the correct
+computational model of gestural grounding in biological cognition, or that the
+five-sign label set is sufficient for full communicative participation.
+\end{constraintboundary}
+
+The reconstruction bound established in Chapter~\ref{ch:vocabulary}---that
+$H(D \mid D') \geq N - M > 0$ for any compression with $M < N$---has a direct
+computational consequence: any system operating under compression must interpolate
+missing structure from prior regularities. In computational systems, this
+interpolation produces hallucinations in the formal sense.
+
+\claimD The design objective is therefore not zero hallucination but
+\emph{bounded hallucination}: reconstruction errors that remain corrigible through
+feedback rather than self-reinforcing through proxy stabilization. A system whose
+hallucinations are corrigible is safe in a way that a system with zero apparent
+hallucination but hidden proxy stabilization is not.
+
+\claimC The uncertainty gradient finding from the Cheng, Broadbent, and Chappell
+(2025) system is consistent with this framework: correct reasoning exhibits a
+negative uncertainty gradient over time (hallucinations are detected and corrected),
+while incorrect reasoning exhibits a positive or oscillating gradient (hallucinations
+stabilize or escalate). The gradient is a corrigibility signal. A system monitoring
+its own uncertainty gradient is implementing a weak version of the corrigibility
+condition.
+
+\begin{constraintboundary}
+\textbf{Established:} KES as a formal language for admissibility-filtered hypothesis
+selection. Spherepop operator semantics as a minimal irreversible event calculus.
+The corrigibility condition as the correct design target for hallucination management.
+
+\textbf{Heuristic~[H]:} TARTAN as a computational architecture. The annotated
+noise schema is a heuristic engineering principle, not a formally derived result.
+
+\textbf{Conjectural~[C]:} The uncertainty gradient as a universal corrigibility
+signal. The specific claim requires empirical validation across diverse system types.
+
+\textbf{Falsification:} A compressed inference system that achieves zero hallucination
+under arbitrary compression ratios would falsify the reconstruction bound. A system
+with positive uncertainty gradient that nonetheless converges on correct outputs
+would weaken the corrigibility gradient claim.
+\end{constraintboundary}
+
+\section{Temporal Salience and Sparse Qualification}
+\label{sec:marine}
+
+The problem of salience detection under energetic and informational constraints
+appears across biological cognition, signal processing, distributed sensing, and
+adaptive computation. Conventional spectral methods frequently assume that
+exhaustive decomposition is both feasible and desirable, yet biological systems
+rarely possess the energetic or temporal capacity required for complete
+reconstruction of an incoming signal field.
+
+\claimH The following framework is introduced as a computational heuristic for
+low-cost temporal qualification under bounded resources. The central claim is that
+many systems can achieve robust environmental responsiveness through partial temporal
+stabilization metrics rather than exhaustive representational completeness.
+
+\subsection{Temporal Qualification Before Spectral Reconstruction}
+
+Traditional signal analysis proceeds by transforming an incoming waveform into a
+fully decomposed spectral representation. Biological systems, however, frequently
+operate through earlier-stage temporal filtering mechanisms that identify local
+instability, transient coherence, and salient directional discontinuities before
+detailed reconstruction occurs.
+
+Temporal qualification refers to the extraction of structurally relevant features
+directly from evolving signal relations. Metrics such as local jitter, peak
+persistence, envelope discontinuity, and transient regularity provide low-cost
+approximations of environmental significance without requiring exhaustive
+decomposition. This is admissibility pruning applied to signal processing: the
+system progressively excludes trajectories inconsistent with local temporal
+stability conditions rather than reconstructing every possible interpretation.
+
+\subsection{Formal Specification}
+
+Let an incoming signal be represented as a continuous trajectory
+$x(t): \mathbb{R} \to \mathbb{R}^n$. Define a qualification window
+$W_\tau(t) = [t-\tau, t+\tau]$ and a local temporal variation operator:
+\[
+  J_\tau(x,t) = \frac{1}{2\tau}\int_{t-\tau}^{t+\tau}
+  \left\|\frac{dx}{ds}\right\| ds.
+\]
+The quantity $J_\tau$ measures local temporal instability. Signals with excessive
+instability relative to environmental persistence thresholds are progressively
+suppressed through local admissibility weighting:
+\[
+  A(x,t) = \exp(-\lambda J_\tau(x,t)),
+\]
+where $\lambda$ controls suppression strength.
+
+Under a finite representational activation budget $\sum_{i=1}^N a_i(t) \leq
+E_{\max}$, sparse qualification emerges through selective amplification of only
+those trajectories satisfying admissibility conditions:
+\[
+  \mathcal{A}(t) = \bigl\{x_i \mid C(x_i,t) < \epsilon\bigr\},
+\]
+where $C(x_i,t)$ represents local incompatibility cost. Inference operates within
+the admissible subset $\mathcal{A}(t) \subseteq \Omega(t)$ rather than across
+the full trajectory space.
+
+\subsection{Temporal Residue and Attentional Gating}
+
+Temporal residue refers to the persistence of prior signal structure across
+subsequent qualification intervals. Define recursive persistence:
+\[
+  R_n = \alpha R_{n-1} + (1-\alpha)\Phi(x_n),
+\]
+where $0 < \alpha < 1$ controls persistence memory and $\Phi(x_n)$ measures local
+structural coherence. The attentional gate is then:
+\[
+  G(x_n) = \sigma(R_n - \theta),
+\]
+where $\sigma$ is a sigmoid function and $\theta$ is a gating threshold. Signals
+maintaining coherent persistence accumulate larger residue and therefore increased
+attentional weighting. Salience emerges from persistence under recursive
+qualification rather than absolute magnitude alone.
+
+\begin{constraintboundary}
+\textbf{Status:~\textbf{[H]}} The framework proposes only that lightweight temporal
+qualification heuristics may provide efficient approximations of salience under
+bounded energetic conditions. Claims regarding subjective experience, emotional
+authenticity, or universal cognitive equivalence are excluded from this formalism.
+
+\textbf{Falsification:} A biologically plausible system that achieves equivalent
+salience detection at lower computational cost without temporal qualification, or
+a system where spectral exhaustion proves more efficient than temporal pruning
+under realistic energetic constraints, would weaken the heuristic.
+\end{constraintboundary}

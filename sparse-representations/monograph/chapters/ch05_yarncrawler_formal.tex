@@ -1,0 +1,208 @@
+\chapter{Yarncrawler: The Self-Refactoring Polycompiler}
+\label{ch:yarncrawler_formal}
+
+\epigraph{A Yarncrawler does not simply interpret its world---it keeps itself alive
+by reinterpreting itself into being.}{}
+
+\section{The Operative Metaphor and Its Formal Content}
+
+The Yarncrawler framework models organisms, cultural systems, and artificial
+intelligences as stigmergic parsers maintaining homeorhetic Markov blankets. The
+name is not merely evocative. A crawler moves through an environment by traversal.
+A yarn system is structured through threads that can be unwound and rewound. A
+polycompiler processes multiple input formats and compiles them into a unified
+output while modifying its own compilation rules in response to what it encounters.
+The combination captures the essential operation: a system that parses its
+environment while simultaneously rewriting its own grammar.
+
+A useful image is that of a ball of yarn with a guiding aperture, a semantic straw.
+Threads are continuously pulled from the interior, passed through the aperture, reinforced
+with contextual material, and rewound on the exterior. This cycle of extraction,
+transformation, and reintegration parallels how agents parse inputs, re-thread
+outputs, and repair their own structural coherence.
+
+\section{The Seven Swarm-Care Axioms}
+
+Before the formal definition, the operational principles that govern Yarncrawler
+behavior are stated as axioms. These axioms were developed in the framework's
+original formulation and provide the semantic content that the mathematical
+definition subsequently formalizes.
+
+\begin{axiom}{Local Action Only}
+A Yarncrawler acts only on its current node and its local neighbors. No global
+inference is required or permitted. Under the Markov blanket decomposition, local
+conditional independence guides node-specific belief revision: only local evidence
+affects local updates.
+\end{axiom}
+
+\begin{axiom}{Semantic Trail Documentation}
+All operations must be logged: input state, evaluation, action taken, and outcome.
+Every correction leaves a trace---a map of belief revision tied to the confidence
+in the prediction that was corrected.
+\end{axiom}
+
+\begin{axiom}{Autocatalytic Fix Design}
+Fixes should ease future inference and adaptation. A repair operation is
+\emph{autocatalytic} if it lowers the cost of subsequent repairs in the same
+region. Good fixes are not merely locally optimal---they are self-amplifying
+priors that reshape the generative model.
+\end{axiom}
+
+\begin{axiom}{Trail Reinforcement and Decay}
+Successful trails are strengthened; failing trails are allowed to fade. Trail
+weights evolve according to $w_{t+1} = w_t \cdot \exp(-\lambda \Delta t)$ for
+decay and $w_{t+1} = w_t + \alpha R(x_t)$ for reinforcement, where $R$ is a
+success signal and $\alpha$ a learning rate.
+\end{axiom}
+
+\begin{axiom}{Node Hygiene}
+A Yarncrawler maintains its environment even when conditions appear stable.
+Preventative maintenance is inference under uncertainty: the system anticipates
+disorder and reduces entropy before it accumulates past the repair threshold.
+\end{axiom}
+
+\begin{axiom}{Failure Isolation and Recovery}
+When a node exceeds a critical damage threshold, it is quarantined. Its state
+snapshot is archived for future re-entry. Retreat and data capture are rational
+under epistemic overload. The system does not attempt repair beyond its current
+capacity.
+\end{axiom}
+
+\begin{axiom}{Swarm Feedback Integration}
+Yarncrawlers share belief updates across the swarm. The combined belief is formed
+by precision-weighted averaging: $q_{\text{combined}}(s) = \sum_i \Pi_i q_i(s) /
+\sum_i \Pi_i$, where $\Pi_i$ is the precision (inverse uncertainty) of crawler
+$i$'s update. Confidence acts as epistemic gravity.
+\end{axiom}
+
+\section{Formal Definition}
+
+\begin{definition}{Yarncrawler}
+A \emph{Yarncrawler} is a quintuple
+\[
+  \mathcal{Y} = \bigl(\mathcal{M},\, \{(U_i, \varphi_i, f_i)\}_{i \in I},\,
+  \{w_i\}_{i \in I},\, \mathcal{K},\, \mathcal{R}\bigr)
+\]
+where:
+\begin{itemize}
+  \item $\mathcal{M}$ is a smooth semantic manifold with atlas $\{U_i\}_{i \in I}$;
+  \item $\varphi_i: U_i \to \mathbb{R}$ is the local scalar potential (semantic
+        density) of expert $i$;
+  \item $f_i: U_i \to T\mathcal{M}$ is the local vector field (directed repair
+        flow) of expert $i$;
+  \item $\{w_i\}_{i \in I}$ is a partition of unity subordinate to $\{U_i\}$,
+        so that $\sum_{i \in I} w_i(x) = 1$ and $\operatorname{supp}(w_i)
+        \subseteq U_i$;
+  \item $\mathcal{K}$ is a finite knowledge store with embedding $\varphi_{\rm emb}$;
+  \item $\mathcal{R}$ is a stigmergic reinforcement operator updating the gates
+        $w$ and local fields $(\varphi, f)$ subject to minimization of a seam
+        penalty and free-energy functional.
+\end{itemize}
+The global \RSVP fields are defined from these local data by:
+\[
+  \Phi(x) = \sum_i w_i(x)\,\varphi_i(x), \qquad
+  \mathbf{v}(x) = -\nabla\Phi(x), \qquad
+  S(x) = -\sum_i w_i(x)\log w_i(x).
+\]
+The dynamics of a Yarncrawler trajectory $x_t$ are:
+\[
+  \dot{x}_t \in \operatorname{co}\{f_i(x_t) : w_i(x_t) > 0\}
+             - \nabla\Phi(x_t) + B(x_t)\,u_t,
+\]
+where $B$ encodes blanket-mediated control and $\operatorname{co}$ denotes the
+convex hull.
+\end{definition}
+
+\subsection*{Worked Interpretation: What Each Component Means}
+
+The mathematical objects in the quintuple map onto concrete behaviors as follows.
+
+$\mathcal{M}$ is the space of possible semantic states the system can occupy: all the
+configurations of knowledge, belief, and parsed structure that are available to it.
+For a squirrel, $\mathcal{M}$ is the space of foraging strategies indexed by
+environmental cues. For a language model, it is the latent space of its semantic
+representations.
+
+The local expert pairs $(U_i, \varphi_i, f_i)$ are the system's specialized competence
+regions. A squirrel has different behavioral routines for open meadows, dense undergrowth,
+and known cache sites; each routine is a local expert valid in its region $U_i$. The
+scalar potential $\varphi_i$ measures how strongly the expert ``claims'' a given state
+as its domain of competence. The vector field $f_i$ specifies which direction to move
+within that domain.
+
+The partition of unity $\{w_i\}$ is the gating mechanism. At any given state, multiple
+experts may have partial competence. The weights $w_i(x)$ determine how much each
+expert contributes to the current behavior. The entropy $S(x) = -\sum_i w_i \log w_i$
+measures how spread the competence is: low entropy means one expert dominates; high
+entropy means multiple experts are equally relevant, which corresponds to genuine
+semantic ambiguity.
+
+The knowledge store $\mathcal{K}$ is the stigmergic memory: the accumulated traces of
+prior traversals. In the squirrel, it is the system of cached seeds and the spatial
+memory of where they are. In the Bruniquel cave builders, it was the accumulating
+knowledge of which stalagmite lengths produce which frequencies.
+
+The reinforcement operator $\mathcal{R}$ is the repair mechanism. After each traversal,
+it adjusts $w_i$, $\varphi_i$, and $f_i$ to reduce the seam penalty: the mismatch
+between adjacent experts at their boundaries. This is the self-refactoring operation
+that gives the Yarncrawler its name. The grammar of the parser is rewritten by the
+act of parsing.
+
+\section{The Yarncrawler as a Lax Monoidal Functor}
+
+The category-theoretic formulation provides the cleanest single-sentence characterization
+of the Yarncrawler.
+
+\begin{definition}{Yarncrawler Parser (Category-Theoretic)}
+Let $\mathcal{W}$ be the \emph{world-trajectory category} whose objects are finite
+sensorimotor traces $\tau_{[t_0,t_1]}$ and whose morphisms are temporal
+concatenations and coarse-grainings. Let $\mathcal{M}$ be the \emph{internal
+semantic category} whose objects are typed semantic modules and whose morphisms are
+admissible rewrites. Let $\mathbf{Reconf}(\mathcal{M})$ be the reconfiguration
+2-category encoding self-repair moves as 2-morphisms.
+
+A \emph{Yarncrawler parser} is a lax monoidal functor
+\[
+  \mathsf{P}: (\mathcal{W}, \otimes) \longrightarrow (\mathcal{M}, \boxtimes)
+\]
+together with a self-rewrite endofunctor
+$\mathsf{R}: \mathcal{M} \to \mathcal{M}$ such that for each trace $\tau$,
+\[
+  \mathsf{P}(\tau) \xRightarrow{\;\eta_\tau\;} \mathsf{R}(\mathsf{P}(\tau))
+\]
+is a 2-cell in $\mathbf{Reconf}(\mathcal{M})$ satisfying locality (only modules
+near the current ``tear'' are modified) and type safety (repairs remain within
+the admissible semantic category).
+\end{definition}
+
+\begin{remark}
+The lax rather than strict monoidal structure is essential. A strict functor would
+require that the parsing of concatenated traces be exactly the concatenation of
+their parsings. Laxness permits the coherence maps to be non-trivial: the parsing
+of a sequence can differ from the sequential composition of parsings, which is
+precisely what happens when the self-repair operation $\mathsf{R}$ modifies the
+parser midway through a trace.
+\end{remark}
+
+\section{Homeorhetic Viability}
+
+\begin{definition}{Homeorhetic Viability Band}
+A closed set $\mathcal{V} \subseteq \mathcal{M}$ is \emph{viable} for a
+Yarncrawler if for every initial state $x_0 \in \mathcal{V}$ there exists a
+control $u_t$ such that $x_t \in \mathcal{V}$ for all $t$ and
+\[
+  \int_0^\infty \bigl(\beta\, L_{\rm seam}(x_t) + \sigma(x_t)\bigr)\,dt < \infty,
+\]
+where $L_{\rm seam}$ is the seam penalty measuring mismatch between adjacent
+local experts and $\sigma(x_t)$ is the entropy export rate. The system is
+\emph{homeorhetically stable} if $\mathcal{V}$ is viable and the seam penalty
+converges to zero along optimal trajectories.
+\end{definition}
+
+Homeorhesis---the maintenance of a stable trajectory rather than a stable
+equilibrium---is the appropriate stability concept for Yarncrawler systems.
+Such systems do not seek rest states; they seek the continuation of viable
+process. The distinction matters for the cosmological projection of
+Chapter~\ref{ch:cosmological}: the universe, on the \RSVP interpretation,
+is homeorhetically stable in its entropy relaxation trajectory rather than
+asymptotically approaching a fixed equilibrium state.

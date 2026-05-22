@@ -1,0 +1,116 @@
+% ============================================================
+%  THE ORTYX PROTOCOL
+%  Appendix F: Recursive Semantic Drift and
+%              Representational Closure
+% ============================================================
+
+\chapter{Recursive Semantic Drift and Representational Closure}
+\label{app:closure}
+
+\noindent
+This appendix formalizes the recursive closure dynamics
+identified informally in Chapter~6 and measured by
+the $\AuditR$ operator in Chapter~11. The semantic
+closure metric provides a quantitative basis for
+identifying when a framework's vocabulary is evolving
+primarily under its own dynamics rather than under
+corrective pressure from the world.
+
+\section{The Representation--Reality Gap}
+\label{app-f:gap}
+
+Let $X_t \in X$ denote the underlying system state
+at time $t$ and $M_t \in M$ represent the framework's
+current reduced symbolic state (its vocabulary, its
+current interpretive commitments, its active claims).
+Suppose the representation evolves under a self-driven
+mapping $F : M \to M$ and an environmental correction
+term with coupling strength $\kappa \ge 0$:
+\[
+  M_{t+1} = F(M_t) + \kappa\,G(X_t),
+\]
+where $G : X \to M$ maps the underlying state to a
+correction signal in the representational space.
+
+\section{The Semantic Closure Metric}
+\label{app-f:closure-metric}
+
+\begin{definition}
+The \emph{semantic closure metric} at time $t$ is:
+\[
+  \SemClose(t) = \frac{\|F(M_t)\|}{\|G(X_t)\|},
+\]
+measuring the ratio of internal dynamics to external
+correction. When $\SemClose(t) \gg 1$, the representation
+evolves primarily under its own dynamics; when
+$\SemClose(t) \ll 1$, the representation is dominated
+by external correction.
+\end{definition}
+
+\begin{definition}
+\emph{Runaway closure} occurs when:
+\[
+  \SemClose(t) \to \infty \quad \text{as} \quad t \to \infty,
+\]
+regardless of the underlying system state $X_t$. This
+corresponds to the representation becoming fully self-referential:
+its evolution is determined by its own dynamics, not
+by the phenomena it purports to represent.
+\end{definition}
+
+\section{Conditions for Closure}
+\label{app-f:conditions}
+
+Runaway closure occurs under the following conditions:
+
+\begin{enumerate}
+  \item \textit{Weak coupling} ($\kappa \to 0$): external
+  correction becomes negligible, leaving the representation
+  to evolve under $F$ alone.
+  \item \textit{Strong internal dynamics} ($\|F(M_t)\|$
+  grows faster than $\|G(X_t)\|$): the self-driven
+  dynamics outpace the corrective pressure from reality.
+  \item \textit{Accommodating $F$}: the internal mapping
+  $F$ is structured to preserve vocabulary coherence
+  regardless of input --- it absorbs any $M_t$ into
+  a smooth continuation.
+\end{enumerate}
+
+In the context of the \Ortyx{} audit, condition~(3)
+corresponds to $\FailGeo{3}$ (Semantic Universality
+Collapse): the mapping $F$ has been defined broadly
+enough to accommodate any incoming $M_t$ without
+generating internal inconsistency, which means external
+correction can never produce an inconsistency that
+would force revision.
+
+\section{The $\AuditR$ Operator}
+\label{app-f:audit-r}
+
+The $\AuditR$ operator is a summary statistic measuring
+the degree of closure risk in a framework $\SysTriple$:
+
+\[
+  \AuditR(\SysTriple) = \mathbb{E}\bigl[\SemClose(t)\bigr]_T,
+\]
+where the expectation is taken over a test period $T$
+during which the framework is subjected to representative
+challenges. In practice, $\AuditR$ is assessed qualitatively
+by examining:
+
+\begin{enumerate}
+  \item Whether the framework's vocabulary has migrated
+  across domains in ways that weaken external traction.
+  \item Whether the framework has developed accommodation
+  strategies that render potential disconfirmations
+  consistent with its claims.
+  \item Whether the framework's self-description is
+  becoming the primary input to its future development
+  rather than empirical evidence.
+\end{enumerate}
+
+High $\AuditR$ scores indicate that the framework is
+approaching the closure regime; the appropriate response
+is to increase $\kappa$ by introducing more demanding
+external falsification tests rather than to allow the
+internal dynamics to continue unchecked.

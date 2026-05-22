@@ -1,0 +1,96 @@
+\chapter{CLIO: Constraint-Leveraged Inference and Optimization}
+\label{app:clio}
+
+\noindent \CLIO --- Constraint-Leveraged Inference and Optimization --- is the
+recursive constraint repair framework developed as the self-correction layer of
+the Yarncrawler architecture. This appendix distinguishes the framework from the
+convergent system of Cheng, Broadbent, and Chappell 	tep{cheng2025clio}, develops the formal
+specification, and identifies the key design differences.
+
+\section{Two Versions of CLIO}
+
+The acronym \CLIO has been used independently in two frameworks with overlapping
+but distinct concerns. The Cheng--Broadbent--Chappell system (hereafter
+CBC-CLIO) is an inference-time orchestration layer over large language models
+that uses recursive confidence signals to steer reasoning without post-training.
+The framework developed here (hereafter RC-CLIO for Recursive Constraint repair)
+addresses a different problem: maintaining coherence across overlapping theoretical
+frameworks in a distributed conceptual manifold.
+
+The convergences are real. Both systems use recursive depth as a control variable.
+Both treat uncertainty reduction as a positive signal. Both expose their reasoning
+process rather than hiding it behind post-hoc rationalization. The CBC-CLIO
+finding that correct reasoning exhibits a negative uncertainty gradient over time
+is consistent with the RC-CLIO corrigibility condition: a system whose
+reconstruction errors are being corrected shows decreasing unresolved residue.
+
+The divergences are equally real. CBC-CLIO optimizes toward known correct answers
+on benchmarks. RC-CLIO operates in settings where the admissibility conditions
+themselves are being constructed rather than given---where there is no external
+oracle to verify the output. CBC-CLIO's uncertainty signal is self-reported by
+the model. RC-CLIO's uncertainty signal is the non-trivial cohomological residue
+of the theoretical manifold, detectable through gluing failures at framework
+boundaries.
+
+\section{The RC-CLIO Specification}
+
+\begin{definition}{RC-CLIO Repair Cycle}
+A single \emph{RC-CLIO repair cycle} over a theoretical manifold
+$(\mathcal{M}, \{(U_i, \varphi_i)\})$ consists of four phases:
+
+\textbf{Phase 1: Seam detection.} Compute the seam penalty
+$L_{\rm seam}(x) = \sum_{i < j} w_i(x)w_j(x)\|f_i(x) - f_j(x)\|^2$
+over all overlapping charts. Identify regions where $L_{\rm seam}$ exceeds
+a threshold $\epsilon_{\rm repair}$.
+
+\textbf{Phase 2: Cocycle identification.} For each high-seam region, identify
+the Čech 1-cocycle responsible: the mismatch between restrictions of adjacent
+local sections to their shared overlap.
+
+\textbf{Phase 3: Repair morphism construction.} Introduce new morphisms into
+the affected local sections that trivialize the cocycle. The repair morphism
+must satisfy locality (modifying only sections near the tear), type safety
+(remaining within the admissible semantic category), and stigmergic monotonicity
+(reducing the seam penalty without increasing it elsewhere).
+
+\textbf{Phase 4: Residue annotation.} Record the repair in the system's
+provenance structure: which seam was repaired, by which morphism, and what
+alternative repairs were available but not applied.
+\end{definition}
+
+\section{The Corrigibility Condition in RC-CLIO}
+
+\begin{definition}{RC-CLIO Corrigibility}
+An RC-CLIO system is \emph{corrigible} with respect to a target manifold
+$\mathcal{M}^*$ if:
+\begin{enumerate}
+  \item The seam detection phase correctly identifies all regions where the
+    current manifold $\mathcal{M}$ differs from $\mathcal{M}^*$.
+  \item The repair morphisms introduced in Phase 3 reduce $d(\mathcal{M},
+    \mathcal{M}^*)$ monotonically.
+  \item The residue annotation in Phase 4 is complete: all applied morphisms
+    are recorded with their alternatives.
+\end{enumerate}
+A system fails corrigibility if it introduces repair morphisms that reduce the
+seam penalty $L_{\rm seam}$ while increasing $d(\mathcal{M}, \mathcal{M}^*)$:
+this is proxy stabilization at the level of the repair process itself.
+\end{definition}
+
+\section{Relationship to CBC-CLIO}
+
+The CBC-CLIO system implements a version of Phase 1 (seam detection through
+uncertainty monitoring) and Phase 3 (repair through recursive re-invocation
+of the reasoning process). It does not implement Phase 2 (cohomological
+identification of the obstruction) or Phase 4 (provenance annotation of
+repairs). This is appropriate given CBC-CLIO's operational context: it is
+designed for single-session scientific question-answering, not for long-horizon
+theoretical manifold maintenance.
+
+\claimC The CBC-CLIO uncertainty oscillation finding---that correct answers
+show negative uncertainty gradients while incorrect answers show positive or
+oscillating gradients---is consistent with Phase 1 of RC-CLIO. In RC-CLIO
+terms: a system whose seam penalties are converging to zero is on a corrigible
+trajectory; a system whose seam penalties are oscillating has entered a repair
+cycle that is not reducing $d(\mathcal{M}, \mathcal{M}^*)$ despite reducing
+$L_{\rm seam}$ locally. The oscillation is the signature of proxy stabilization
+in the repair process.

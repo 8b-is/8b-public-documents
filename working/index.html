@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Process Relational Audioscope</title>
+
+<style>
+:root{
+  --green:#00ff88;
+  --soft:#8affc1;
+  --bg:#000;
+}
+
+*{ box-sizing:border-box; }
+
+html,body{
+  margin:0;
+  background:#000;
+  overflow:hidden;
+  font-family:monospace;
+  color:var(--green);
+  width:100%;
+  height:100%;
+}
+
+/* background */
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at center,
+      rgba(0,255,120,0.06),
+      transparent 60%),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+  opacity:.18;
+  pointer-events:none;
+}
+
+/* stars */
+
+#stars{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+}
+
+/* ui */
+
+.ui{
+  position:fixed;
+  top:12px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(94vw,700px);
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+}
+
+.title{
+  font-size:clamp(14px,2vw,18px);
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  text-align:center;
+  color:#c8ffe2;
+  text-shadow:0 0 12px var(--green);
+}
+
+/* track selector */
+
+.tracks{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:center;
+}
+
+.track{
+  border:1px solid rgba(0,255,120,.35);
+  background:rgba(0,20,0,.45);
+  color:#9dffcb;
+  padding:7px 12px;
+  cursor:pointer;
+  font-size:11px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  transition:.25s;
+  backdrop-filter:blur(3px);
+}
+
+.track:hover{
+  background:rgba(0,60,20,.55);
+}
+
+.track.active{
+  background:rgba(0,255,120,.12);
+  box-shadow:0 0 12px rgba(0,255,120,.25);
+  border-color:rgba(0,255,120,.7);
+  color:#fff;
+}
+
+/* portal */
+
+.portal-wrap{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#viz{
+  width:min(78vw,78vh);
+  height:min(78vw,78vh);
+  border-radius:50%;
+  display:block;
+  background:#000;
+  box-shadow:
+    0 0 35px rgba(0,255,120,.18),
+    inset 0 0 80px rgba(0,255,120,.08);
+}
+
+/* subtitles */
+
+.subs{
+  position:fixed;
+  bottom:58px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(92vw,620px);
+  text-align:center;
+  font-size:clamp(13px,2vw,16px);
+  line-height:1.45;
+  color:#d8ffe8;
+  text-shadow:0 0 8px var(--green);
+  padding:0 12px;
+  white-space:pre-wrap;
+  word-wrap:break-word;
+  z-index:30;
+  pointer-events:none;
+}
+
+/* status */
+
+.status{
+  position:fixed;
+  bottom:16px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:11px;
+  letter-spacing:.12em;
+  opacity:.55;
+  z-index:30;
+}
+
+/* glitches */
+
+.glitch{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+  z-index:100;
+  mix-blend-mode:screen;
+}
+
+.glitch.active{
+  animation:glitchFlash .18s linear;
+}
+
+@keyframes glitchFlash{
+  0%{
+    opacity:0;
+    transform:translate(0,0);
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,.10) 0px,
+        transparent 2px,
+        transparent 4px
+      );
+  }
+  25%{
+    opacity:.22;
+    transform:translate(-8px,3px);
+  }
+  50%{
+    opacity:.15;
+    transform:translate(10px,-4px);
+  }
+  100%{
+    opacity:0;
+    transform:translate(0,0);
+  }
+}
+
+/* mobile */
+
+@media(max-width:700px){
+
+  .track{
+    font-size:10px;
+    padding:6px 9px;
+  }
+
+  #viz{
+    width:min(92vw,92vw);
+    height:min(92vw,92vw);
+  }
+
+  .subs{
+    bottom:64px;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="ui">
+
+  <div class="title" id="title">
+    PROCESS RELATIONAL AUDIOSCOPE
+  </div>
+
+  <div class="tracks" id="tracks"></div>
+
+</div>
+
+<div class="portal-wrap">
+  <canvas id="viz"></canvas>
+</div>
+
+<div class="subs" id="subs"></div>
+
+<div class="status">
+  CLICK / TOUCH TO PLAY OR PAUSE
+</div>
+
+<div class="glitch" id="glitch"></div>
+
+<audio id="audio" preload="auto"></audio>
+
+<script>
+
+/* =========================================================
+   TRACKS
+========================================================= */
+
+const TRACKS = [
+
+{
+  file:"How_machines_reconstruct_your_physical_intent.mp3",
+  label:"Physical Intent",
+  type:"trajectory"
+},
+
+{
+  file:"Reality_Is_a_Verb_Not_a_Noun.mp3",
+  label:"Reality as Process",
+  type:"process"
+},
+
+{
+  file:"Mapping_software_to_spatial_silicon_chips.mp3",
+  label:"Spatial Silicon",
+  type:"silicon"
+},
+
+{
+  file:"Why_mental_models_override_reality.mp3",
+  label:"Mental Models",
+  type:"projection"
+}
+
+]
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const audio   = document.getElementById("audio")
+const subsEl  = document.getElementById("subs")
+const tracksEl= document.getElementById("tracks")
+const titleEl = document.getElementById("title")
+const glitch  = document.getElementById("glitch")
+
+/* =========================================================
+   TRACK BUTTONS
+========================================================= */
+
+TRACKS.forEach((t,i)=>{
+
+  const b = document.createElement("button")
+  b.className = "track"
+  b.textContent = t.label
+
+  b.onclick = async (e)=>{
+    e.stopPropagation()
+    await loadTrack(i,true)
+  }
+
+  tracksEl.appendChild(b)
+
+})
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+let ctxA
+let analyser
+let data
+let started = false
+
+function initAudio(){
+
+  if(ctxA) return
+
+  ctxA = new (window.AudioContext||window.webkitAudioContext)()
+
+  analyser = ctxA.createAnalyser()
+  analyser.fftSize = 2048
+  analyser.smoothingTimeConstant = .82
+
+  data = new Uint8Array(analyser.fftSize)
+
+  const src = ctxA.createMediaElementSource(audio)
+
+  src.connect(analyser)
+  analyser.connect(ctxA.destination)
+}
+
+/* =========================================================
+   SUBTITLES
+========================================================= */
+
+let cues = []
+
+async function loadVTT(file){
+
+  cues = []
+
+  try{
+
+    const r = await fetch(file)
+
+    if(!r.ok){
+      console.warn("VTT missing:",file)
+      return
+    }
+
+    const txt = await r.text()
+
+    cues = parseVTT(txt)
+
+    console.log("Loaded",cues.length,"cues")
+
+  }catch(e){
+
+    console.warn("VTT error:",e)
+
+  }
+}
+
+function parseVTT(txt){
+
+  const lines = txt.split('\n')
+  const out = []
+
+  let i = 0
+
+  while(i < lines.length){
+
+    const line = lines[i].trim()
+
+    if(line.includes('-->')){
+
+      const [s,e] = line.split('-->').map(v=>v.trim())
+
+      i++
+
+      const text = []
+
+      while(i < lines.length && lines[i].trim()){
+
+        text.push(lines[i].trim())
+        i++
+
+      }
+
+      out.push({
+
+        start:toSec(s),
+        end:toSec(e),
+        text:text.join('\n')
+
+      })
+
+    }else{
+
+      i++
+
+    }
+  }
+
+  return out
+}
+
+function toSec(t){
+
+  const p = t.replace(',', '.').split(':')
+
+  if(p.length===3){
+
+    return (+p[0])*3600 + (+p[1])*60 + (+p[2])
+
+  }
+
+  return (+p[0])*60 + (+p[1])
+}
+
+audio.ontimeupdate = ()=>{
+
+  const t = audio.currentTime
+
+  const cue = cues.find(c=> t >= c.start && t < c.end + .25)
+
+  subsEl.textContent = cue ? cue.text : ''
+
+}
+
+/* =========================================================
+   LOAD TRACK
+========================================================= */
+
+let current = 0
+
+async function loadTrack(i,autoplay=false){
+
+  current = ((i % TRACKS.length) + TRACKS.length) % TRACKS.length
+
+  const tr = TRACKS[current]
+
+  document.querySelectorAll('.track').forEach((b,idx)=>{
+
+    b.classList.toggle('active', idx===current)
+
+  })
+
+  audio.src = tr.file
+  audio.load()
+
+  await loadVTT(
+    tr.file.replace(".mp3",".vtt")
+  )
+
+  titleEl.textContent = tr.label.toUpperCase()
+
+  if(autoplay){
+
+    try{
+
+      await audio.play()
+
+    }catch(e){}
+
+  }
+}
+
+audio.onended = ()=>{
+
+  loadTrack(current+1,true)
+
+}
+
+/* =========================================================
+   CLICK / TOUCH PLAY PAUSE
+========================================================= */
+
+document.body.onclick = async ()=>{
+
+  if(!started){
+
+    started = true
+
+    initAudio()
+
+    if(ctxA.state !== "running"){
+      await ctxA.resume()
+    }
+
+    await loadTrack(0,true)
+
+    return
+  }
+
+  if(ctxA.state !== "running"){
+    await ctxA.resume()
+  }
+
+  if(audio.paused){
+
+    await audio.play()
+
+  }else{
+
+    audio.pause()
+
+  }
+}
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas = document.getElementById("viz")
+const c = canvas.getContext("2d")
+
+const DPR = devicePixelRatio || 1
+
+let W,H,CX,CY,R
+
+function resize(){
+
+  const s = Math.min(innerWidth*.78, innerHeight*.78)
+
+  canvas.width  = s * DPR
+  canvas.height = s * DPR
+
+  canvas.style.width  = s + "px"
+  canvas.style.height = s + "px"
+
+  c.setTransform(DPR,0,0,DPR,0,0)
+
+  W = s
+  H = s
+
+  CX = W/2
+  CY = H/2
+  R  = Math.min(W,H)*0.38
+}
+
+resize()
+
+addEventListener('resize',resize)
+
+/* =========================================================
+   STARFIELD
+========================================================= */
+
+const starCanvas = document.getElementById("stars")
+const sg = starCanvas.getContext("2d")
+
+let SW,SH
+
+function resizeStars(){
+
+  SW = starCanvas.width = innerWidth
+  SH = starCanvas.height = innerHeight
+
+}
+
+resizeStars()
+
+addEventListener('resize',resizeStars)
+
+const stars = Array.from({length:140},()=>({
+
+  x:Math.random()*SW,
+  y:Math.random()*SH,
+  z:Math.random()*2
+
+}))
+
+function drawStars(){
+
+  sg.clearRect(0,0,SW,SH)
+
+  for(const s of stars){
+
+    s.y += .3 + s.z
+
+    if(s.y > SH){
+
+      s.y = -10
+      s.x = Math.random()*SW
+
+    }
+
+    sg.fillStyle = `rgba(180,255,220,${0.08+s.z*0.08})`
+
+    sg.fillRect(s.x,s.y,s.z*1.5,s.z*1.5)
+
+  }
+}
+
+/* =========================================================
+   GLITCHES
+========================================================= */
+
+setInterval(()=>{
+
+  glitch.classList.add('active')
+
+  setTimeout(()=>{
+
+    glitch.classList.remove('active')
+
+  },180)
+
+},55000 + Math.random()*20000)
+
+/* =========================================================
+   MAIN DRAW
+========================================================= */
+
+let phase = 0
+let mouseX = 0
+let mouseY = 0
+
+addEventListener('mousemove',e=>{
+
+  mouseX = (e.clientX/innerWidth - .5)
+  mouseY = (e.clientY/innerHeight - .5)
+
+})
+
+function draw(){
+
+  requestAnimationFrame(draw)
+
+  drawStars()
+
+  c.fillStyle = "rgba(0,0,0,0.12)"
+  c.fillRect(0,0,W,H)
+
+  let energy = 0
+
+  if(analyser){
+
+    analyser.getByteTimeDomainData(data)
+
+    for(let i=0;i<data.length;i+=8){
+
+      energy += Math.abs((data[i]-128)/128)
+
+    }
+
+    energy /= data.length/8
+
+  }
+
+  phase += .01 + energy*.05
+
+  const driftX = mouseX * 18
+  const driftY = mouseY * 18
+
+  /* portal boundary */
+
+  c.beginPath()
+  c.arc(CX,CY,R+10,0,Math.PI*2)
+  c.strokeStyle = `rgba(0,255,120,${0.10+energy*.3})`
+  c.lineWidth = 2
+  c.stroke()
+
+  /* design modes */
+
+  const mode = TRACKS[current].type
+
+  c.save()
+
+  c.beginPath()
+  c.arc(CX,CY,R,0,Math.PI*2)
+  c.clip()
+
+  /* faint internal grid */
+
+  if(mode==="silicon"){
+
+    c.strokeStyle = "rgba(0,255,120,0.05)"
+
+    for(let x=0;x<W;x+=24){
+
+      c.beginPath()
+      c.moveTo(x,0)
+      c.lineTo(x,H)
+      c.stroke()
+
+    }
+
+    for(let y=0;y<H;y+=24){
+
+      c.beginPath()
+      c.moveTo(0,y)
+      c.lineTo(W,y)
+      c.stroke()
+
+    }
+  }
+
+  /* trace */
+
+  if(analyser){
+
+    const lag =
+      mode==="trajectory" ? 120 :
+      mode==="projection" ? 70 :
+      mode==="silicon" ? 20 :
+      90
+
+    for(let pass=0; pass<3; pass++){
+
+      const alpha =
+        pass===0 ? .12 :
+        pass===1 ? .25 :
+        .8
+
+      const spread =
+        pass===0 ? 1.12 :
+        pass===1 ? 1.05 :
+        1
+
+      c.beginPath()
+
+      for(let i=0;i<data.length;i++){
+
+        const a = (data[i]-128)/128
+
+        const b = (data[(i+lag)%data.length]-128)/128
+
+        const theta = i/data.length * Math.PI*2
+
+        let x,y
+
+        if(mode==="trajectory"){
+
+          x = CX + driftX +
+              Math.sin(theta*2 + phase)*a*R*.75*spread
+
+          y = CY + driftY +
+              Math.sin(theta*3 + phase*.7)*b*R*.75*spread
+
+        }else if(mode==="process"){
+
+          x = CX + driftX +
+              Math.sin(theta*5 + phase)*a*R*.65*spread
+
+          y = CY + driftY +
+              Math.cos(theta*4 + phase*.4)*b*R*.65*spread
+
+        }else if(mode==="silicon"){
+
+          x = CX + driftX +
+              Math.sign(Math.sin(theta*4))*a*R*.6*spread
+
+          y = CY + driftY +
+              Math.sign(Math.cos(theta*4))*b*R*.6*spread
+
+        }else{
+
+          x = CX + driftX +
+              Math.sin(theta*2 + phase)*a*R*.72*spread +
+              Math.sin(theta*11)*10
+
+          y = CY + driftY +
+              Math.sin(theta*7 + phase*.3)*b*R*.72*spread
+
+        }
+
+        if(i===0) c.moveTo(x,y)
+        else c.lineTo(x,y)
+      }
+
+      c.strokeStyle = `rgba(120,255,160,${alpha})`
+      c.lineWidth = pass===2 ? 1.6 + energy*2.2 : .7
+      c.shadowBlur = pass===2 ? 14 + energy*28 : 0
+      c.shadowColor = "#00ff88"
+
+      c.stroke()
+
+    }
+  }
+
+  c.restore()
+
+}
+
+draw()
+
+</script>
+
+</body>
+</html>

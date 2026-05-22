@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Semantic State</title>
+
+<style>
+
+:root{
+  --amber:#ffb347;
+  --amberSoft:#ffd089;
+  --bg:#060402;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  overflow:hidden;
+
+  font-family:monospace;
+  color:var(--amber);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  min-height:100vh;
+  cursor:pointer;
+}
+
+/* scanlines */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,220,120,0.03) 0px,
+      rgba(255,220,120,0.03) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+
+  mix-blend-mode:screen;
+  opacity:0.22;
+}
+
+/* screen glare */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+
+  background:
+    radial-gradient(
+      circle at 30% 18%,
+      rgba(255,240,180,0.12),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 75% 10%,
+      rgba(255,220,140,0.05),
+      transparent 22%
+    );
+
+  mix-blend-mode:screen;
+}
+
+.title{
+  margin-bottom:12px;
+
+  font-size:14px;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+
+  color:var(--amber);
+
+  text-shadow:
+    0 0 10px rgba(255,180,70,0.9),
+    0 0 18px rgba(255,150,40,0.4);
+}
+
+/* portal */
+
+canvas{
+  width:min(480px,90vw);
+  height:min(480px,90vw);
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(circle at center,
+      #1a1208 0%,
+      #080502 65%,
+      #000 100%);
+
+  border:2px solid rgba(255,180,70,0.26);
+
+  box-shadow:
+    0 0 35px rgba(255,170,70,0.12),
+    inset 0 0 120px rgba(255,180,90,0.08);
+}
+
+/* subtitles */
+
+.subs{
+  position:fixed;
+
+  bottom:40px;
+
+  width:min(600px,92vw);
+
+  min-height:2em;
+
+  padding:6px 10px;
+
+  text-align:center;
+  line-height:1.5;
+  font-size:14px;
+
+  color:#ffe0aa;
+
+  text-shadow:
+    0 0 8px rgba(255,190,90,0.8);
+
+  background:
+    rgba(40,18,0,0.28);
+
+  border:
+    1px solid rgba(255,180,70,0.12);
+
+  border-radius:6px;
+
+  pointer-events:none;
+}
+
+/* essay link */
+
+.link{
+  position:fixed;
+
+  bottom:8px;
+
+  width:min(600px,92vw);
+
+  text-align:center;
+
+  font-size:12px;
+
+  color:var(--amberSoft);
+
+  opacity:0.72;
+
+  text-decoration:none;
+}
+
+.link:hover{
+  opacity:1;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="title">
+  The Semantic State
+</div>
+
+<canvas id="viz"></canvas>
+
+<div class="subs" id="subs"></div>
+
+<a class="link"
+   href="https://standardgalactic.github.io/memnet/semantic_state.pdf"
+   target="_blank">
+  The Semantic State
+</a>
+
+<audio id="audio" preload="auto">
+  <source
+    src="The_Semantic_State.mp3"
+    type="audio/mpeg">
+</audio>
+
+<script>
+
+/* ─────────────────────────────────────
+   ELEMENTS
+───────────────────────────────────── */
+
+const audio =
+  document.getElementById("audio");
+
+const subs =
+  document.getElementById("subs");
+
+const canvas =
+  document.getElementById("viz");
+
+const g =
+  canvas.getContext("2d");
+
+/* prevent essay click pausing */
+
+document.querySelector(".link")
+.onclick = e=>{
+  e.stopPropagation();
+};
+
+/* ─────────────────────────────────────
+   AUDIO
+───────────────────────────────────── */
+
+let ctxAudio;
+let analyser;
+let data;
+
+function initAudio(){
+
+  if(ctxAudio) return;
+
+  ctxAudio =
+    new (
+      window.AudioContext ||
+      window.webkitAudioContext
+    )();
+
+  analyser =
+    ctxAudio.createAnalyser();
+
+  analyser.fftSize = 2048;
+
+  data =
+    new Uint8Array(
+      analyser.fftSize
+    );
+
+  const src =
+    ctxAudio.createMediaElementSource(audio);
+
+  src.connect(analyser);
+  analyser.connect(ctxAudio.destination);
+}
+
+/* click anywhere */
+
+document.body.onclick = async ()=>{
+
+  initAudio();
+
+  if(ctxAudio.state==="suspended"){
+    await ctxAudio.resume();
+  }
+
+  if(audio.paused){
+    await audio.play();
+  }else{
+    audio.pause();
+  }
+};
+
+/* ─────────────────────────────────────
+   SUBTITLES
+───────────────────────────────────── */
+
+let cues = [];
+
+async function loadVTT(file){
+
+  cues = [];
+
+  try{
+
+    const r =
+      await fetch(file);
+
+    if(!r.ok){
+      throw new Error(r.status);
+    }
+
+    const txt =
+      await r.text();
+
+    const blocks =
+      txt.split(/\n{2,}/);
+
+    for(const block of blocks){
+
+      const lines =
+        block.trim().split("\n");
+
+      const ts =
+        lines.find(
+          l=>l.includes("-->")
+        );
+
+      if(!ts) continue;
+
+      const [s,e] =
+        ts.split("-->")
+          .map(x=>x.trim());
+
+      const cueText =
+        lines
+          .slice(lines.indexOf(ts)+1)
+          .join(" ");
+
+      cues.push({
+        start:parseTime(s),
+        end:parseTime(e),
+        text:cueText
+      });
+    }
+
+  }catch(err){
+
+    console.warn(
+      "VTT failed:",
+      err
+    );
+  }
+}
+
+function parseTime(t){
+
+  const p =
+    t.replace(",",".")
+     .split(":");
+
+  return p.length===3
+    ? +p[0]*3600 + +p[1]*60 + +p[2]
+    : +p[0]*60 + +p[1];
+}
+
+audio.ontimeupdate = ()=>{
+
+  const t =
+    audio.currentTime;
+
+  const cue =
+    cues.find(c =>
+      t >= c.start &&
+      t <  c.end + 0.2
+    );
+
+  subs.textContent =
+    cue ? cue.text : "";
+};
+
+loadVTT(
+  "The_Semantic_State.vtt"
+);
+
+/* ─────────────────────────────────────
+   CANVAS
+───────────────────────────────────── */
+
+const DPR =
+  window.devicePixelRatio || 1;
+
+canvas.width  = 420 * DPR;
+canvas.height = 420 * DPR;
+
+g.scale(DPR,DPR);
+
+let tick = 0;
+
+/* helper */
+
+function noise(x){
+
+  return (
+    Math.sin(x)*0.5 +
+    Math.sin(x*0.71)*0.28 +
+    Math.sin(x*1.41)*0.14
+  );
+}
+
+/* intermittent screen glitch */
+
+let glitchFrames = 0;
+
+function maybeGlitch(){
+
+  if(glitchFrames > 0){
+    glitchFrames--;
+    return true;
+  }
+
+  if(Math.random() < 0.0025){
+    glitchFrames =
+      4 + Math.random()*8;
+  }
+
+  return false;
+}
+
+/* ─────────────────────────────────────
+   DRAW
+───────────────────────────────────── */
+
+function draw(){
+
+  tick++;
+
+  const glitching =
+    maybeGlitch();
+
+  /* phosphor fade */
+
+  g.fillStyle =
+    glitching
+      ? "rgba(12,4,0,0.18)"
+      : "rgba(10,5,0,0.08)";
+
+  g.fillRect(
+    0,0,420,420
+  );
+
+  const cx =
+    210 +
+    (glitching
+      ? (Math.random()-0.5)*6
+      : 0);
+
+  const cy =
+    210 +
+    (glitching
+      ? (Math.random()-0.5)*4
+      : 0);
+
+  const R = 165;
+
+  g.save();
+
+  g.beginPath();
+
+  g.arc(
+    cx,
+    cy,
+    R,
+    0,
+    Math.PI*2
+  );
+
+  g.clip();
+
+  /* semantic topology rings */
+
+  for(let i=0;i<14;i++){
+
+    const rr =
+      24 + i*11;
+
+    g.beginPath();
+
+    for(let a=0;a<=Math.PI*2;a+=0.035){
+
+      const warp =
+        Math.sin(
+          a*5 +
+          tick*0.003 +
+          i*0.2
+        ) * (
+          glitching ? 5 : 2
+        );
+
+      const x =
+        cx +
+        Math.cos(a)*(rr+warp);
+
+      const y =
+        cy +
+        Math.sin(a)*(rr+warp);
+
+      if(a===0)
+        g.moveTo(x,y);
+      else
+        g.lineTo(x,y);
+    }
+
+    g.strokeStyle =
+      `rgba(255,180,70,${
+        0.014 + i*0.004
+      })`;
+
+    g.lineWidth = 1;
+
+    g.stroke();
+  }
+
+  /* grid drift */
+
+  g.strokeStyle =
+    "rgba(255,180,70,0.028)";
+
+  const shift =
+    Math.sin(
+      tick*0.0018
+    ) * 20;
+
+  for(let x=-420;x<840;x+=26){
+
+    g.beginPath();
+
+    g.moveTo(
+      x+shift,
+      -420
+    );
+
+    g.lineTo(
+      x+shift,
+      840
+    );
+
+    g.stroke();
+  }
+
+  /* trace */
+
+  if(analyser){
+
+    analyser.getByteTimeDomainData(data);
+
+    let energy = 0;
+
+    for(let i=0;i<data.length;i+=8){
+
+      energy +=
+        Math.abs(
+          (data[i]-128)/128
+        );
+    }
+
+    energy /= (data.length/8);
+
+    const lag =
+      Math.floor(
+        data.length * (
+          0.14 +
+          noise(
+            tick*0.008
+          ) * 0.06
+        )
+      );
+
+    /* ghost */
+
+    g.beginPath();
+
+    for(let i=0;i<data.length;i++){
+
+      const a =
+        (data[i]-128)/128;
+
+      const b =
+        (data[
+          (i+lag)%data.length
+        ]-128)/128;
+
+      const theta =
+        (i/data.length) *
+        Math.PI*2;
+
+      const warp =
+        1 +
+        Math.sin(
+          theta*8 +
+          tick*0.004
+        ) * (
+          glitching ? 0.08 : 0.03
+        );
+
+      const x =
+        cx +
+        a * R *
+        warp *
+        0.92;
+
+      const y =
+        cy +
+        b * R *
+        warp *
+        0.82;
+
+      if(i===0)
+        g.moveTo(x,y);
+      else
+        g.lineTo(x,y);
+    }
+
+    g.strokeStyle =
+      `rgba(255,180,70,${
+        0.10 + energy*0.18
+      })`;
+
+    g.lineWidth = 5;
+
+    g.stroke();
+
+    /* bright layer */
+
+    g.beginPath();
+
+    for(let i=0;i<data.length;i++){
+
+      const a =
+        (data[i]-128)/128;
+
+      const b =
+        (data[
+          (i+lag)%data.length
+        ]-128)/128;
+
+      const theta =
+        (i/data.length) *
+        Math.PI*2;
+
+      const warp =
+        1 +
+        Math.sin(
+          theta*8 +
+          tick*0.004
+        ) * (
+          glitching ? 0.08 : 0.03
+        );
+
+      const x =
+        cx +
+        a * R *
+        warp *
+        0.92;
+
+      const y =
+        cy +
+        b * R *
+        warp *
+        0.82;
+
+      if(i===0)
+        g.moveTo(x,y);
+      else
+        g.lineTo(x,y);
+    }
+
+    g.strokeStyle =
+      "#ffd18a";
+
+    g.lineWidth =
+      1.6 + energy*1.6;
+
+    g.shadowBlur =
+      12 + energy*20;
+
+    g.shadowColor =
+      "#ffb347";
+
+    g.stroke();
+
+    g.shadowBlur = 0;
+  }
+
+  /* outer shell */
+
+  g.beginPath();
+
+  g.arc(
+    cx,
+    cy,
+    R,
+    0,
+    Math.PI*2
+  );
+
+  g.strokeStyle =
+    "rgba(255,180,70,0.22)";
+
+  g.lineWidth = 2;
+
+  g.stroke();
+
+  g.restore();
+
+  requestAnimationFrame(draw);
+}
+
+draw();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+\chapter{Perceptual Reconstruction and Harmonic Completion}
+\label{app:perceptual}
+
+\epigraph{A signal may remain semantically recognizable while losing fine-grained
+structural relations necessary for perceptual richness, temporal immersion, or
+sustained attentional coherence.}{}
+
+\noindent Perception does not operate through perfect recovery of external
+structure. All reconstructive systems operate under informational incompleteness,
+energetic limitation, and finite temporal accessibility. Perceptual systems
+therefore rely upon partial reconstruction procedures that stabilize coherent
+interpretations from degraded or underspecified inputs. This appendix investigates
+harmonic reconstruction, perceptual coherence, and temporal continuity under
+compressed representation regimes.
+
+The material here should be understood as \textbf{[P]} phenomenological
+interpretation and \textbf{[H]} heuristic engineering throughout. It does not
+establish that compressed audio damages consciousness, removes emotional essence,
+or eliminates hidden biological frequencies necessary for cognition. Such claims
+exceed available evidence. The framework proposes only that reconstruction quality
+influences perceptual coherence and that harmonic continuity may affect subjective
+richness, immersion, and attentional stability under constrained representational
+conditions.
+
+\section{Compression and the Symbolic/Inferential Distinction}
+
+All lossy compression systems preserve certain structural relations while discarding
+others. The resulting reconstruction is shaped not only by retained information but
+also by the assumptions embedded within the reconstruction procedure itself.
+
+Perceptual degradation frequently emerges when temporally or harmonically significant
+relations are removed despite preserving coarse symbolic intelligibility. This
+reflects the broader separation between symbolic continuity and inferential
+continuity developed in Chapter~\ref{ch:scaffolded}. A signal may remain
+semantically recognizable---the words are audible, the melody is identifiable---
+while losing fine-grained structural relations necessary for perceptual richness,
+temporal immersion, or sustained attentional coherence.
+
+\section{Harmonic Reconstruction as Constraint Completion}
+
+Suppose a signal admits a partial harmonic decomposition:
+\[
+  x(t) = \sum_{k=1}^{N} a_k \cos(\omega_k t + \phi_k).
+\]
+Compression removes a subset of components:
+\[
+  \hat{x}(t) = \sum_{k \in S} a_k \cos(\omega_k t + \phi_k), \quad S \subseteq \{1,\ldots,N\}.
+\]
+Reconstruction seeks admissible completion operators $\mathcal{R}: \hat{x}(t) \mapsto
+\tilde{x}(t)$ that infer missing relational structure from surviving harmonic
+constraints:
+\[
+  \tilde{x} = \arg\min_{y \in \mathcal{C}} D(y, \hat{x}),
+\]
+where $\mathcal{C}$ denotes the space of temporally coherent reconstructions and
+$D$ extracts perceptually relevant relational structure rather than raw amplitude
+similarity alone.
+
+The perceptual divergence between original and reconstruction is:
+\[
+  D(x, \tilde{x}) = \int \|K(x(t)) - K(\tilde{x}(t))\|^2\, dt,
+\]
+where $K$ extracts perceptually relevant relational structure. This is a
+constrained interpolation problem, not a restoration problem. The reconstructed
+signal is an inferential approximation generated under bounded informational
+accessibility, not a recovery of the original.
+
+\section{Temporal Continuity and Perceptual Stability}
+
+Biological perception exhibits strong sensitivity to temporal discontinuity.
+Abrupt fragmentation, phase instability, and incoherent transient structure
+increase perceptual fatigue and reduce sustained attentional stabilization.
+Define local temporal fragmentation through phase structure $\phi(t)$:
+\[
+  F(t) = \left|\frac{d^2\phi}{dt^2}\right|.
+\]
+Perceptual stability emerges when integrated fragmentation remains bounded:
+\[
+  \int_{t_0}^{t_1} F(t)\,dt < \epsilon.
+\]
+
+\claimH Harmonic reconstruction mechanisms may partially restore such continuity
+even when substantial information has been lost. The resulting increase in perceived
+richness does not imply that hidden information has been recovered in a literal
+sense. Rather, the reconstruction process stabilizes relational structures
+compatible with prior perceptual expectations and surviving signal constraints.
+
+\section{Inferential Completion in Auditory Perception}
+
+Perceptual reconstruction depends heavily upon inferential completion. Human
+auditory systems routinely interpolate missing information from contextual
+structure, harmonic expectation, and temporal continuity:
+\[
+  \hat{x} = \arg\max_z P(z \mid y, H),
+\]
+where $y \subset x$ is the available perceptual input and $H$ represents prior
+structural expectations. Hallucination, interpolation, and perceptual completion
+all arise naturally whenever $\dim(y) < \dim(x)$. The system operates by
+constrained reconstruction rather than exhaustive recovery of inaccessible total
+states. This is exactly the reconstruction bound of Chapter~\ref{ch:vocabulary}
+applied to the auditory domain.
+
+\claimP Such effects belong primarily to psychoacoustics, perceptual inference,
+and temporal coherence theory. They do not require speculative metaphysics
+about consciousness or hidden frequencies. The interesting questions are
+computational and psychoacoustic: which structural relations does the auditory
+system most depend on for stability, and which reconstruction heuristics best
+preserve those relations under compression?

@@ -1,0 +1,111 @@
+% ============================================================
+%  THE ORTYX PROTOCOL
+%  Appendix E: Entropic Accessibility and Constraint Descent
+% ============================================================
+
+\chapter{Entropic Accessibility and Constraint Descent}
+\label{app:entropy}
+
+\noindent
+This appendix develops the RSVP-compatible formalism
+of accessibility entropy and constraint descent, which
+provides the mathematical basis for the reinterpretation
+of salience as inverse accessibility and the
+constraint-governed trajectory framework of Chapter~17.
+
+\section{Admissible Trajectory Spaces}
+\label{app-e:admissible}
+
+Let $X$ be the state space of a dynamical system.
+From a state $x_t \in X$ at time $t$, define the
+admissible future trajectory space:
+\[
+  \AdmTraj(x_t) = \{x : X \to X\text{ continuous} :
+  x(t) = x_t,\ \mathcal{C}(x(s)) = 0\ \forall s \ge t\},
+\]
+where $\mathcal{C} : X \to \mathbb{R}_{\ge 0}$ is
+a constraint functional with $\mathcal{C}(x) = 0$
+denoting constraint satisfaction.
+
+\begin{definition}
+The \emph{accessibility entropy} at state $x_t$ is:
+\[
+  \AccEnt(x_t) = \log\mu\bigl(\AdmTraj(x_t)\bigr),
+\]
+where $\mu$ is an appropriate measure on the space
+of admissible trajectories. High $\AccEnt$ indicates
+many admissible futures (low constraint); low $\AccEnt$
+indicates few admissible futures (high constraint).
+\end{definition}
+
+\section{Functional Systems as Low-Entropy Basins}
+\label{app-e:functional}
+
+Functional systems --- systems that reliably achieve
+their objectives --- correspond to low-dimensional
+admissible basins:
+\[
+  \mu\bigl(\AdmTraj(x_t)\bigr) \ll
+  \mu\bigl(\AdmTraj_{\max}\bigr),
+\]
+where $\AdmTraj_{\max}$ is the unconstrained trajectory
+space. Equivalently, $\AccEnt(x_t)$ is small relative
+to its maximum value.
+
+\begin{proposition}
+A system in a low-$\AccEnt$ state is highly predictable:
+its future trajectory is strongly determined by its
+current state. A system in a high-$\AccEnt$ state is
+weakly predictable: many distinct futures are consistent
+with its current state.
+\end{proposition}
+
+The RSVP reinterpretation of salience (\S\ref{app-b:jitter-entropy})
+proposes $\SalFunc \propto 1/\AccEnt$: signals with
+many admissible continuations are low-salience (high
+entropy, unpredictable); signals with few admissible
+continuations are high-salience (low entropy, predictable).
+
+\section{Constraint Descent Dynamics}
+\label{app-e:constraint-descent}
+
+When the constraint functional $\mathcal{C}$ is
+differentiable, constraint-preserving evolution follows:
+\[
+  \frac{dx}{dt} = -\nabla \AccEnt(x) = -\frac{\nabla\mu(\AdmTraj(x))}{\mu(\AdmTraj(x))},
+\]
+driving the system toward states with fewer admissible
+trajectories --- toward higher constraint and lower
+entropy. Stable structures correspond to local minima
+of $\AccEnt$:
+\[
+  \nabla \AccEnt(x^\ast) = 0, \qquad
+  \nabla^2 \AccEnt(x^\ast) > 0.
+\]
+
+\section{The Salience--Accessibility Correspondence}
+\label{app-e:sal-acc}
+
+The structural claim linking the Marine salience metric
+to accessibility entropy can be stated as the following
+research hypothesis:
+
+\begin{auditprop}
+\label{ap:salience-accessibility}
+\textit{(Salience--Accessibility Hypothesis)}: For
+audio signals, peak-level jitter $\Jp(i) + \Ja(i)$
+is negatively correlated with the accessibility entropy
+$\AccEnt(x_{t_i})$ of the signal's state at peak $i$,
+when the state space $X$ is specified as the space
+of admissible waveform continuations under the signal's
+physical generating model. This hypothesis generates
+a testable prediction: low-jitter peaks should correspond
+to states where the waveform's short-term future is
+strongly constrained by its current state.
+\end{auditprop}
+
+This audit proposition is classified as a \LevelII{}
+claim (productive research hypothesis) rather than
+a \LevelI{} claim (established engineering result)
+because the specification of the state space and measure
+required to test it has not been completed.

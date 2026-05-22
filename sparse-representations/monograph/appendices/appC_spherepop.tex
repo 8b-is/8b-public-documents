@@ -1,0 +1,151 @@
+\chapter{Spherepop: Operator Semantics and Worked Examples}
+\label{app:spherepop}
+
+\noindent Spherepop is an irreversible event calculus defined by four primitive
+operators acting on a possibility space. This appendix develops the operational
+semantics of all four operators, their type signatures, composition rules, and
+worked examples demonstrating how Spherepop sequences implement cognitive and
+social operations.
+
+\section{The Possibility Space}
+
+\begin{definition}{Possibility Space}
+A \emph{possibility space} $\mathcal{P}$ is a partially ordered set of
+configurations $\{p_1, p_2, \ldots\}$ with a distinguished subset
+$\mathcal{A} \subseteq \mathcal{P}$ of \emph{admissible configurations}
+satisfying the current constraint set $\mathcal{C}$. The \emph{actuality set}
+$\mathcal{E} \subseteq \mathcal{P}$ is the set of configurations that have
+been committed: extracted from $\mathcal{A}$ and rendered actual.
+\end{definition}
+
+\section{The Four Operators}
+
+\begin{definition}{Pop}
+$\mathrm{Pop}: \mathcal{A} \times \mathcal{P} \to \mathcal{P} \times \mathcal{E}$
+
+\textbf{Signature:} Takes an admissible configuration $p \in \mathcal{A}$ and
+the current possibility space $\mathcal{P}$; returns the contracted possibility
+space $\mathcal{P}' = \mathcal{P} \setminus \{p\}$ and the updated actuality set
+$\mathcal{E}' = \mathcal{E} \cup \{p\}$.
+
+\textbf{Effect:} Extracts a committed event from possibility into actuality. All
+alternatives to $p$ that are incompatible with $p$ given the active Bindings are
+simultaneously removed from $\mathcal{A}$ (but not necessarily from $\mathcal{P}$,
+since they may become relevant again if the Binding is released---though Bindings
+themselves are irreversible).
+
+\textbf{Irreversibility:} Once $\mathrm{Pop}(p)$ has been applied, $p$ cannot
+be returned to $\mathcal{A}$. The event is committed.
+
+\textbf{Example:} A Neanderthal builder selects a stalagmite fragment of length
+$L = 0.47\,\text{m}$ from the set of available fragments. The fragment is
+extracted from the possibility space of candidate elements and placed in the ring.
+All fragments that would produce identical pitch are still available (they remain
+in $\mathcal{P}$), but this specific fragment is now committed.
+\end{definition}
+
+\begin{definition}{Refuse}
+$\mathrm{Refuse}: 2^\mathcal{P} \times \mathcal{P} \to \mathcal{P}$
+
+\textbf{Signature:} Takes a set of inadmissible configurations $R \subseteq
+\mathcal{P}$ and the current possibility space; returns $\mathcal{P}' =
+\mathcal{P} \setminus R$.
+
+\textbf{Effect:} Eliminates inadmissible trajectories from the possibility space
+without committing to any alternative. Refuse is the admissibility filtering
+operation that produces $\mathcal{A}(\mathcal{C})$ from the unconstrained space.
+
+\textbf{Irreversibility:} Once refused, configurations cannot be re-admitted
+within the same system-instance. The constraint that grounds the refusal may be
+relaxed in a different context, but the Refuse operation itself leaves structural
+residue.
+
+\textbf{Example:} A squirrel, upon biting an object and finding it inedible,
+removes it from its cache-candidate possibility space. The object remains in
+the physical environment (it remains in the world-state) but is excluded from
+the system's admissible foraging trajectories.
+\end{definition}
+
+\begin{definition}{Bind}
+$\mathrm{Bind}: \mathcal{E} \times \mathcal{P} \to \mathcal{B}$
+
+\textbf{Signature:} Takes a committed event $e \in \mathcal{E}$ and a prospective
+event $p \in \mathcal{P}$; returns a dependency record $(e \to p) \in \mathcal{B}$
+asserting that the occurrence of $e$ imposes constraints on the admissibility of $p$.
+
+\textbf{Effect:} Establishes structural dependencies between events, constraining
+future possibilities. Bind creates the dependency graph that constitutes the
+provenance structure of the system.
+
+\textbf{Irreversibility:} Active Bindings cannot be released within the same
+system-instance. They accumulate the structural residue that makes the system's
+history recoverable.
+
+\textbf{Example:} In the Yarncrawler climate simulation, the Seattle tax-redirection
+strategy is Bound to the Portland cooling-center expansion: the success of the
+former constrains the admissible implementations of the latter. Prior decisions
+structure the possibility space of future ones.
+\end{definition}
+
+\begin{definition}{Collapse}
+$\mathrm{Collapse}: \mathcal{P} \to \mathcal{E}$
+
+\textbf{Signature:} Takes the entire current possibility space $\mathcal{P}$
+and commits it to a definite configuration, rendering all alternatives inaccessible.
+
+\textbf{Effect:} Terminates the local trajectory of hypothesis refinement. Where
+Pop extracts a single event, Collapse resolves an entire horizon of possibilities
+into a committed configuration. After Collapse, no further Pop or Refuse operations
+are possible on the committed domain.
+
+\textbf{Irreversibility:} Collapse is the strongest irreversibility operation.
+It commits everything. The structural residue of a Collapse is the entire history
+of the possibility space that was resolved.
+
+\textbf{Example:} At the end of the Bruniquel construction, the arrangement of
+stalagmite fragments is Collapsed into a definite spatial configuration. The
+alternative arrangements that were considered during construction are no longer
+accessible to the same construction process---though they may become relevant to
+a future reconstruction attempt.
+\end{definition}
+
+\section{Composition Rules}
+
+Spherepop operators compose to produce \KES trajectories:
+
+\[
+  \Omega_{t+1} = \mathrm{Pop}^{k} \circ \mathrm{Refuse}^{m} \circ
+  \mathrm{Bind}^{n} (\Omega_t)
+\]
+
+for appropriate choices of the exponent parameters. The ordering constraint is
+that Bind must precede Pop (dependencies must be established before events are
+committed under them), and Refuse must precede Pop (inadmissible options must
+be eliminated before remaining options are selected). Collapse may only follow
+when $|\mathcal{A}| = 1$ (the admissible space has contracted to a single option)
+or as an executive operation terminating further refinement.
+
+\section{The Bone Matrix Correspondence}
+
+The seven Yarncrawler swarm-care axioms introduced in
+Chapter~\ref{ch:yarncrawler_formal} correspond to Spherepop operation sequences:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Swarm-care Axiom & Spherepop Sequence \\
+\midrule
+Local Action Only & $\mathrm{Refuse}(\text{non-local trajectories})$ \\
+Trail Documentation & $\mathrm{Bind}(\text{action}, \text{log entry})$ \\
+Autocatalytic Fix & $\mathrm{Bind}(\text{fix}, \text{future repair path})$ \\
+Trail Reinforcement/Decay & $\mathrm{Pop}(\text{high-weight trail})$ \\
+Node Hygiene & $\mathrm{Refuse}(\text{entropy-exceeding states})$ \\
+Failure Isolation & $\mathrm{Collapse}(\text{quarantine zone})$ \\
+Swarm Feedback & $\mathrm{Bind}(\text{precision-weighted update}, \text{global})$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This correspondence shows that the Yarncrawler axioms are not independent
+engineering heuristics but derived consequences of operating Spherepop sequences
+under the constraint that Markov blanket factorization is preserved throughout.

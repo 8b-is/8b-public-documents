@@ -1,0 +1,33 @@
+% ── Three-track theorem system ──────────────────────────────
+%
+%  Track 1 — Mathematical derivations
+%  Track 2 — Audit methodology (auditprop, auditrule)
+%  Track 3 — Phenomenological observations (phenomenon, interpretation)
+%
+%  Keeping these separate preserves inferential clarity across
+%  400+ pages of mixed formal and interpretive writing.
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{protocol}[theorem]{Protocol}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+% Track 2: Audit propositions and rules
+\theoremstyle{definition}
+\newtheorem{auditprop}{Audit Proposition}[chapter]
+\newtheorem{auditrule}[auditprop]{Audit Rule}
+
+% Track 3: Phenomenological observations
+\theoremstyle{remark}
+\newtheorem{phenomenon}{Phenomenological Observation}[chapter]
+\newtheorem{interpretation}[phenomenon]{Interpretation}

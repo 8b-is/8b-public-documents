@@ -1,0 +1,255 @@
+\chapter{Core Vocabulary}
+\label{ch:vocabulary}
+
+\epigraph{Terminology is prevented from becoming detached from operational meaning.
+The insistence on repeatedly rebuilding assumptions from the ground upward functions
+as a defense against proxy drift at the conceptual level itself.}{}
+
+\noindent This chapter establishes the definitional scaffold on which the remainder of the
+monograph is built. Terms introduced here are used without redefinition in subsequent
+chapters. Where a concept is partially anticipated in Chapter~\ref{ch:manifold}, the
+definition here provides the formal completion.
+
+\section{State Spaces and Trajectory Selection}
+
+\begin{definition}{State Space}
+A \emph{state space} $\mathcal{X}$ is a set whose elements represent all possible
+configurations of a system. A \emph{trajectory} through $\mathcal{X}$ is a map
+$\gamma: I \to \mathcal{X}$ from an index set $I$ (typically a time interval) into
+the state space. The \emph{selection pressure} acting on a trajectory space is the
+set of mechanisms that filter admissible from inadmissible paths. Selection pressure
+may arise from physical laws, thermodynamic constraints, logical requirements,
+historical boundary conditions, or any combination of these.
+\end{definition}
+
+The distinction between exhaustive search and constrained navigation is fundamental.
+A system performing exhaustive search considers the full space $\mathcal{X}^I$ of
+possible trajectories and evaluates each against an objective function. A system
+performing constrained navigation operates only within $\mathcal{A}(\mathcal{C})$
+from the outset, never considering inadmissible paths. Biological and cognitive systems
+almost exclusively employ constrained navigation, because exhaustive search is
+thermodynamically impossible at any scale of practical interest.
+
+\section{Compression, Sparsity, and Structural Invariants}
+
+\begin{definition}{Compression}
+A \emph{compression} of a system description $D$ is a map $\kappa: D \to D'$ where
+$|D'| < |D|$ under some measure of description length, and $D'$ preserves a specified
+set of structural relations present in $D$. A compression is \emph{lossless with
+respect to} $\mathcal{R}$ if every relation $r \in \mathcal{R}$ is recoverable from
+$D'$. It is \emph{lossy} if some $r \in \mathcal{R}$ is not recoverable. Compression
+is therefore not reduction of volume alone but selective preservation of relations.
+\end{definition}
+
+\begin{definition}{Structural Invariant}
+A \emph{structural invariant} of a system under a family of transformations
+$\{T_\alpha\}$ is a property $P$ such that $P(T_\alpha(s)) = P(s)$ for all $\alpha$
+and all states $s$ in the relevant domain. Structural invariants are the properties
+that compression must preserve to remain operationally useful. A compression that
+erases structural invariants necessary for understanding, provenance, or accountability
+is a \emph{destructive compression} regardless of its information-theoretic efficiency.
+\end{definition}
+
+\begin{definition}{Sparsity}
+A representation is \emph{sparse} if most of its degrees of freedom are zero or
+near-zero, with significant values concentrated in a small fraction of components.
+Sparsity is the condition under which compression becomes tractable: a sparse
+representation can be compressed without destroying structural invariants because
+most of the space is already empty. The \emph{Natural Sparsity Principle} states
+that in biological systems, sparsity emerges as a natural consequence of
+physiological pressures---energetic constraints, signal noise, chemical
+gradients---without requiring explicit computational penalties to enforce minimal
+complexity.
+\end{definition}
+
+\subsection*{Why Sparsity Makes Reconstruction Tractable}
+
+The connection between sparsity and tractable reconstruction can be sketched
+formally. Let $\mathbf{x} \in \mathbb{R}^N$ be a signal with $k \ll N$ nonzero
+components. The number of bits required to specify $\mathbf{x}$ is approximately
+$k \log(N/k) + k \log(\max|\mathbf{x}|/\epsilon)$ for precision $\epsilon$, far
+less than the $N \log(\max|\mathbf{x}|/\epsilon)$ bits required for a dense signal.
+
+Under bounded energetic constraints, a system with budget $B$ (in bits or equivalent
+energy units) can faithfully represent $\mathbf{x}$ if and only if $B \geq$ the
+encoding cost. For dense signals this budget is exhausted rapidly; for sparse signals
+it is not. The compressive sensing literature shows that under sparsity, signals can
+be recovered from $O(k \log N)$ measurements rather than $N$ measurements, with
+reconstruction error bounded by the sparsity level.
+
+The biological relevance is direct. Neural firing rates are sparse: typical cortical
+neurons fire at low average rates, with high-rate bursts carrying most information.
+This means the energetic cost of neural representation scales with signal sparsity
+rather than state-space dimensionality. A brain that maintained dense representations
+of all sensory dimensions simultaneously would require thermodynamically infeasible
+metabolic support. Sparsity is not a design choice but a thermodynamic necessity
+that the Natural Sparsity Principle identifies as a universal constraint on
+cognitive architecture.
+
+\section{Reconstruction and Hallucination}
+
+\begin{definition}{Reconstruction}
+\emph{Reconstruction} is the process by which a system assembles an operationally
+coherent configuration from partial traces. A reconstruction is \emph{grounded} if
+it remains constrained by external feedback signals. It is \emph{corrigible} if
+errors in reconstruction are detectable and correctable through interaction with the
+environment. It is \emph{drifting} if it progressively decouples from external
+constraint and stabilizes on an internally self-consistent but externally inaccurate
+model.
+\end{definition}
+
+\begin{definition}{Hallucination (Formal)}
+\emph{Hallucination} is reconstruction that exceeds available constraint: the
+assembly of a locally coherent configuration from traces that underdetermine it,
+without external correction signals sufficient to resolve the underdetermination.
+Hallucination is not a pathology but the default operating condition of any
+sufficiently compressed system under uncertainty. The critical distinction is not
+between hallucinating and non-hallucinating systems but between systems whose
+hallucinations remain \emph{corrigible} through feedback and systems whose internal
+reconstructions drift irreversibly from external constraint.
+\end{definition}
+
+\begin{remark}
+This definition of hallucination is deliberately broader than its use in AI
+discourse, where it typically refers to language model confabulation. The formal
+definition encompasses perception, memory consolidation, theoretical inference,
+institutional modeling, and any other process in which a partial trace is assembled
+into a more complete representation. All such processes hallucinate in this sense;
+the question is always whether the hallucination is correctable.
+\end{remark}
+
+\subsection*{Reconstruction Bound}
+
+The inevitability of hallucination under compression can be made precise. Let $D$
+be a description of cardinality $|D| = N$ and let $\kappa(D) = D'$ be a compression
+with $|D'| = M < N$. The number of distinct descriptions $D$ consistent with $D'$
+is at least $2^{N-M}$, since the compressed representation cannot distinguish among
+them. Any reconstruction process that must select a single completion from among
+these $2^{N-M}$ possibilities must hallucinate: it must choose structure that the
+compression does not uniquely determine.
+
+More formally, if $p(D \mid D')$ is the posterior distribution over original
+descriptions given the compressed form, then:
+\[
+  H(D \mid D') = -\sum_D p(D \mid D') \log p(D \mid D') \geq N - M > 0.
+\]
+The conditional entropy is strictly positive whenever $M < N$. A reconstructing
+system with access only to $D'$ cannot recover $D$ with certainty. It must
+interpolate the missing $N - M$ bits from prior structure, contextual signals,
+or statistical regularities. That interpolation is hallucination in the formal
+sense: reconstruction exceeding available constraint.
+
+The corrigibility condition---the requirement that reconstruction errors remain
+correctable through feedback---does not eliminate this hallucination. It ensures
+only that when the interpolated structure turns out to be wrong, the error is
+detectable and correctable before it propagates into downstream commitments.
+
+\section{Provenance and the Boot Sequence}
+
+\begin{definition}{Provenance}
+The \emph{provenance} of a conceptual or computational object is the recoverable
+dependency graph of the operations and inputs that produced it. Provenance includes:
+the sequence of constraint-stabilization events that enabled the object's current
+form; the assumptions that were imported versus derived; and the points at which
+external evidence entered the reconstruction process. A system with high provenance
+transparency is one whose dependency graph can be approximately reconstructed by an
+external observer.
+\end{definition}
+
+\begin{definition}{Boot Sequence}
+A \emph{boot sequence} is the ordered set of constraint-stabilization events
+necessary to make a higher-level abstraction operationally meaningful. Lower-level
+constraints must be stabilized before higher-level ones can be evaluated. Erasing
+the boot sequence---presenting only the terminal abstraction without the ordered
+initialization history---transforms an inspectable object into an opaque one. The
+boot sequence is thus the provenance of a system's layered structure.
+\end{definition}
+
+\section{The Formal Substrates: RSVP, KES, Spherepop}
+
+Three formal frameworks function as computational and geometric substrates throughout
+this monograph. They are introduced briefly here and developed formally in the
+appendices. References to these frameworks in subsequent chapters should be understood
+as references to the formal specifications given there.
+
+\begin{definition}{\RSVP Field System}
+The \emph{Relativistic Scalar-Vector Plenum} (\RSVP) is a coupled field system
+consisting of three dynamical fields over a spacetime manifold $\mathcal{M}$:
+\begin{itemize}
+  \item $\Phifield(\mathbf{x}, t)$: a scalar density field encoding concentration,
+        potential, or legitimacy of state.
+  \item $\vfield(\mathbf{x}, t)$: a vector flow field encoding directed transport,
+        trajectories, and causality.
+  \item $\Sfield(\mathbf{x}, t)$: an entropy field encoding disorder, uncertainty,
+        and complexity budgets.
+\end{itemize}
+The three fields evolve according to coupled nonlinear partial differential equations.
+The full Lagrangian structure and seven governing axioms are given in
+Appendix~\ref{app:rsvp}. Within the semantic interpretation developed in
+Chapter~\ref{ch:yarncrawler_formal}, $\Phifield$ measures semantic density, $\vfield$
+encodes recursive trajectories of meaning, and $\Sfield$ tracks unresolved noise
+available for future reinterpretation.
+\end{definition}
+
+\begin{definition}{\KES Map}
+The \emph{Kinetic-Event Synthesis} (\KES) map is the function
+\[
+  \KES: \Omega_t \longrightarrow H_{t+1}
+\]
+from a current world-state $\Omega_t$ to a successor hypothesis space $H_{t+1}$.
+The map formalizes the basic cognitive operation: given a current configuration of
+constraints, evidence, and prior commitments, what hypothesis spaces are admissible
+at the next step? The full convergence conditions and technical specification are
+given in Appendix~\ref{app:kes}.
+\end{definition}
+
+\begin{definition}{Spherepop Calculus}
+\emph{Spherepop} is an irreversible event calculus defined by four primitive
+operators acting on a possibility space $\mathcal{P}$:
+\begin{itemize}
+  \item $\mathrm{Pop}$: extracts committed events from possibility space,
+        transitioning them to actuality.
+  \item $\mathrm{Refuse}$: eliminates inadmissible trajectories, contracting the
+        admissible space.
+  \item $\mathrm{Bind}$: establishes structural dependencies between events,
+        constraining future possibilities.
+  \item $\mathrm{Collapse}$: commits a possibility space to a definite
+        configuration, rendering alternatives inaccessible.
+\end{itemize}
+All four operations are irreversible: once applied, they cannot be undone within
+the same system. The operational semantics of all four operators are developed
+formally in Appendix~\ref{app:spherepop}.
+\end{definition}
+
+\begin{remark}
+The irreversibility of Spherepop operators is not a limitation but a design
+commitment. Systems that can always reverse their operations accumulate no
+structural residue; they have no history and therefore no trajectory. The
+Collapse operator in particular formalizes the commitment structure that
+distinguishes genuine decision from perpetual deferral.
+\end{remark}
+
+\section*{Constraint Boundary}
+
+\begin{constraintboundary}
+\textbf{What this chapter establishes:} Formal definitions of admissibility,
+compression, sparsity, reconstruction, hallucination, provenance, and the boot
+sequence. The reconstruction bound $H(D \mid D') \geq N - M > 0$ is formally
+derived. The three formal substrates (\RSVP, \KES, Spherepop) are introduced as
+technical objects.
+
+\textbf{What this chapter does not establish:} That these definitions uniquely
+capture the relevant phenomena in any particular domain. The definitions are
+productive insofar as they generate useful inferences; their domain of validity
+must be established by application.
+
+\textbf{Remaining speculative:} The claim that the Natural Sparsity Principle
+operates universally across biological systems is a \textbf{[C]} conjecture
+supported by neuroscience and thermodynamics but not formally derived here.
+
+\textbf{Falsification conditions:} A system that produces corrigible reconstruction
+from a strictly lossless compression would falsify the claim that hallucination is
+constitutive of compressed inference. A biological cognitive system that maintains
+dense rather than sparse representations at thermodynamically sustainable cost
+would falsify the Natural Sparsity Principle.
+\end{constraintboundary}

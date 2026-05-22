@@ -1,0 +1,215 @@
+\chapter{Identity, Bootstrapping, and Persistent Process}
+\label{ch:identity}
+
+\epigraph{Persistence itself may often be an active maintenance process rather
+than a static substance. Identity becomes less like an immutable object and
+more like a repeatedly recompiled process maintaining coherence through time.}{}
+
+\section{The Self as Repeated Reconstruction}
+
+A narrative self is not continuously present in the way ordinary intuition
+suggests. Continuity is actively reconstructed after sleep, anesthesia, trauma,
+distraction, and context switching. The feeling of persistent identity emerges
+from this reconstruction process succeeding smoothly enough that the
+discontinuities become invisible.
+
+\claimP This is not merely a phenomenological observation but has formal
+structure in the trajectory framework. Identity is a trajectory through a state
+space that satisfies local compatibility conditions at each step. The compatibility
+conditions are the accumulated constraints of prior commitments, relationships,
+memories, and bodily continuity. The ``self'' at any moment is the locally
+admissible configuration that satisfies all these constraints simultaneously.
+When the constraints are temporarily suspended---during sleep, anesthesia,
+trauma---the reconstruction process must re-assemble an admissible configuration
+from available traces. The resulting configuration is the self after the
+interruption.
+
+\section{Computational Bootstrapping as Philosophical Model}
+
+The layered initialization sequence of an operating system provides a structural
+model for how complex coherent systems emerge from primitive constraint-stabilization
+events.
+
+Firmware initializes primitive hardware assumptions. The bootloader establishes
+a minimal execution environment. The kernel initializes memory structures,
+scheduling systems, and drivers. Higher-level abstractions---file systems,
+user interfaces, application frameworks---only become meaningful because these
+lower-level structures have already been stabilized. Each layer depends on the
+layers below it having been successfully initialized. Skipping a layer does not
+produce a partial system; it produces a system that fails to initialize at all,
+because the abstractions of layer $n+1$ are not meaningful without the
+constraints of layer $n$.
+
+\claimP The analogy extends to theoretical understanding. Concepts must be
+bootstrapped in dependency order to produce genuine comprehension rather than
+surface familiarity. A student who memorizes the statement of the second law of
+thermodynamics without first developing intuition for entropy, irreversibility,
+and heat flow has initialized a terminal abstraction without its boot sequence.
+The statement may be reproduced accurately under examination; it cannot be applied
+to novel problems because the inferential machinery that generated it is not present.
+
+This is why the monograph's chapter ordering enforces the dependency structure
+rather than proceeding from the most striking claims. The Yarncrawler formal
+definition in Chapter~\ref{ch:yarncrawler_formal} is not meaningful without the
+admissibility and reconstruction vocabulary of Chapters~\ref{ch:manifold}
+and~\ref{ch:vocabulary}. The sheaf-theoretic repair machinery of
+Chapter~\ref{ch:sheaf} is not meaningful without the Yarncrawler definition.
+The cosmological application of Chapter~\ref{ch:cosmological} is not meaningful
+without both. Each chapter is a boot layer.
+
+\section{Persistence as Active Maintenance}
+
+Selves, institutions, scientific paradigms, languages, and software ecosystems
+persist not by being immutable objects but by continuously reproducing enough
+structural continuity to remain operational across interruptions and
+transformations.
+
+\claimP A scientific paradigm persists not because its core claims are immune
+to revision but because each generation of practitioners reinitializes the
+paradigm from available evidence and prior commitments, producing a reconstruction
+that is close enough to prior reconstructions that the paradigm remains recognizable.
+When the reconstructions begin diverging significantly---when the boot sequence
+produces different results in different laboratories---the paradigm is undergoing
+revision even if no single paper announces it.
+
+\claimP A language persists not because its words have fixed meanings but because
+each generation of speakers reconstructs approximately the same set of
+constraint relations among words from available input. The language drifts when
+the reconstruction process begins producing systematically different constraint
+relations. The drift is invisible at any given moment---each speaker's reconstruction
+is locally admissible---and only visible retrospectively when the accumulated
+difference becomes too large to ignore.
+
+\section{Semantic, Episodic, and Procedural Memory as Boot Layers}
+
+The computational memory literature distinguishes three types of long-term memory
+in agentic systems, a taxonomy borrowed from cognitive psychology:
+
+\begin{itemize}
+  \item \textbf{Semantic memory}: generalized factual knowledge, stable across
+    contexts. In the trajectory framework, semantic memory encodes the stable
+    regions of the admissibility manifold---the constraint structures that do
+    not change with individual interaction histories.
+  \item \textbf{Episodic memory}: records of specific past interactions and
+    their outcomes. This is structural residue in the formal sense of
+    Definition~\ref{def:residue}: the accumulated traces of prior constraint
+    configurations that continue influencing future trajectory selection.
+  \item \textbf{Procedural memory}: the instructions and operational rules that
+    govern how the system executes its tasks---the system prompt, the tool-use
+    guidelines, the triage criteria.
+\end{itemize}
+
+\claimP This trichotomy maps directly onto the boot sequence architecture of
+this chapter. Semantic memory is the lowest boot layer: the foundational
+constraints that must be initialized before higher-level operations are
+meaningful. Episodic memory is the middle layer: the historical record that
+personalizes general constraints to a specific interaction context. Procedural
+memory is the highest layer: the operational instructions that are only
+meaningful given the semantic and episodic layers beneath them.
+
+The crucial observation---which recent agentic systems are beginning to implement
+formally---is that procedural memory must be dynamically updatable. A system with
+fixed procedural memory (hardcoded system prompts, static triage rules) cannot
+adapt to changing constraint conditions. It can only navigate the admissibility
+space defined at initialization. As the operational environment changes---as
+users provide feedback, as workflow requirements evolve, as edge cases accumulate
+in the episodic record---the procedural layer must be revised to maintain
+corrigibility.
+
+\subsection{Procedural Memory as Dynamic Admissibility Revision}
+
+In Spherepop terms, updating procedural memory is a Bind operation at the
+level of the system's own operational rules: a new dependency is established
+between observed feedback (a committed event in the episodic record) and the
+future admissibility conditions under which the system will operate. The update
+is irreversible in the sense that the feedback has been incorporated; but unlike
+Pop or Collapse, the procedural update is designed to be further revisable by
+subsequent feedback.
+
+\claimH This is exactly the RC-CLIO repair cycle (Appendix~\ref{app:clio})
+applied to the operational layer: seam detection (feedback identifies a mismatch
+between current behavior and desired behavior), cocycle identification (the
+specific instruction that is producing the mismatch), repair morphism
+construction (an LLM generates a revised instruction that would have produced
+the correct behavior), and residue annotation (the revision is stored with its
+provenance so future revisions can build on it rather than overwriting it blindly).
+
+\subsection{The Provenance Problem in Procedural Updates}
+
+The critical risk in dynamic procedural memory is the same as the proxy
+stabilization risk identified in Chapter~\ref{ch:ellul}: the updated
+instructions can drift from the underlying operational reality if the feedback
+loop is slower than the update rate, or if updates optimize for local feedback
+approval rather than global behavioral coherence.
+
+\claimP An LLM that updates system prompts based on user feedback is performing
+exactly the proxy drift operation: it is modifying $r$ (the procedural memory)
+in response to signals that may not accurately track the target system $s$
+(the full space of admissible behaviors). A single piece of negative feedback
+may cause an overly broad revision that breaks previously correct behavior.
+A pattern of positive feedback may reinforce a locally pleasing but globally
+inadmissible trajectory.
+
+The provenance requirement therefore applies with full force to procedural
+memory systems. Each update to a system prompt should be stored with its
+complete dependency record: which feedback event triggered it, what the
+prior instruction was, what alternatives were considered, and what the
+predicted behavioral change is. Without this record, a series of individually
+reasonable updates can accumulate into a procedural state that no one
+designed and no one can fully reconstruct---the institutional identity
+proxy problem of Section~\ref{sec:proxy_identity} reproduced at the
+agent level.
+
+\begin{constraintboundary}
+\textbf{Status:~\textbf{[P/H]}} The mapping of semantic/episodic/procedural
+memory onto the boot sequence architecture is phenomenological. The RC-CLIO
+correspondence is a heuristic engineering interpretation, not a formal
+derivation.
+
+\textbf{Design implication:} Procedural memory systems should implement
+provenance annotation as a first-class feature, not an afterthought. The
+update history of a system prompt is as important as its current state,
+for the same reasons that a version control system's commit history is
+more informative than the current file contents alone.
+
+\textbf{Falsification:} A procedural memory system that achieves stable,
+coherent long-term behavioral adaptation without provenance annotation---
+in which updates reliably improve global behavior despite operating only
+on compressed local feedback signals---would weaken the provenance
+requirement claim.
+\end{constraintboundary}
+
+When the maintenance process for identity begins operating on compressed summaries
+rather than reconstructed structure, the proxy stabilization failure mode
+reappears at the ontological level. The remembered profile, institutional brand,
+or theoretical paradigm begins functioning as a gravitational attractor shaping
+future interpretation rather than a faithful record enabling genuine reconstruction.
+
+\claimP An institution whose identity has become a proxy---whose members navigate
+the institution's self-description rather than its actual operational structure---
+has undergone proxy stabilization at the level of collective self-model. The
+stated mission, the founding documents, the official history become the proxy
+$r$; the actual constraint structure and operational reality are the target $s$;
+and optimization pressure (for internal coherence, for external legibility, for
+fundraising) drives $r$ and $s$ apart at a rate proportional to the pressure and
+inversely proportional to the feedback from actual operations.
+
+The formal structure is identical to the proxy drift of Chapter~\ref{ch:ellul}.
+The domain is different: not a platform metric but a self-model. The mechanism
+is the same.
+
+\begin{constraintboundary}
+\textbf{Established:} The formal connection between identity and trajectory
+maintenance under constraint. The bootstrapping model as an account of how
+higher-level cognitive and institutional structures depend on lower-level
+initialization.
+
+\textbf{Phenomenological~[P]:} The applications to scientific paradigms,
+language drift, and institutional identity. These are interpretive frameworks
+supported by the formal structure but not derived from it.
+
+\textbf{Not claimed:} That biological identity is literally a computational
+process. The computational bootstrapping analogy is structural, not ontological.
+The analogy licenses operational insight transfer insofar as the relevant
+constraint structures are analogous; it does not imply that minds are computers.
+\end{constraintboundary}

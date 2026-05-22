@@ -1,0 +1,127 @@
+% ── tcolorbox shared styles ─────────────────────────────────
+
+% Technical note (neutral analytical)
+\tcbset{
+  ortyx@note/.style={
+    breakable, enhanced,
+    colback=Ortyx@box@bg, colframe=Ortyx@accent,
+    fonttitle=\small\bfseries\color{Ortyx@rule},
+    attach boxed title to top left={yshift=-2mm,xshift=4mm},
+    boxed title style={colback=Ortyx@box@bg,colframe=Ortyx@accent,
+                       sharp corners,boxrule=0.4pt},
+    boxrule=0.4pt, arc=2pt, left=8pt, right=8pt, top=8pt, bottom=8pt,
+    before upper={\setstretch{1.1}\small}
+  }
+}
+
+% Critique (warm sienna)
+\tcbset{
+  ortyx@critique/.style={
+    breakable, enhanced,
+    colback=Ortyx@warn@bg, colframe=Ortyx@warn,
+    fonttitle=\small\bfseries\color{Ortyx@warn},
+    attach boxed title to top left={yshift=-2mm,xshift=4mm},
+    boxed title style={colback=Ortyx@warn@bg,colframe=Ortyx@warn,
+                       sharp corners,boxrule=0.4pt},
+    boxrule=0.4pt, arc=2pt, left=8pt, right=8pt, top=8pt, bottom=8pt,
+    before upper={\setstretch{1.1}\small}
+  }
+}
+
+% Reconstruction/salvage (forest green)
+\tcbset{
+  ortyx@salvage/.style={
+    breakable, enhanced,
+    colback=Ortyx@salvage@bg, colframe=Ortyx@salvage,
+    fonttitle=\small\bfseries\color{Ortyx@salvage},
+    attach boxed title to top left={yshift=-2mm,xshift=4mm},
+    boxed title style={colback=Ortyx@salvage@bg,colframe=Ortyx@salvage,
+                       sharp corners,boxrule=0.4pt},
+    boxrule=0.4pt, arc=2pt, left=8pt, right=8pt, top=8pt, bottom=8pt,
+    before upper={\setstretch{1.1}\small}
+  }
+}
+
+% ── Named environments ──────────────────────────────────────
+
+\newenvironment{technote}[1][Technical Note]{%
+  \begin{tcolorbox}[ortyx@note,title={#1}]}{\end{tcolorbox}}
+
+\newenvironment{critique}[1][Critique]{%
+  \begin{tcolorbox}[ortyx@critique,title={#1}]}{\end{tcolorbox}}
+
+\newenvironment{salvage}[1][Reconstruction]{%
+  \begin{tcolorbox}[ortyx@salvage,title={#1}]}{\end{tcolorbox}}
+
+% ── Epistemic status environment ───────────────────────────
+%
+%  Canonical status labels (not exhaustive):
+%    Operationally Grounded       — measured, benchmarkable
+%    Reconstructive Conjecture    — plausible but unconfirmed
+%    Phenomenological             — interpretive, not derived
+%    Metaphorical Extension       — analogy; not equivalence
+%    Ontologically Committed      — strong metaphysical claim
+%    Empirically Underspecified   — claims outrun measurement
+%    Speculative Extrapolation    — exploratory; audit-pending
+%
+\newenvironment{epistemicstatus}[1]{%
+  \begin{tcolorbox}[
+    breakable, enhanced,
+    colback=Ortyx@box@bg, colframe=Ortyx@subtle,
+    boxrule=0.3pt, arc=2pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    fonttitle=\small\bfseries\color{Ortyx@neutral},
+    title={\small\scshape Epistemic Status:\enspace\normalfont\itshape #1},
+    attach boxed title to top left={yshift=-2mm,xshift=4mm},
+    boxed title style={colback=Ortyx@box@bg,colframe=Ortyx@subtle,
+                       sharp corners,boxrule=0.3pt},
+    before upper={\setstretch{1.05}\small}
+  ]}{\end{tcolorbox}}
+
+% ── Danger zone environment ─────────────────────────────────
+%
+%  Procedural / diagnostic — not adversarial. These flag structural
+%  instability patterns that recur across speculative systems.
+%
+%  Canonical danger zone labels:
+%    Representation Drift          — representational convenience → metaphysics
+%    Ontological Escalation        — abstraction → being
+%    Symbolic Continuity Without Constraint — prose coherence ≠ inference
+%    Universal Absorbency          — framework assimilates all outcomes
+%    Operational Severance         — formalism detaches from measurement
+%    Compression ≠ Ontology        — good models ≠ privileged reality access
+%    The Universe Is Allowed to Say No — external resistance must remain possible
+%    Recursive Closure Risk        — audit vocabulary itself inflates
+%
+\newenvironment{dangerzone}[1][Danger Zone]{%
+  \begin{tcolorbox}[
+    breakable, enhanced,
+    colback=Ortyx@warn@bg, colframe=Ortyx@warn,
+    boxrule=0.5pt, arc=2pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    fonttitle=\small\bfseries\color{Ortyx@warn},
+    title={\small\scshape\color{Ortyx@warn} #1},
+    attach boxed title to top left={yshift=-2mm,xshift=4mm},
+    boxed title style={colback=Ortyx@warn@bg,colframe=Ortyx@warn,
+                       sharp corners,boxrule=0.4pt},
+    before upper={\setstretch{1.08}\small}
+  ]}{\end{tcolorbox}}
+
+% ── Interlude environment (mdframed) ────────────────────────
+\mdfdefinestyle{interlude}{
+  linecolor=Ortyx@subtle, linewidth=0.6pt,
+  backgroundcolor=Ortyx@box@bg,
+  topline=true, bottomline=true,
+  leftline=false, rightline=false,
+  innertopmargin=14pt, innerbottommargin=14pt,
+  innerleftmargin=18pt, innerrightmargin=18pt,
+  skipabove=18pt, skipbelow=18pt,
+  nobreak=false
+}
+
+\newenvironment{interlude}[1][]{%
+  \begin{mdframed}[style=interlude]%
+  \ifx\\#1\\%
+  \else{\centering\small\scshape\color{Ortyx@neutral}#1\par\medskip}\fi
+  \setstretch{1.1}\small
+}{\end{mdframed}}

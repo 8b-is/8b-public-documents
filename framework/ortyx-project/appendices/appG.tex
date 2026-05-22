@@ -1,0 +1,186 @@
+% ============================================================
+%  THE ORTYX PROTOCOL
+%  Appendix G: The Formal Grammar of the Ortyx Protocol
+% ============================================================
+
+\chapter{The Formal Grammar of the \Ortyx{} Protocol}
+\label{app:grammar}
+
+\noindent
+This appendix assembles the complete formal specification
+of the \Ortyx{} Protocol in compact notation. It provides
+a reference for the audit operators, failure geometries,
+classification taxonomy, and the recursive self-application
+equation. The prose interpretations appear in Parts~III
+and~V; this appendix gives the formal definitions alone.
+
+\section{The System Triple}
+\label{app-g:triple}
+
+A theoretical framework under audit is represented as:
+\[
+  \SysTriple = (\mathcal{A}, \mathcal{M}, \mathcal{E}),
+\]
+where $\mathcal{A}$ is the axiom set, $\mathcal{M}$
+is the mechanism set, and $\mathcal{E}$ is the empirical
+claim set. Let $\mathcal{E}_{\mathcal{A}}$ denote the
+claims in $\mathcal{E}$ entailed by $\mathcal{A}$ alone.
+
+\section{The Four Audit Operators}
+\label{app-g:operators}
+
+\subsection{Structural Consistency}
+\[
+  \AuditS(\SysTriple)
+  = \frac{|\mathcal{E}_{\mathcal{M}} \setminus \mathcal{E}_{\mathcal{A}}|}{|\mathcal{E}|},
+\]
+the fraction of empirical claims non-trivially derived
+from the mechanisms beyond the axioms alone. Range: $[0,1]$.
+
+\subsection{Falsifiability}
+\[
+  \AuditF(\SysTriple)
+  = \frac{|\mathcal{E}_{\mathrm{falsifiable}}|}{|\mathcal{E}|},
+\]
+where $\mathcal{E}_{\mathrm{falsifiable}}$ is the set
+of claims for which a specific disconfirming observation
+can be specified. Range: $[0,1]$.
+
+\subsection{Projection Dependence}
+\[
+  \AuditP(\SysTriple)
+  = \frac{1}{|\mathcal{E}|} \sum_{e \in \mathcal{E}}
+  \mathbf{1}\!\bigl[\sup_{x \in X_{\mathrm{adm}}}
+  \Delta_{\pi_e}(x) > \varepsilon_e\bigr],
+\]
+where $\Delta_{\pi_e}(x) = |\ConstrX(x) - \ConstrM(\pi_e(x))|$
+and $\varepsilon_e$ is the acceptable projection defect
+for claim $e$. Range: $[0,1]$.
+
+\subsection{Recursive Closure}
+\[
+  \AuditR(\SysTriple)
+  = \mathbb{E}_T\!\left[\SemClose(t)\right]
+  = \mathbb{E}_T\!\left[\frac{\|F(M_t)\|}{\|G(X_t)\|}\right],
+\]
+where $T$ is the evaluation period. Range: $[0, \infty)$,
+normalized to $[0,1]$ for use in $\EpStab$ by an appropriate
+monotone transform.
+
+\section{The Epistemic Stability Functional}
+\label{app-g:stability}
+
+\[
+  \EpStab(\SysTriple)
+  = \alpha\,\AuditS(\SysTriple)
+  + \beta\,\AuditF(\SysTriple)
+  - \gamma\,\AuditP(\SysTriple)
+  - \delta\,\AuditR(\SysTriple),
+\]
+where $\alpha, \beta, \gamma, \delta > 0$ are
+context-sensitive weights with standard values
+$\alpha = \beta = 0.35$, $\gamma = \delta = 0.15$
+for mature frameworks; and $\alpha = 0.2$,
+$\beta = 0.5$, $\gamma = 0.2$, $\delta = 0.1$
+for early-stage research programmes.
+
+\section{The Four Failure Geometries}
+\label{app-g:failures}
+
+\begin{align*}
+  \FailGeo{1} &: \text{Decorative Formalism}\\
+  &\quad \text{Notation without admissible constraint.}\\[4pt]
+  \FailGeo{2} &: \text{Definitional Closure}\\
+  &\quad \mathcal{E} \subseteq \mathcal{E}_{\mathcal{A}}
+  \text{ (conclusions embedded in definitions).}\\[4pt]
+  \FailGeo{3} &: \text{Semantic Universality Collapse}\\
+  &\quad \forall O: O \text{ consistent with }
+  \SysTriple \text{ (no disconfirming observation).}\\[4pt]
+  \FailGeo{4} &: \text{Operational Severance}\\
+  &\quad \exists e \in \mathcal{E}: \text{no measurement}
+  \text{ procedure for quantities named in } e.
+\end{align*}
+
+\section{The Four Inferential Levels}
+\label{app-g:levels}
+
+\begin{align*}
+  \LevelI  &: \text{Engineering utility.}
+  \text{ Measurable performance claims.}\\
+  \LevelII &: \text{Computational metaphor.}
+  \text{ Structural analogies generating research directions.}\\
+  \LevelIII&: \text{Cognitive phenomenology.}
+  \text{ Reports on the character of experience.}\\
+  \LevelIV &: \text{Ontological claim.}
+  \text{ Assertions about what phenomena fundamentally are.}
+\end{align*}
+
+\section{The Decomposition and Reinterpretation}
+\label{app-g:decomposition}
+
+\textit{Phase 3 (Decomposition):}
+\[
+  \SysTriple \xrightarrow{\AuditOp} (\ThetaS, \ThetaU),
+\]
+where $\ThetaS$ contains claims with acceptable
+audit scores and $\ThetaU$ contains claims that fail
+the audit at significant severity levels.
+
+\textit{Phase 4 (Reinterpretation):}
+\[
+  \RSVPfunctor : \ThetaS \to \ThetaStar,
+\]
+a structure-preserving map from survivable components
+to a lower-projection-defect expressive context.
+
+\textit{Phase 5 (Self-application):}
+\[
+  \OrtOp_{n+1} = \AuditOp(\OrtOp_n).
+\]
+The protocol survives through continuous self-application
+rather than through the achievement of a stable fixed point.
+
+\section{Five Reconstruction Categories}
+\label{app-g:categories}
+
+After decomposition and prior to reinterpretation,
+the Interlude classifies surviving and non-surviving
+components into five categories:
+
+\begin{enumerate}
+  \item \textit{Discarded}: Not recoverable within any
+  reasonable reinterpretation; $\FailGeo{2}$ or $\FailGeo{3}$
+  at high severity.
+  \item \textit{Unstable but Recoverable}: In $\ThetaU$
+  due to missing specification; could migrate to $\ThetaS$
+  if gaps are closed.
+  \item \textit{Metaphorically Useful}: Survives as
+  \LevelII{} analogy; does not survive as \LevelIV{} claim.
+  \item \textit{Operationally Grounded}: In $\ThetaS$
+  at \LevelI{}; survives the full audit.
+  \item \textit{Reconstructible}: In $\ThetaS$;
+  translatable via $\RSVPfunctor$ to $\ThetaStar$
+  with explicit constraint-faithfulness acknowledgment.
+\end{enumerate}
+
+\section{The Constraint Horizon Principle}
+\label{app-g:constraint-horizon}
+
+From Chapter~24: designing a system as though computational
+resources are severely constrained --- even when they
+are not --- produces architectures with lower projection
+defect, higher structural consistency, and stronger
+reuse properties than designing without explicit constraint.
+The formal statement: for any design problem $P$ with
+available resources $R$, introduce an artificial
+constraint $R' \subset R$ as a design horizon. The
+resulting design $D(R')$ will exhibit:
+\[
+  \AuditP(D(R')) \le \AuditP(D(R)),
+\]
+\[
+  \AuditS(D(R')) \ge \AuditS(D(R)),
+\]
+for the same specification $\SysTriple$, because constraint
+forces explicit specification of admissibility conditions
+that unconstrained design can leave implicit.

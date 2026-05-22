@@ -1,0 +1,116 @@
+\chapter{TARTAN: Trajectory-Aware Recursive Tiling with Annotated Noise}
+\label{app:tartan}
+
+\noindent \TARTAN is a computational framework for multiscale simulation and
+inference that distinguishes local plausibility from global consistency using
+sheaf-theoretic ideas, treating hallucination as a gluing failure rather than
+a noise artifact. This appendix develops the architecture, annotated noise
+schema, and four projection modes.
+
+\section{Core Architecture}
+
+\begin{definition}{TARTAN Tiling}
+A \emph{TARTAN tiling} of a computational domain $\Omega$ is a hierarchical
+partition $\mathcal{T} = \{T_i^{(k)}\}_{i,k}$ where $k$ indexes resolution
+levels and $T_i^{(k)}$ are tiles at level $k$. The tiling satisfies:
+\begin{itemize}
+  \item \textbf{Recursion:} Each tile $T_i^{(k)}$ is covered by a collection
+    of tiles $\{T_j^{(k+1)}\}$ at the next resolution level.
+  \item \textbf{Trajectory awareness:} Each tile carries a trajectory annotation
+    $\tau_i^{(k)}$: the record of prior state sequences that have passed through
+    the tile's domain.
+  \item \textbf{Noise annotation:} Each tile carries a noise annotation
+    $\eta_i^{(k)}$: the record of unresolved structure within the tile that
+    could not be assigned to any trajectory.
+\end{itemize}
+\end{definition}
+
+The fundamental departure from standard multi-resolution analysis is the noise
+annotation. Rather than discarding unresolved structure as error to be minimized,
+\TARTAN archives it as annotated residue available for future reinterpretation.
+This operationalizes the hallucination-as-normal principle of
+Chapter~\ref{ch:vocabulary}: the unresolved structure is the non-trivial $H^1$
+cocycle of the local sheaf.
+
+\section{The Annotated Noise Schema}
+
+Each noise annotation $\eta_i^{(k)}$ carries the following metadata:
+
+\begin{itemize}
+  \item \textbf{Origin:} Which trajectory segment produced this unresolved
+    structure.
+  \item \textbf{Constraint violation type:} Which admissibility condition the
+    structure failed (thermodynamic, logical, geometric, historical).
+  \item \textbf{Reinterpretation candidates:} The set of alternative
+    trajectory segments that could absorb this structure under relaxed
+    gluing conditions.
+  \item \textbf{Persistence weight:} How long the noise has remained unresolved;
+    high-persistence noise is prioritized for repair.
+\end{itemize}
+
+The annotated noise schema converts gluing failures from silent errors into
+structured records. A \TARTAN system operating over a long time horizon
+accumulates an annotated noise ledger that functions as a diagnostic tool:
+recurring noise patterns indicate persistent admissibility failures that
+require structural repair rather than local patching.
+
+\section{Local Plausibility versus Global Consistency}
+
+\claimH The central insight of \TARTAN is that local plausibility and global
+consistency are distinct properties that standard multi-resolution methods
+conflate. A locally plausible configuration is one that satisfies the
+admissibility conditions within a single tile. A globally consistent configuration
+is one whose local solutions glue into a coherent global section.
+
+\begin{definition}{TARTAN Consistency Check}
+A tiling $\mathcal{T}$ is \emph{globally consistent at level $k$} if for every
+pair of adjacent tiles $(T_i^{(k)}, T_j^{(k)})$ sharing a boundary $\partial_{ij}$:
+\[
+  \tau_i^{(k)}\big|_{\partial_{ij}} = \tau_j^{(k)}\big|_{\partial_{ij}},
+\]
+that is, the trajectory annotations agree on the shared boundary. A failure of
+this condition is a \emph{seam inconsistency}, recorded in the noise annotation
+of both tiles.
+\end{definition}
+
+\section{Four Projection Modes}
+
+\TARTAN operates in four projection modes corresponding to the four derived
+stacks of the \RSVP field system (Appendix~\ref{app:rsvp}):
+
+\textbf{Mode 1: Thermodynamic projection.} Each tile tracks the local entropy
+production rate. Seam inconsistencies generate entropy; repairs reduce it.
+The tiling evolves by preferentially extending tiles that reduce overall entropy
+production.
+
+\textbf{Mode 2: Kinetic projection.} Each tile tracks the local velocity field.
+Seam inconsistencies manifest as velocity discontinuities at tile boundaries.
+The tiling evolves by smoothing velocity across boundaries while preserving
+trajectory annotation.
+
+\textbf{Mode 3: Informational projection.} Each tile tracks the local residue
+field $\mathcal{R}$. Seam inconsistencies manifest as conflicting provenance
+records at tile boundaries. The tiling evolves by resolving provenance conflicts
+through the sheaf repair operations of Chapter~\ref{ch:sheaf}.
+
+\textbf{Mode 4: Semantic projection.} Each tile tracks the local semantic
+density $\Phi$ and its annotation. Seam inconsistencies are exactly the
+semantic tears of the Yarncrawler framework---mismatches between adjacent
+local interpretations. The tiling evolves by the stigmergic repair mechanism
+of Theorem~\ref{thm:stigmergic}.
+
+\section{Relationship to Hallucination Formalism}
+
+\claimH Under \TARTAN, hallucination is precisely a seam inconsistency that
+has been filled by a locally plausible but globally inconsistent trajectory
+annotation. The annotation satisfies the admissibility conditions within its
+tile but fails the global consistency check at tile boundaries. The annotated
+noise schema records this failure with its reinterpretation candidates, enabling
+future repair when additional evidence arrives.
+
+This makes the corrigibility condition of Definition~\ref{def:hallucination}
+computationally explicit: a corrigible hallucination is one whose seam
+inconsistency is recorded in the noise annotation with reinterpretation
+candidates; a drifting hallucination is one whose seam inconsistency has been
+silently propagated to adjacent tiles without annotation, corrupting their
+trajectory records.

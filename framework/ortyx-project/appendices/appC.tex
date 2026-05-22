@@ -1,0 +1,125 @@
+% ============================================================
+%  THE ORTYX PROTOCOL
+%  Appendix C: Harmonic Consensus and Sparse Relational Compression
+% ============================================================
+
+\chapter{Harmonic Consensus and Sparse Relational Compression}
+\label{app:harmonic}
+
+\noindent
+This appendix develops the formal mathematics of the
+HCF1 harmonic consensus compression framework. The
+encoding efficiency claims that survive the decomposition
+at \LevelI{} are derived here.
+
+\section{Independent Harmonic Encoding}
+\label{app-c:independent}
+
+Let a signal contain a harmonic complex with fundamental
+frequency $f_0$ and $N$ harmonics at frequencies
+$f_n = n f_0$, $n = 1, \ldots, N$. Let $A_n(t)$ and
+$\phi_n(t)$ denote the amplitude envelope and instantaneous
+phase of the $n$-th harmonic respectively. The
+traditional spectral encoding stores all harmonics
+independently:
+\[
+  \mathcal{H} = \{(A_n(t), f_n, \phi_n(t))\}_{n=1}^{N}.
+\]
+The storage complexity is $O(N)$ per time step.
+
+\section{The Conformity Relation}
+\label{app-c:conformity}
+
+Define the normalized amplitude velocity of the $n$-th
+harmonic:
+\[
+  v_n(t) = \frac{dA_n/dt}{A_n(t)}.
+\]
+Define the harmonic conformity relation with conformity
+threshold $\varepsilon > 0$:
+\[
+  \Gamma_n(t) = \mathbf{1}\!\left(|v_n(t) - v_0(t)| < \varepsilon\right).
+\]
+When $\Gamma_n(t) = 1$, harmonic $n$ is evolving in
+proportion to the fundamental within tolerance
+$\varepsilon$. When $\Gamma_n(t) = 0$, harmonic $n$
+is deviating from the fundamental's envelope dynamics.
+
+\begin{definition}
+A harmonic complex is \emph{$\varepsilon$-conformant}
+at time $t$ if $\sum_{n=1}^{N} \Gamma_n(t) = N$ ---
+that is, all harmonics conform to the fundamental
+within tolerance $\varepsilon$.
+\end{definition}
+
+\section{Sparse Consensus Encoding}
+\label{app-c:consensus}
+
+The sparse consensus encoding stores:
+\[
+  \mathcal{H}_{\mathrm{cons}}
+  = \{A_0(t), f_0, \phi_0(t), \Gamma_1(t), \ldots, \Gamma_N(t)\}
+  \cup \{(A_n(t), \delta\phi_n(t)) : \Gamma_n(t) = 0\},
+\]
+where $\delta\phi_n(t)$ is the phase deviation of
+non-conforming harmonics from prediction. Let $k(t)$
+denote the number of non-conforming harmonics at time
+$t$: $k(t) = N - \sum_{n=1}^N \Gamma_n(t)$.
+
+\begin{theorem}
+\label{thm:compression}
+The consensus encoding has storage complexity $O(1) + O(k(t))$
+per time step, compared to $O(N)$ for independent
+encoding. The compression ratio is:
+\[
+  \rho(t) = \frac{O(N)}{O(1) + O(k(t))} \approx \frac{N}{k(t)}
+\]
+for large $N$ and small $k(t)$. For strongly coupled
+harmonic sources with high conformity rates $k(t)/N \ll 1$,
+the compression ratio is large.
+\end{theorem}
+
+\section{Expected Compression Over Time}
+\label{app-c:expected}
+
+For a stationary stochastic model where each harmonic
+independently conforms with probability $p_{\mathrm{conf}}$:
+\[
+  \mathbb{E}[k(t)] = N(1 - p_{\mathrm{conf}}).
+\]
+The expected storage complexity under consensus encoding is:
+\[
+  \mathbb{E}[\text{cost}] = O(1) + O(N(1 - p_{\mathrm{conf}})).
+\]
+For strongly coupled harmonic sources (high physical
+coupling, $p_{\mathrm{conf}} \to 1$), the expected
+cost approaches $O(1)$. For uncoupled sources
+($p_{\mathrm{conf}} \to 0$), the expected cost approaches
+$O(N)$, identical to independent encoding.
+
+\section{Connection to Predictive Coding}
+\label{app-c:predictive-coding}
+
+The consensus encoding can be interpreted as a predictive
+code in the following sense. The predictor for harmonic
+$n$ at time $t$ is:
+\[
+  \hat{A}_n(t) = A_n(t - \Delta t) \cdot
+  \exp\!\bigl(v_0(t)\,\Delta t\bigr),
+\]
+the prediction that harmonic $n$ evolves proportionally
+to the fundamental over the interval $\Delta t$.
+The conformity indicator $\Gamma_n(t)$ tests whether
+the prediction error falls within tolerance $\varepsilon$.
+The consensus encoding stores only the prediction errors
+that exceed the tolerance threshold, in the same way
+that predictive coding in the signal processing literature
+stores only the residual between predicted and actual values.
+
+\begin{proposition}
+The consensus encoding achieves the entropy of the
+conformity process $\{\Gamma_n(t)\}$ plus the entropy
+of the residuals $\{A_n - \hat{A}_n : \Gamma_n = 0\}$,
+which is at most the entropy of the full independent
+encoding whenever the conformity rate exceeds $1/2$.
+\end{proposition}

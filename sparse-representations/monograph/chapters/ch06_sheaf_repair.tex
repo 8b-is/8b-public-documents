@@ -1,0 +1,184 @@
+\chapter{Sheaf-Theoretic Foundations of Semantic Repair}
+\label{ch:sheaf}
+
+\epigraph{The Yarncrawler is a sheaf-based repair machine. Local parsing windows
+correspond to stalks, repair corresponds to introducing new morphisms, and entropy
+corresponds to cohomological obstruction.}{}
+
+\section{Semantic Space and Covers}
+
+Let $X$ denote a semantic space---the domain of cultural landmarks, neural states,
+semantic nodes, or any other structured collection of meaning-bearing objects. A
+cover $\mathcal{U} = \{U_i\}_{i \in I}$ represents overlapping neighborhoods of
+$X$, each corresponding to a local parsing window within which semantic content
+can be coherently described.
+
+\subsection*{Toy Example: Three Overlapping Interpretive Windows}
+
+Before the general definition, consider the simplest case that exhibits a gluing
+failure. Let $X = [0,3]$ represent a temporal sequence of observations, covered
+by three overlapping windows:
+\[
+  U_1 = [0, 1.5], \quad U_2 = [1, 2.5], \quad U_3 = [2, 3].
+\]
+Each window $U_i$ contains a local section $s_i$: a semantic interpretation of
+what was observed during that interval. Suppose:
+\begin{itemize}
+  \item $s_1$ concludes: the object encountered is a seed.
+  \item $s_2$ concludes: the object encountered is a pebble.
+  \item $s_3$ concludes: the object is food.
+\end{itemize}
+On the overlap $U_1 \cap U_2 = [1, 1.5]$, both $s_1$ and $s_2$ must agree about
+what was happening during that interval. But ``seed'' and ``pebble'' are
+incompatible. This incompatibility is a \emph{Čech 1-cocycle}: a mismatch on
+an overlap that prevents gluing into a consistent global interpretation.
+
+A repair operation $\rho_{12}$ introduces the softened category ``seed-like
+object'' into $s_2$, which is compatible with both. The cocycle is trivialized:
+the 1-cocycle becomes a coboundary. On the overlap $U_2 \cap U_3 = [2, 2.5]$,
+``seed-like object'' and ``food'' are compatible under the coarser category
+``edible item.'' A global section $s$ on all of $[0,3]$ now exists: the
+observation was of an edible, seed-like item.
+
+Crucially, the system defers collapse. Until $U_3$ is observed, multiple global
+sections remain viable (``pebble'' vs.\ ``seed-like''). The non-uniqueness of
+the global section is captured by the non-triviality of $H^1$. Only when $U_3$
+provides the additional constraint ``food'' does the ambiguity resolve. Strategic
+ambiguity---holding multiple viable global sections in suspension---is the correct
+epistemic response to underdetermined gluing.
+
+\begin{definition}{Presheaf of Semantic Modules}
+A \emph{presheaf of semantic modules} is a contravariant functor
+\[
+  \mathcal{S}: \mathcal{U}^{\rm op} \to \mathbf{Cat}
+\]
+that assigns to each open neighborhood $U \subseteq X$ a category $\mathcal{S}(U)$
+of local semantic modules. Objects of $\mathcal{S}(U)$ are local semantic threads,
+claims, cached structures, or repaired routines valid within $U$. Morphisms are
+semantic restrictions or rewrites. For inclusions $V \subseteq U$, the restriction
+functor $\rho^U_V: \mathcal{S}(U) \to \mathcal{S}(V)$ encodes context reduction:
+what is asserted in the larger context may be forgotten or specialized in the
+smaller one.
+\end{definition}
+
+\section{The Sheaf Condition and Semantic Repair}
+
+\begin{definition}{Semantic Tear and Repair}
+A family of local sections $\{s_i \in \mathcal{S}(U_i)\}$ is \emph{glueable} if:
+(i) local consistency holds: $\rho^{U_i}_{U_i \cap U_j}(s_i) \cong
+\rho^{U_j}_{U_i \cap U_j}(s_j)$ for all overlapping pairs; and (ii) there exists
+a global extension $s \in \mathcal{S}(\bigcup_i U_i)$ restricting to each $s_i$.
+
+A \emph{semantic tear} occurs when local consistency fails on some overlap
+$U_i \cap U_j$: the restriction of $s_i$ and the restriction of $s_j$ to their
+common domain are not isomorphic. A \emph{repair} is the introduction of new objects
+or morphisms into $\mathcal{S}(U_i)$ or $\mathcal{S}(U_j)$ such that glueability
+is restored.
+\end{definition}
+
+\section{Cohomology as Semantic Entropy}
+
+Cohomology detects the unresolved incompatibilities that remain after local
+repairs have been applied. The Čech cohomology groups of the presheaf
+$\mathcal{S}$ with respect to the cover $\mathcal{U}$ organize these
+obstructions by dimension:
+\begin{align*}
+  H^0(X, \mathcal{S}) &\quad \text{viable global sections (coherent meanings)}, \\
+  H^1(X, \mathcal{S}) &\quad \text{minimal ambiguities (semantic seams)}, \\
+  H^k(X, \mathcal{S}),\; k \geq 2 &\quad \text{deeper obstructions to coherence.}
+\end{align*}
+
+These cohomology groups are interpreted as measures of semantic entropy: the
+unresolved cocycles represent ambiguity stored for potential reinterpretation. Repair
+corresponds to introducing new morphisms that trivialize cocycles, moving from
+$H^1$ toward $H^0$ by resolving the incompatibilities that the cocycles record.
+
+\begin{remark}
+Strategic ambiguity is a resource rather than a failure. A Yarncrawler that
+collapses all ambiguity immediately---forcing a unique global section at every
+step---forfeits the adaptability that deferred gluing provides. The presence of
+a non-trivial $H^1$ is a signal that multiple viable interpretations exist; the
+system defers collapse until additional evidence arrives to determine which
+interpretation to commit to.
+\end{remark}
+
+\section{The Stigmergic Repair Closure Theorem}
+
+\begin{theorem}{Stigmergic Repair Closure}
+Let $\mathcal{S}$ be a presheaf of local semantic sections over patches
+$\{U_i\}$, with overlaps $U_i \cap U_j$ that may admit inconsistent
+interpretations. Suppose that for each overlap there exists an elastic repair
+operation $\rho_{ij}$ satisfying:
+\begin{enumerate}
+  \item $\rho_{ij}$ preserves type safety: objects remain within a coarser
+        semantic category (for example, ``seed-like'' rather than either
+        ``seed'' or ``pebble'');
+  \item $\rho_{ij}$ reduces local free energy $\mathcal{F}(U_i \cap U_j)$
+        relative to the unrepaired sections; and
+  \item $\rho_{ij}$ is stigmergic: the cost of subsequent repairs decreases
+        with the density of prior contributions.
+\end{enumerate}
+Then the family of repaired sections $\{s^{\rho}_i\}$ admits at least one global
+section $s$ with $\mathcal{F}(s) \leq \sum_i \mathcal{F}(s_i)$ and with viability
+increasing in the cumulative density of repairs.
+\end{theorem}
+
+\begin{proposition}{Repair Preserves Blanket Structure}
+If every repair is generated by local morphisms that commute with restrictions and
+respect conditional independence at the Markov blanket---that is, if
+$X_t \perp\!\!\!\perp E_t \mid (S_t, A_t)$ is maintained throughout---then any
+finite composition of repairs preserves the gluing structure of $\mathcal{S}$.
+\end{proposition}
+
+\section{Self-Maintaining Growth under Stigmergic Feedback}
+
+\begin{theorem}{Self-Maintaining Growth}
+Let $\Phi(t)$ denote the accumulated density of a repaired structure (cache, berm,
+semantic section). Suppose the repair cost function $C(n)$ for the $n$-th
+contribution is monotonically decreasing in cumulative density $\Phi(n)$. Then
+there exists a critical threshold $\Phi^*$ such that
+\[
+  \Phi(n+1) - \Phi(n) \geq \delta > 0 \quad \text{whenever } \Phi(n) \geq \Phi^*,
+\]
+that is, once $\Phi^*$ is surpassed, the system enters a regime of self-sustaining
+growth where each new repair lowers the barrier for future repairs.
+\end{theorem}
+
+The discrete-time dynamics implementing this theorem take the form:
+\[
+  \Phi_{t+1} = \Phi_t + \Delta t \left(
+    \alpha \frac{\Phi_t}{\Phi_t + \theta}
+    \left(1 - \frac{\Phi_t}{K}\right) - \delta \Phi_t
+  \right),
+\]
+where $\alpha \equiv \lambda \kappa$ is baseline inflow, $\theta > 0$ encodes early
+friction (the cost of initial contributions), $K$ is carrying capacity, and
+$\delta \geq 0$ is decay. The stigmergic threshold condition is $\alpha > \delta\theta$.
+
+\section{Ecological and Cultural Instantiations}
+
+The abstract sheaf-repair mechanism is grounded by two concrete instantiations that
+run across the ecological and cultural domains analyzed in the companion work.
+
+In squirrel foraging, each foraging episode is a local patch $U_i$ with a section
+$s_i$ encoding the interpretation of an encountered object. A nut recognized in
+one context and a visually similar pebble encountered in another produce conflicting
+restrictions at the overlap. Rather than collapsing, the squirrel repairs by adopting
+a softened category---``seed-like object.'' The cocycle condition fails strictly but
+is restored under a relaxed gluing criterion, preserving viability. Multiple possible
+global interpretations are held in suspension until additional evidence resolves the
+ambiguity.
+
+In berm construction, an analogous process occurs at the cultural scale. A villager
+encountering a cairn at a territorial edge may perceive it as insufficient and add
+more material. The material composition need not be uniform; bones, ash, and dung
+may be included alongside rocks. Local repairs introduce semantic elasticity: the
+criterion is ``boundary-marker-like'' rather than ``stone-only.'' Over time,
+overlapping deposits cohere into self-maintaining structures that attract further
+contributions, forming the Voronoi-like tessellations of Amazonian terra preta.
+
+In both cases, the global section---the food cache or the territorial berm---emerges
+not from top-down planning but from the gluing of locally inconsistent but compatible
+acts of repair. This is the universal mechanism of the Yarncrawler framework: local
+disagreements reconciled through semantic elasticity, strategic ambiguity, and
+stigmergic reinforcement.

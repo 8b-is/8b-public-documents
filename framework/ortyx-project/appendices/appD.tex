@@ -1,0 +1,136 @@
+% ============================================================
+%  THE ORTYX PROTOCOL
+%  Appendix D: Wave-Based Memory Interference Formalism
+% ============================================================
+
+\chapter{Wave-Based Memory Interference Formalism}
+\label{app:memory}
+
+\noindent
+This appendix develops the formal mathematics of the
+MEM|8 wave-based memory architecture. The associative
+memory efficiency claims that survive the decomposition
+at \LevelI{} are derived here.
+
+\section{Memory Wave Functions}
+\label{app-d:wave-functions}
+
+Let memory states be represented by complex-valued
+wave functions over a representational space $x \in \mathbb{R}^d$
+and time $t \ge 0$:
+\[
+  M_i(x,t) = A_i(x,t)\,e^{i(\omega_i t + \phi_i(x,t))},
+\]
+where $A_i(x,t) \ge 0$ is a spatially and temporally
+varying amplitude envelope, $\omega_i > 0$ is the
+characteristic frequency, and $\phi_i(x,t) \in [0, 2\pi)$
+is the spatially and temporally varying phase. The global
+memory field is:
+\[
+  \MemField(x,t) = \sum_{i=1}^{N} M_i(x,t).
+\]
+
+\section{Retrieval via Resonance}
+\label{app-d:retrieval}
+
+Memory retrieval under query function $Q : \mathbb{R}^d \to \mathbb{C}$
+is modelled as the resonance score:
+\[
+  R_i(Q,t) = \left|\int_{\mathbb{R}^d}
+  Q(x)\,\overline{M_i(x,t)}\,dx\right|,
+\]
+where $\overline{M_i}$ denotes complex conjugation. The
+memory with highest resonance score is the retrieved
+memory.
+
+\begin{proposition}
+For orthonormal memory functions $\{M_i\}$ with
+$\int M_i \overline{M_j}\,dx = \delta_{ij}$, the retrieval
+is exact: $R_i(M_i, t) = \|M_i\|_{L^2}^2$ and
+$R_i(M_j, t) = 0$ for $i \neq j$.
+\end{proposition}
+
+In practice, memory functions are not orthonormal;
+interference between memories affects retrieval fidelity.
+
+\section{Interference Energy and Associative Storage}
+\label{app-d:interference}
+
+The interference energy of the global field is:
+\[
+  E_{\mathrm{int}}(t) = \|\MemField(\cdot, t)\|_{L^2}^2
+  = \sum_{i=1}^{N} \|M_i\|_{L^2}^2
+  + \sum_{i \neq j} \int M_i(x,t)\,\overline{M_j(x,t)}\,dx.
+\]
+The cross-term $\sum_{i \neq j} \langle M_i, M_j \rangle$
+encodes pairwise associative relationships between memories.
+
+\begin{theorem}
+\label{thm:associative-storage}
+A superposition of $N$ wave functions encodes $O(N^2)$
+pairwise relationships at $O(N)$ storage cost (the $N$
+wave functions themselves). Specifically, the cross-term
+interference matrix $C_{ij} = \langle M_i, M_j \rangle$
+contains $\binom{N}{2}$ distinct pairwise relationships,
+all implicitly encoded in the wave superposition without
+additional storage.
+\end{theorem}
+
+This theorem provides the \LevelI{} grounding for
+the associative memory efficiency claim. It follows
+from linear algebra and does not depend on the
+interpretation of $x$, $\omega_i$, or the biological
+correspondence hypothesis.
+
+\section{Amplitude Modulation}
+\label{app-d:amplitude}
+
+The emotional amplitude modulation is:
+\[
+  A_i(x,t) = A_i^0 \exp(-\lambda_i t)\,\bigl(1 + \eta\,e(t)\bigr),
+\]
+where $\lambda_i > 0$ is the decay constant, $A_i^0$
+is the initial amplitude, $e(t) \in \mathbb{R}$ is the
+emotional state function, and $\eta > 0$ is the coupling
+strength.
+
+\begin{proposition}
+Memories with larger coupling $\eta |e(t)|$ decay
+more slowly: the effective decay constant under modulation
+is approximately $\lambda_i / (1 + \eta |e(t)|)$ for
+$\eta |e(t)|$ small. This provides a mathematical
+mechanism for emotional enhancement of memory persistence.
+\end{proposition}
+
+The operationalization gap noted in Chapters~7 and~12
+--- that $e(t)$ lacks a measurement procedure --- remains
+open. Proposition above holds for any measurable $e(t)$;
+the engineering challenge is specifying $e(t)$ from
+observable quantities.
+
+\section{Cross-Modal Binding}
+\label{app-d:binding}
+
+Cross-modal binding in the MEM|8 formalism arises from
+frequency resonance between memories from different
+modalities. Let $M_i^{(a)}$ and $M_j^{(v)}$ denote
+auditory and visual memories respectively with
+characteristic frequencies $\omega_i^{(a)}$ and
+$\omega_j^{(v)}$. Constructive interference occurs when:
+\[
+  |\omega_i^{(a)} - \omega_j^{(v)}| < \delta_\omega
+\]
+for a binding threshold $\delta_\omega > 0$. The
+binding strength is proportional to the magnitude
+of the cross-term $|\langle M_i^{(a)}, M_j^{(v)}\rangle|$,
+which is maximized at zero frequency difference.
+
+\begin{proposition}
+The binding strength between auditory memory $M_i^{(a)}$
+and visual memory $M_j^{(v)}$ decreases monotonically
+with $|\omega_i^{(a)} - \omega_j^{(v)}|$ for memories
+with otherwise identical structure. The mechanism provides
+a mathematical basis for the cross-modal binding claim
+at \LevelI{}, contingent on the operationalization of
+the characteristic frequencies.
+\end{proposition}

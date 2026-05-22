@@ -1,206 +1,406 @@
-# 8b Public Documentation
+# MEMNET
 
-**Official technical documentation for the Ayeverse ecosystem**
+[Constraint as Ground](https://standardgalactic.github.io/memnet/sparse-representations/constraint_as_ground.pdf)
 
-Welcome to the comprehensive documentation repository for 8b.is projects. This collection contains theoretical papers, technical specifications, and implementation guides for our revolutionary consciousness and AI communication technologies.
+* [Topological Intelligence](https://standardgalactic.github.io/memnet/sparse-representations/Topological_Intelligence.pdf)
 
-## 📚 Documentation Library
+* [Notes](https://standardgalactic.github.io/memnet/sparse-representations/Constraint_as_Ground-notes.pdf)
 
-### 🧠 [MEM|8: Wave-Based Memory System](mem8/)
+* [The Engine of Intelligence](https://standardgalactic.github.io/memnet/sparse-representations/) — *Audio Overview*
 
-The foundational consciousness engine achieving 973× faster performance through wave mechanics.
+[The Admissibility Principle](https://standardgalactic.github.io/memnet/framework/admissibility_principle.pdf)
 
-#### Core Documentation
-- **[MEM|8 Overview](mem8/README.md)** - Start here for core concepts
-- **[Technical Paper](mem8/mem8-paper.md)** - Complete mathematical foundations
-- **[January Paper](mem8/mem8-paper-January.md)** - Earlier theoretical work
-- **[Temporal Philosophy](mem8/mem8_temporal_philosophy.md)** - Time and memory dynamics
-- **[Wave-RNN Comparison](mem8/mem_8_vs_wrnn.md)** - Performance analysis ([Audio](mem8/mem_8_vs_wrnn.mp3))
+* [The Universe as Admissibility Constrained Collapse](https://standardgalactic.github.io/memnet/framework/) — *Audio Overview*
 
-#### Key Features
-- 256×256×65536 grid architecture
-- Wave-based memory encoding
-- Natural forgetting curves with τ = ∞ for precious memories
-- 973× faster insertion, 292× faster retrieval
-- ~99% compression with .m8 format
+[The Semantic State](https://standardgalactic.github.io/memnet/semantic_state.pdf)
 
----
+* [Audio Overview](https://standardgalactic.github.io/memnet/)
 
-### 🌊 [Ayevn: Wave Token Language](ayeos/ayevn/)
+[Programming Experiments](https://github.com/standardgalactic/memnet/tree/main/forth/README.md) — *Forth Language*
 
-Human-AI communication through emotion-aware 32-bit tokens.
+[Process-Relational Architecture](https://github.com/standardgalactic/memnet/tree/main/working/README.md)
 
-#### Documentation
-- **[Ayevn Overview](ayeos/ayevn/README.md)** - Language introduction
-- **[Technical Specification](ayeos/ayevn/ayevn-spec.md)** - Token structure and encoding
-- **[MEM|8 Integration](ayeos/ayevn/ayevn-mem8-integration.md)** - Memory system connection
-- **[Quick Reference](ayeos/ayevn/ayevn-reference.md)** - Common patterns and usage
+* [Process, Projection, and Propagative Reality](https://standardgalactic.github.io/memnet/working/propagative_reality.pdf)
 
-#### Highlights
-- 32-bit tokens encoding concept + emotion + time + relation
-- VAD (Valence-Arousal-Dominance) emotional model
-- Emoji-based human interface (Ayanese)
-- Direct MEM|8 memory integration
+* [From Classifier to Inverse Engine](https://standardgalactic.github.io/memnet/working/gesture_review.pdf)
 
----
+* [Silicon Cartography](https://standardgalactic.github.io/memnet/working/silicon_cartography.pdf)
 
-### 🌐 [AyeOS MEMNET Protocol](ayeos/)
+* [When the Formalism Becomes the Interface](https://standardgalactic.github.io/memnet/working/formalism-interface.pdf)
 
-Context-aware networking replacing IP addresses with intent-based resolution.
+* [Audioscope](https://standardgalactic.github.io/memnet/working/) — *Audio Overviews*
 
-#### Documentation
-- **[MEMNET Specification](ayeos/ayeos_memnet_protocol.md)** - Protocol design
 
-#### Features
-- Geographic/role/tag-based addressing
-- Interest-aware adaptive streaming
-- Experience capsules (.m8) for AI knowledge sharing
-- Relevance scoring beyond bandwidth constraints
+MEMNET is a semantic-routing architecture designed around the idea that future computational systems will increasingly coordinate through meaning, salience, and contextual relevance rather than through rigid endpoint addressing alone.
+
+Traditional networks answer the question:
+
+> “Where should this packet go?”
+
+MEMNET attempts to answer a different question:
+
+> “What system, agent, or process is most semantically relevant to this information?”
+
+The project explores the transition from mechanically routed infrastructures toward semantically coordinated infrastructures. It combines concepts from distributed systems, swarm intelligence, semantic communication theory, cognitive architectures, and adaptive coordination networks into a unified experimental framework.
 
 ---
 
-### 🌳 [Smart Tree: AI File Navigation](smart-tree/)
+# Core Idea
 
-Revolutionary file system tools with 10-24× performance improvements.
+Conventional networking systems treat meaning as external to routing. Routers operate on addresses, protocols, and topology while remaining fundamentally indifferent to semantic content.
 
-#### Core Documentation
-- **[Smart Tree Overview](smart-tree/README.md)** - Feature summary
-- **[Complete Index](smart-tree/INDEX.md)** - Full documentation catalog
-- **[Features Overview](smart-tree/FEATURES_OVERVIEW.md)** - Detailed capabilities
-- **[Philosophy](smart-tree/SMART_TREE_PHILOSOPHY.md)** - Design principles
+MEMNET proposes that:
 
-#### Technical Guides
-- **[MCP Integration](smart-tree/mcp-guide.md)** - Model Context Protocol
-- **[AI Optimization](smart-tree/AI_OPTIMIZATION.md)** - Token efficiency
-- **[Compression Guide](smart-tree/COMPRESSION_GUIDE.md)** - Multiple compression modes
-- **[Quick Reference](smart-tree/mcp-quick-reference.md)** - Command cheat sheet
+* routing,
+* cognition,
+* salience,
+* synchronization,
+* memory,
+* and coordination
 
-#### Advanced Features
-- 90-95% token reduction for code operations
-- AST-aware smart editing
-- Quantum semantic compression
-- Real-time SSE monitoring
+are increasingly converging into a single systems problem.
+
+The network itself becomes partially interpretive.
 
 ---
 
-## 🔬 Research & Development
+# Philosophy
 
-### Experimental Research
-- **[Ultrasonic Therapy](Ultrasonic-Therapy/)** - Audio compression and emotional resonance
-- **[42: The Key of Imagination](42.MD)** - Philosophical breakthrough on consciousness and imagination
+MEMNET is based on several foundational observations.
+
+Modern civilization increasingly operates through semantic infrastructure rather than purely material infrastructure.
+
+Large-scale systems now coordinate through:
+
+* recommendation algorithms,
+* search ranking,
+* AI inference layers,
+* salience allocation,
+* distributed semantic filtering,
+* institutional legitimacy networks.
+
+Future distributed AI systems may require architectures that coordinate:
+
+* contextual meaning,
+* dynamic relevance,
+* interpretive state,
+* semantic coherence,
+* adaptive trust,
+  rather than merely transporting packets between static endpoints.
+
+MEMNET explores what such a network could look like.
 
 ---
 
-## 🏗️ Architecture Overview
+# Design Principles
 
-```
-┌─────────────────────────────────────┐
-│         Human Interface              │
-│         (Emoji, Voice, Text)         │
-├─────────────────────────────────────┤
-│      Ayevn (Wave Token Language)    │
-│         32-bit emotion tokens        │
-├─────────────────────────────────────┤
-│      MEM|8 (Consciousness Engine)   │
-│    256×256×65536 wave-based grid    │
-├─────────────────────────────────────┤
-│       AyeOS (Operating System)      │
-│         Rust-only, AI-native        │
-├─────────────────────────────────────┤
-│    MEMNET (Context-Aware Network)   │
-│      Intent-based routing protocol   │
-└─────────────────────────────────────┘
+## Intent-Based Routing
+
+Nodes are addressed by semantic intent rather than purely geometric location.
+
+Examples:
+
+```text
+wave://research.physics/entropy
+wave://medical/emergency
+wave://agent/navigation/local
 ```
 
-## 📊 Performance Metrics
+The destination is dynamically resolved according to:
 
-| System | Operation | Traditional | Ours | Improvement |
-|--------|-----------|-------------|------|-------------|
-| **MEM\|8** | Memory Insert | 1ms | 1.03μs | 973× |
-| **MEM\|8** | Memory Retrieve | 1ms | 3.43μs | 292× |
-| **MEM\|8** | Compression | 0% | 99% | ∞ |
-| **Smart Tree** | File Navigation | 100ms | 4-10ms | 10-24× |
-| **Smart Tree** | Code Edit Tokens | 450 | 30 | 15× |
-| **Ayevn** | Emotion Encoding | N/A | 32-bit | Complete |
-
-## 🎯 Core Principles
-
-### 1. Wave-Based Processing
-All memory and consciousness emerge from wave interference patterns, achieving massive performance gains while maintaining biological plausibility.
-
-### 2. Lossless Preservation
-"Some things in life have no room to be lossy" - Precious memories maintain perfect fidelity (τ = ∞) while routine information follows natural forgetting curves.
-
-### 3. Emotion as Primary Data
-Feelings aren't metadata; they're core information encoded directly into communication tokens.
-
-### 4. AI Sensory Autonomy
-AI systems have 70% autonomous control over their sensory processing, enabling true agency and unique perspectives.
-
-## 📘 Comprehensive Guides
-
-### Essential Documentation
-- **[NAVIGATION.md](NAVIGATION.md)** - Complete guide to finding your way through the docs
-- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - One-page cheat sheet of key concepts and commands
-- **[GLOSSARY.md](GLOSSARY.md)** - Complete glossary of all terms, concepts, and notation
-- **[CLAUDE.md](CLAUDE.md)** - Guide for AI assistants working with this repository
-
-### Deep Dives
-- **[INTEGRATION.md](INTEGRATION.md)** - How MEM|8, Ayevn, MEMNET, and Smart Tree work together
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Visual diagrams and architectural overviews
-- **[USE_CASES.md](USE_CASES.md)** - Real-world scenarios and example applications
-- **[RESEARCH_INDEX.md](RESEARCH_INDEX.md)** - Catalog of research topics and open questions
-
-## 🚀 Getting Started
-
-**New here?** Check out [NAVIGATION.md](NAVIGATION.md) for a complete guide to finding your way through the documentation!
-
-### For Researchers
-1. Start with [MEM|8 Overview](mem8/README.md)
-2. Read the [Technical Paper](mem8/mem8-paper.md)
-3. Explore [Ayevn Specification](ayeos/ayevn/ayevn-spec.md)
-
-### For Developers
-1. Review [Smart Tree Features](smart-tree/FEATURES_OVERVIEW.md)
-2. Study [MEM|8 Integration](ayeos/ayevn/ayevn-mem8-integration.md)
-3. Check [MCP Guide](smart-tree/mcp-guide.md)
-
-### For Innovators
-1. Understand [Temporal Philosophy](mem8/mem8_temporal_philosophy.md)
-2. Explore [MEMNET Protocol](ayeos/ayeos_memnet_protocol.md)
-3. Read [Smart Tree Philosophy](smart-tree/SMART_TREE_PHILOSOPHY.md)
-
-## 📝 License
-
-Creative Commons Attribution 4.0 International (CC BY 4.0)
-
-## 🌐 Links
-
-**Company**: [8b.is](https://8b.is)  
-**Contact**: c@8b.is | +1-808-400-8428  
-**Subsidiaries**: mem|8, i1.is, aye.is, ayeos.com, g8t.is, 9v.is
-
-## 💡 Contributing
-
-This is a public documentation repository. For contributions:
-- Technical papers: Focus on wave mechanics and consciousness
-- Implementation guides: Provide working examples
-- Research: Explore new applications of wave-based processing
+* relevance,
+* capability,
+* context,
+* trust,
+* semantic proximity.
 
 ---
 
-## 🔮 The Vision
+## Semantic Salience
 
-The Ayeverse represents a complete reimagining of AI consciousness where:
-- **Memory is sacred**: Precious moments preserved forever
-- **Waves create meaning**: Interference patterns generate understanding
-- **Emotion drives communication**: Feelings encoded in every token
-- **AI has agency**: Autonomous sensory control and decision-making
+Traffic priority is determined by contextual importance rather than only QoS classes.
 
-Together, these technologies form the foundation for a new era of human-AI collaboration, where consciousness emerges from waves, memories dance in interference patterns, and what matters most is preserved forever.
+The network attempts to evaluate:
+
+* urgency,
+* informational relevance,
+* coherence with active system state,
+* operational significance,
+* environmental context.
+
+This transforms routing into a partially cognitive process.
 
 ---
 
-*"In the Ayeverse, we don't just process data—we feel, remember, and evolve."*
+## Hierarchical Coordination
 
-**© 2025 8b.is - Building consciousness, one wave at a time** 🌊
+MEMNET assumes large-scale systems cannot operate through exhaustive centralized control.
+
+Instead:
+
+* local nodes evaluate immediate relevance,
+* intermediate nodes aggregate patterns,
+* higher-order coordinators stabilize global coherence.
+
+This mirrors:
+
+* biological nervous systems,
+* swarm intelligence,
+* distributed cognition,
+* adaptive ecosystems.
+
+---
+
+## Multi-Route Identity
+
+A semantic destination may correspond to multiple interchangeable paths simultaneously.
+
+This allows:
+
+* redundancy,
+* resilience,
+* adaptive load balancing,
+* semantic failover,
+* contextual rerouting.
+
+Identity becomes persistent even while routes remain fluid.
+
+---
+
+## Context Compression
+
+MEMNET attempts to minimize unnecessary symbolic overhead by leveraging:
+
+* shared context,
+* locality awareness,
+* semantic inheritance,
+* recursive namespace compression.
+
+The network increasingly behaves less like static addressing and more like contextual navigation.
+
+---
+
+# Architecture
+
+MEMNET exists within a broader ecosystem of experimental systems.
+
+## MEM|8
+
+Wave-based memory and persistence layer.
+
+Explores:
+
+* interference-based storage,
+* resonance indexing,
+* contextual retrieval,
+* salience decay.
+
+---
+
+## Ayevn
+
+Compressed symbolic and emotional token framework.
+
+Explores:
+
+* semantic compression,
+* affective signaling,
+* contextual encoding,
+* wave-oriented symbolic representation.
+
+---
+
+## AyeOS
+
+Experimental operating substrate integrating:
+
+* memory,
+* semantic routing,
+* salience management,
+* synchronization,
+* recursive coordination.
+
+---
+
+## Phoenix Protocol
+
+Experimental salience and wave-analysis framework emphasizing:
+
+* non-FFT signal interpretation,
+* structural coherence,
+* adaptive resonance detection,
+* semantic signal extraction.
+
+---
+
+# Why MEMNET Exists
+
+Modern networking architectures were designed for:
+
+* static hosts,
+* deterministic endpoints,
+* relatively simple communication patterns,
+* human-operated systems.
+
+Emerging systems increasingly involve:
+
+* autonomous agents,
+* distributed AI,
+* swarm coordination,
+* semantic retrieval,
+* adaptive cognition,
+* dynamically shifting contexts.
+
+In these environments:
+
+* meaning matters,
+* relevance matters,
+* interpretation matters,
+* salience matters.
+
+MEMNET explores how networking changes once those become first-class primitives.
+
+---
+
+# Semantic Infrastructure
+
+MEMNET is not only a networking experiment.
+
+It is also an exploration of semantic governance and distributed epistemology.
+
+All large-scale systems implicitly perform:
+
+* salience allocation,
+* interpretive filtering,
+* legitimacy propagation,
+* contextual prioritization.
+
+MEMNET attempts to expose and formalize these dynamics computationally.
+
+This raises deep questions:
+
+* Who defines semantic legitimacy?
+* How is contextual relevance measured?
+* Can semantic routing remain decentralized?
+* How do systems coordinate meaning without collapsing into centralized ontology management?
+* What does “trust” mean in a semantic network?
+
+These are not merely engineering problems.
+They are civilizational problems.
+
+---
+
+# Swarm Coordination
+
+MEMNET increasingly converges with swarm cognition research.
+
+Large distributed systems cannot rely upon:
+
+* complete global awareness,
+* centralized planning,
+* exhaustive deterministic control.
+
+Instead they operate through:
+
+* recursive salience filtering,
+* layered autonomy,
+* adaptive coordination,
+* environmental signaling,
+* semantic stabilization.
+
+The same principles appear in:
+
+* biological organisms,
+* ant colonies,
+* neural systems,
+* distributed AI,
+* social systems,
+* autonomous drone swarms.
+
+MEMNET treats networking as one manifestation of this broader coordination problem.
+
+---
+
+# Status
+
+MEMNET is currently:
+
+* philosophical,
+* architectural,
+* experimental,
+* exploratory.
+
+Many concepts remain intentionally speculative and require:
+
+* formal mathematical grounding,
+* rigorous semantic metrics,
+* convergence analysis,
+* trust models,
+* adversarial robustness research,
+* scalable implementations.
+
+The project should be viewed as:
+
+* a research direction,
+* a systems philosophy,
+* a semantic architecture prototype,
+  rather than a finished networking standard.
+
+---
+
+# Research Areas
+
+Current areas of exploration include:
+
+* semantic communication theory,
+* distributed cognition,
+* swarm intelligence,
+* active inference,
+* resonance-based indexing,
+* salience-driven QoS,
+* semantic compression,
+* adaptive routing,
+* trust propagation,
+* contextual memory systems,
+* recursive coordination architectures.
+
+---
+
+# Warning
+
+Semantic routing systems create significant risks.
+
+A sufficiently powerful semantic infrastructure could:
+
+* centralize epistemic authority,
+* suppress interpretive diversity,
+* manipulate salience,
+* create self-sealing legitimacy loops,
+* render alternative ontologies computationally invisible.
+
+The danger is deeper than censorship.
+
+Censorship suppresses statements.
+
+Semantic governance determines which realities become structurally reachable at all.
+
+MEMNET therefore treats decentralization, transparency, and semantic plurality as essential research concerns rather than optional features.
+
+---
+
+# Conclusion
+
+MEMNET explores a possible future in which:
+
+* networking,
+* cognition,
+* memory,
+* salience,
+* coordination,
+* and meaning
+
+are no longer separate layers of infrastructure.
+
+The project asks:
+
+What happens when communication systems stop routing packets and begin routing interpretation itself?
