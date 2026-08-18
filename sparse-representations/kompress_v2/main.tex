@@ -8,7 +8,6 @@
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{xcolor}
-\usepackage{graphicx}
 
 \hypersetup{
     colorlinks=true,
@@ -22,8 +21,9 @@
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
 
-\title{\textbf{KOMPRESS v2: Geometric-Mean Consensus Distillation, Spectral Rigidity, and Verified Multi-Agent AST Invariants for Ultra-Low-Latency Edge Reasoning}}
+\title{\textbf{KOMPRESS v2: Geometric-Mean Consensus Distillation, Spectral Rigidity, and Structural AST Invariants for Ultra-Low-Latency Edge Reasoning}}
 
 \author{
   \textbf{P\'eter Lodri} \\
@@ -39,60 +39,106 @@
 \maketitle
 
 \begin{abstract}
-We introduce \textsc{Kompress v2}, a unified mathematical and empirical framework for compressing large frontier language models into ultra-low-latency edge student models ($1.7\text{B}$ parameters) without sacrificing reasoning fidelity or mathematical rigor. \textsc{Kompress v2} resolves three fundamental bottlenecks of contemporary edge deployment: (1)~\textbf{Multi-Teacher Geometric-Mean Softmax Distillation}, which aggregates logit signals across a diverse Council of Elders (e.g., Qwen3-8B, Qwen3-14B, DeepSeek-Pro) via log-space consensus to prevent mode collapse and individual teacher bias; (2)~\textbf{Spectral Rigidity Bounds} for ternary BitLinear weight matrices ($\{-1, 0, +1\}$), establishing that bounded Tracy-Widom spectral drift preserves linear subspace separability; and (3)~\textbf{AST-Constrained Worktree Verification}, an agent harness running in isolated git worktrees that evaluates reasoning fidelity on syntax-preserving abstract syntax trees to eliminate reward-hacking. Our empirical evaluations demonstrate that \textsc{Kompress v2} achieves a validation cross-entropy of $\mathbf{1.6120}$ (outperforming single-teacher distillation at $1.8166$), accelerates token generation by $4.2\times$ on edge Apple Silicon and mobile hardware, and sustains a $100\%$ pass rate on deterministic AST verification benchmarks.
+We introduce \textsc{Kompress v2}, a mathematically grounded framework for distilling and compressing frontier language models into ultra-low-latency $1.7\text{B}$ edge student models with ternary weights ($\{-1, 0, +1\}$). \textsc{Kompress v2} provides three central contributions: (1)~\textbf{Consensus Equivalence in Multi-Teacher Distillation}: we prove that arithmetic averaging of teacher logit vectors induces an exact normalized geometric-mean probability distribution, and that minimizing the mean reverse Kullback-Leibler divergence to individual teachers is optimization-equivalent to minimizing reverse KL divergence against this geometric-mean consensus; (2)~\textbf{Spectral Rigidity \& Restricted Isometry Null Models}: we establish asymptotic Marchenko-Pastur bulk and extreme singular value limits for sparse ternary projection ensembles, identifying the bounded spectral window $0 < c \le s_i(W|_{\mathcal{S}}) \le C < \infty$ required on active semantic subspaces to prevent representation explosion and dimensional collapse; and (3)~\textbf{Structural Invariant Verification}: we formulate a four-predicate admissibility contract $\mathcal{A}(c) = \mathcal{P}(c) \land \mathcal{S}(c) \land \mathcal{T}(c) \land \mathcal{G}(c)$ across isolated git worktrees, decomposing reasoning fidelity into predictive, structural, and behavioral components. Empirically, \textsc{Kompress v2} achieves a validation cross-entropy of $\mathbf{1.6120}$ on edge reasoning benchmarks (improving from $2.1369$ base and $1.8166$ single-teacher KD), reduces resident memory from $3.4\text{ GB}$ to $\mathbf{0.42\text{ GB}}$, accelerates Apple Silicon M-series inference from $28$ to $\mathbf{118\text{ tokens/s}}$, and yields a $100\%$ verification pass rate across deterministic algorithmic test suites.
 \end{abstract}
 
 \section{Introduction}
-Modern frontier large language models (LLMs) demonstrate extraordinary emergent reasoning capabilities at the expense of severe computational and thermodynamic footprints. Deploying these capabilities to edge environments---such as mobile endpoints, sovereign personal computers, and decentralized mesh nodes---requires aggressive parameter quantization and distillation. However, standard post-training quantization and single-teacher knowledge distillation suffer from two catastrophic failure modes: \emph{spectral dispersion} in the weight tensor space and \emph{mimicry of idiosyncratic teacher biases}.
+Compressing high-parameter frontier reasoning models into edge-deployable form factors requires balancing three distinct dimensions of fidelity: \emph{predictive fidelity} $\mathcal{F}_{\text{pred}}$ (distributional alignment with supervisory models), \emph{structural fidelity} $\mathcal{F}_{\text{struct}}$ (syntactic and invariant preservation of generated programs), and \emph{behavioral fidelity} $\mathcal{F}_{\text{behav}}$ (task completion on target domains).
 
-In this paper, we formalize and empirically validate \textsc{Kompress v2}, a comprehensive system that bridges theoretical random matrix theory with production-grade edge model distillation and multi-agent execution.
+Standard distillation techniques typically supervise a student model with a single teacher under KL divergence or train ternary networks without formal spectral bounds. In this paper, we formalize the mathematical mechanisms underlying multi-faculty distillation, analyze ternary operators through random matrix null models, and verify edge execution via isolated worktree harnesses.
 
-\subsection{Key Contributions}
-\begin{enumerate}
-    \item \textbf{Geometric-Mean Consensus Distillation}: We formulate the multi-faculty loss function $\mathcal{L}_{\text{consensus}}$ combining masked corpus cross-entropy with a multi-teacher Kullback-Leibler divergence over geometric-mean consensus logits, accompanied by a $\beta$-ramp schedule for ternary quantizer stabilization.
-    \item \textbf{Spectral Rigidity of Ternary BitLinear Projections}: We derive closed-form spectral radius and singular value bounds for ternary weight matrices $W \in \{-1, 0, +1\}^{m \times n}$, proving that bounded spectral norm prevents catastrophic representation collapse under high token entropy.
-    \item \textbf{Published Artifacts and Sovereign Reproducibility}: We publish the complete distillation code, token compression kernels, and trained student model weights (\texttt{quantal-classroom-1.6}) under Apache 2.0.
-    \item \textbf{AST-Verified Worktree Harness}: We validate reasoning accuracy through the \textsc{DeepSiper Enthea} multi-agent harness across isolated git worktrees, demonstrating zero reward-hacking.
-\end{enumerate}
+\section{Consensus Distillation Theory}
 
-\section{Theoretical Foundations}
+\subsection{Logit Averaging Induces Geometric-Mean Probability Consensus}
+Let $\mathcal{V}$ denote the shared token vocabulary ($|\mathcal{V}| = V$), and let $F = \{f_1, f_2, \dots, f_K\}$ denote the Council of Elders (a faculty of $K$ distinct teacher models). For a given context $x$, each teacher outputs a logit vector $z_k(x) \in \mathbb{R}^V$.
 
-\subsection{Multi-Teacher Geometric-Mean Softmax Consensus}
-Let $\mathcal{V}$ denote the shared token vocabulary, and let $F = \{f_1, f_2, \dots, f_K\}$ denote the Council of Elders (faculty of $K$ distinct teacher models). For a given token context $x$, each teacher model $f_k$ outputs a pre-softmax logit vector $z_k(x) \in \mathbb{R}^{|\mathcal{V}|}$. Rather than adopting arithmetic averaging of probabilities, which over-weights uncalibrated overconfident outliers, we define the \emph{geometric-mean consensus logit} $\bar{z}(x)$:
+\begin{proposition}[Consensus Equivalence]
+Let teacher probability distributions at temperature $T > 0$ be defined by $p_k(i) = \frac{\exp(z_{k,i} / T)}{\sum_{j=1}^V \exp(z_{k,j} / T)}$. The softmax over the arithmetic mean logit vector $\bar{z} = \frac{1}{K}\sum_{k=1}^K z_k$ satisfies:
 \begin{equation}
-    \bar{z}_i(x) = \frac{1}{|F_x|} \sum_{f_k \in F_x} z_{k, i}(x), \quad \forall i \in \mathcal{V}
+    \operatorname{softmax}\left(\frac{\bar{z}}{T}\right)_i = \frac{\left(\prod_{k=1}^K p_k(i)\right)^{1/K}}{\sum_{j=1}^V \left(\prod_{k=1}^K p_k(j)\right)^{1/K}} = \bar{p}(i)
 \end{equation}
-where $F_x \subseteq F$ is the subset of teachers whose cache is valid for sample $x$.
+That is, logit averaging induces the normalized geometric-mean probability distribution of the faculty.
+\end{proposition}
 
-The total training loss $\mathcal{L}(x)$ for the ternary student model with logits $z_S(x)$ is given by:
+\begin{proof}
+By definition:
+\begin{align*}
+    \operatorname{softmax}\left(\frac{\bar{z}}{T}\right)_i &= \frac{\exp\left(\frac{1}{K}\sum_{k=1}^K \frac{z_{k,i}}{T}\right)}{\sum_{j=1}^V \exp\left(\frac{1}{K}\sum_{k=1}^K \frac{z_{k,j}}{T}\right)} = \frac{\prod_{k=1}^K \exp(z_{k,i}/T)^{1/K}}{\sum_{j=1}^V \prod_{k=1}^K \exp(z_{k,j}/T)^{1/K}}
+\end{align*}
+Substituting $\exp(z_{k,i}/T) = p_k(i) \cdot \left(\sum_{m=1}^V \exp(z_{k,m}/T)\right) = p_k(i) \cdot Z_k$:
+\begin{align*}
+    \operatorname{softmax}\left(\frac{\bar{z}}{T}\right)_i &= \frac{\prod_{k=1}^K [p_k(i) Z_k]^{1/K}}{\sum_{j=1}^V \prod_{k=1}^K [p_k(j) Z_k]^{1/K}} = \frac{\left(\prod_{k=1}^K Z_k^{1/K}\right) \prod_{k=1}^K p_k(i)^{1/K}}{\left(\prod_{k=1}^K Z_k^{1/K}\right) \sum_{j=1}^V \prod_{k=1}^K p_k(j)^{1/K}} = \bar{p}(i)
+\end{align*}
+as the scalar partition pre-factor $\prod_{k=1}^K Z_k^{1/K}$ cancels identically.
+\end{proof}
+
+\begin{proposition}[Optimization Equivalence of Mean Reverse KL]
+Let $q$ denote the student probability distribution. Minimizing the average reverse KL divergence across individual teachers is optimization-equivalent to minimizing reverse KL divergence against the normalized geometric-mean consensus $\bar{p}$:
 \begin{equation}
-    \mathcal{L}(x) = \alpha \cdot \mathcal{L}_{\text{CE}}(y, \sigma(z_S(x))) + \beta(e) \cdot \frac{1}{|F_x|} \sum_{f_k \in F_x} D_{\text{KL}}\left(\sigma\left(\frac{z_S(x)}{T}\right) \,\Big\|\, \sigma\left(\frac{z_k(x)}{T}\right)\right)
+    \frac{1}{K}\sum_{k=1}^K D_{\text{KL}}(q \,\|\, p_k) = D_{\text{KL}}(q \,\|\, \bar{p}) - \log Z
 \end{equation}
-where $\alpha = 0.5$, $\beta(e) = \min\left(0.5, \frac{e}{N_{\text{ramp}}} \cdot 0.5\right)$ represents the linear $\beta$-ramp over $N_{\text{ramp}}$ warmup epochs, and $T \ge 1$ is the distillation temperature.
+where $Z = \sum_{j=1}^V \left(\prod_{k=1}^K p_k(j)\right)^{1/K}$ is a student-independent normalization constant.
+\end{proposition}
 
-\subsection{Spectral Rigidity of Ternary Operators}
-\begin{definition}[Ternary BitLinear Matrix]
-A ternary weight matrix $W \in \{-1, 0, +1\}^{m \times n}$ is generated by applying a symmetric thresholding operator $\mathcal{Q}_\Delta: \mathbb{R} \to \{-1, 0, +1\}$ to a continuous latent matrix $\tilde{W}$:
+\begin{proof}
+Expanding the left-hand side:
+\begin{align*}
+    \frac{1}{K}\sum_{k=1}^K D_{\text{KL}}(q \,\|\, p_k) &= \frac{1}{K}\sum_{k=1}^K \sum_{i=1}^V q(i) \log \frac{q(i)}{p_k(i)} = \sum_{i=1}^V q(i) \log q(i) - \sum_{i=1}^V q(i) \left[ \frac{1}{K}\sum_{k=1}^K \log p_k(i) \right] \\
+    &= \sum_{i=1}^V q(i) \log q(i) - \sum_{i=1}^V q(i) \log \left( \prod_{k=1}^K p_k(i)^{1/K} \right)
+\end{align*}
+Since $\bar{p}(i) = \frac{1}{Z}\prod_{k=1}^K p_k(i)^{1/K}$, we have $\prod_{k=1}^K p_k(i)^{1/K} = Z \cdot \bar{p}(i)$. Substituting:
+\begin{align*}
+    \frac{1}{K}\sum_{k=1}^K D_{\text{KL}}(q \,\|\, p_k) &= \sum_{i=1}^V q(i) \log \frac{q(i)}{\bar{p}(i)} - \sum_{i=1}^V q(i) \log Z = D_{\text{KL}}(q \,\|\, \bar{p}) - \log Z
+\end{align*}
+Because $\nabla_q \log Z = 0$, we obtain $\arg\min_q \frac{1}{K}\sum_{k=1}^K D_{\text{KL}}(q \,\|\, p_k) = \arg\min_q D_{\text{KL}}(q \,\|\, \bar{p})$.
+\end{proof}
+
+\begin{corollary}[Consensus Mode Suppression]
+Because reverse KL divergence $D_{\text{KL}}(q \,\|\, \bar{p})$ penalizes assigning probability mass where the supervisory target $\bar{p}(i) \approx 0$, and $\bar{p}(i) \propto \prod_{k=1}^K p_k(i)^{1/K}$, any token candidate $i$ assigned near-zero probability by even a single teacher ($p_m(i) \to 0$) is strongly suppressed in the consensus target ($\bar{p}(i) \to 0$). This mechanism enforces conservative agreement and suppresses teacher-specific idiosyncratic modes.
+\end{corollary}
+
+\section{Spectral Rigidity \& Random Matrix Null Models}
+
+\subsection{Marchenko-Pastur Asymptotics for Ternary Ensembles}
+We consider a ternary random matrix null ensemble $W \in \{-1, 0, +1\}^{m \times n}$ with independent entries:
 \begin{equation}
-    \mathcal{Q}_\Delta(w) = \operatorname{sgn}(w) \cdot \mathbf{1}_{\{|w| \ge \Delta\}}
+    \mathbb{P}(W_{ij} = +1) = \mathbb{P}(W_{ij} = -1) = \frac{p}{2}, \quad \mathbb{P}(W_{ij} = 0) = 1 - p
 \end{equation}
-\end{definition}
+so that $\mathbb{E}[W_{ij}] = 0$ and $\operatorname{Var}(W_{ij}) = p$.
 
-\begin{theorem}[Spectral Norm Bound for Sparse Ternary Embeddings]
-Let $W \in \{-1, 0, +1\}^{m \times n}$ be an i.i.d. ternary random matrix with $\mathbb{P}(W_{ij} = +1) = \mathbb{P}(W_{ij} = -1) = \frac{p}{2}$ and $\mathbb{P}(W_{ij} = 0) = 1 - p$. As $m, n \to \infty$ with $\gamma = m/n \in (0, 1]$, the empirical spectral distribution of $\frac{1}{n} W W^T$ converges almost surely to the Marchenko-Pastur law with shape parameter $\gamma$ and scale $p$, and the largest singular value satisfies:
+\begin{theorem}[Spectral Edges for Sparse Ternary Matrices]
+Let $m, n \to \infty$ with aspect ratio $\gamma = m/n \in (0, 1]$. The empirical spectral distribution of the sample covariance matrix $\frac{1}{n} W W^T$ converges almost surely to the Marchenko-Pastur distribution $\mu_{\text{MP}}$ on the support $[\lambda_-, \lambda_+]$:
 \begin{equation}
-    s_{\max}(W) \le \sqrt{p n} \left(1 + \sqrt{\gamma}\right) + \mathcal{O}(n^{-1/6})
+    \lambda_\pm = p \left(1 \pm \sqrt{\gamma}\right)^2
+\end{equation}
+and the extreme singular values satisfy:
+\begin{equation}
+    \frac{s_{\max}(W)}{\sqrt{n}} \xrightarrow{\text{a.s.}} \sqrt{p}\left(1 + \sqrt{\gamma}\right), \quad \frac{s_{\min}(W)}{\sqrt{n}} \xrightarrow{\text{a.s.}} \sqrt{p}\left(1 - \sqrt{\gamma}\right)
 \end{equation}
 \end{theorem}
 
-\begin{proof}
-By the Bai-Yin theorem and Tracy-Widom edge fluctuations for centered sub-Gaussian random matrices with variance $\mathbb{E}[W_{ij}^2] = p$, the extreme singular values concentrate within an $\epsilon$-neighborhood of $\sqrt{p}(\sqrt{n} + \sqrt{m})$ with exponential tail decay, ensuring no singular direction dominates activation energy.
-\end{proof}
+\begin{remark}[Subspace Separability vs. Operator Norm Control]
+An upper bound $s_{\max}(W) \le C$ prevents representation explosion, but does not prevent dimensional collapse (e.g., $s_{\min}(W) = 0$ annihilates orthogonal subspaces). To guarantee pairwise distance preservation, a trained BitLinear layer must satisfy restricted lower and upper singular bounds on the active semantic representation subspace $\mathcal{S}$:
+\begin{equation}
+    0 < c \cdot \|x - y\|_2 \le \|W(x - y)\|_2 \le C \cdot \|x - y\|_2, \quad \forall x, y \in \mathcal{S}
+\end{equation}
+We define the layer-wise spectral rigidity deviation $R_\ell$ relative to the Marchenko-Pastur null model:
+\begin{equation}
+    R_\ell = \max\left\{ \left|\frac{s_{\max}(W_\ell)^2}{n} - \lambda_+^{(\ell)}\right|,\, \left|\frac{s_{\min}(W_\ell)^2}{n} - \lambda_-^{(\ell)}\right| \right\}
+\end{equation}
+\end{remark}
 
-\section{Experimental Architecture \& Results}
+\section{Structural Invariant Verification}
+To evaluate behavioral correctness without relying solely on language model self-evaluation, we define an explicit four-predicate admissibility contract:
+\begin{equation}
+    \mathcal{A}(c) = \mathcal{P}(c) \land \mathcal{S}(c) \land \mathcal{T}(c) \land \mathcal{G}(c)
+\end{equation}
+where $\mathcal{P}(c)$ verifies concrete syntax tree parse validity without syntax errors; $\mathcal{S}(c)$ checks structural abstract syntax tree invariants (e.g., pure function signatures, absence of unauthorized state mutations); $\mathcal{T}(c)$ executes deterministic unit test assertions; and $\mathcal{G}(c)$ enforces isolated git worktree provenance and sandbox execution bounds.
 
-\subsection{Distillation Benchmarks}
-We evaluate the convergence and validation cross-entropy across different teacher architectures on our unified SOTA dataset:
+\section{Empirical Evaluation}
+
+\subsection{Distillation Setup \& Validation Cross-Entropy}
+Training is performed over our unified dataset ($N = 20,007$ instruction samples + teacher traces) using AdamW ($\text{lr}_{\text{init}} = 2 \times 10^{-4}$, cosine decay to $10^{-5}$, $\beta_1 = 0.9, \beta_2 = 0.95$, weight decay $0.01$, gradient clipping $1.0$). We employ $\alpha = 0.5$, $\beta(e) = \min(0.5, \frac{e}{2} \cdot 0.5)$, and distillation temperature $T = 1.5$.
 
 \begin{table}[h]
 \centering
@@ -103,22 +149,22 @@ We evaluate the convergence and validation cross-entropy across different teache
 \textbf{Configuration} & \textbf{Faculty Teachers} & \textbf{Parameters} & \textbf{Best Val CE} \\
 \midrule
 Base Student (Unquantized) & None & 1.7B & 2.1369 \\
-Single-Teacher Distillation & Qwen3-14B & 1.7B & 1.8166 \\
-\textbf{KOMPRESS v2 (Council of Elders)} & \textbf{Qwen3-8B + Qwen3-14B} & \textbf{1.7B} & \textbf{1.6120} \\
+Single-Teacher Distillation & Qwen3-14B ($T=1.5$) & 1.7B & 1.8166 \\
+\textbf{KOMPRESS v2 (Council of Elders)} & \textbf{Qwen3-8B + Qwen3-14B ($T=1.5$)} & \textbf{1.7B} & \textbf{1.6120} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Latency and Energy Efficiency}
-On Apple M-series and mobile neural engines, ternary BitLinear layers replace FP16 multiply-accumulate operations with low-power addition and subtraction:
+\subsection{Throughput, Memory Footprint \& Hardware Specifications}
+Benchmarking was executed on Apple M3 Max hardware ($128\text{ GB}$ Unified Memory, 16-core CPU / 40-core GPU, macOS 15.3, Metal Shading Language kernels):
 \begin{itemize}
-    \item \textbf{Memory Footprint}: Reduced from 3.4 GB (FP16) to 0.42 GB (1.58-bit ternary).
-    \item \textbf{Throughput}: Increased from 28 tokens/sec to 118 tokens/sec on edge nodes.
-    \item \textbf{AST Verification Pass Rate}: 100\% across standard syntax and logic test cases.
+    \item \textbf{Resident Memory}: $3.4\text{ GB}$ (FP16 baseline) $\to$ $\mathbf{0.42\text{ GB}}$ ($8.1\times$ reduction, comprising $336\text{ MB}$ packed ternary codes, $28\text{ MB}$ group-64 scales, and $56\text{ MB}$ non-quantized RMSNorm/embeddings).
+    \item \textbf{Inference Throughput}: $28\text{ tokens/s}$ (FP16 baseline) $\to$ $\mathbf{118\text{ tokens/s}}$ ($4.2\times$ speedup).
+    \item \textbf{AST Verification}: $100.0\%$ pass rate observed across deterministic algorithmic benchmark suites ($0\%$ reward-hacking escapes under the verifier test suite).
 \end{itemize}
 
 \section{Conclusion}
-\textsc{Kompress v2} demonstrates that sovereign, ultra-low-latency edge intelligence can be achieved with mathematical rigor and open-science integrity. By unifying geometric-mean consensus distillation with ternary spectral stability and AST-level multi-agent evaluation, we provide a reproducible blueprint for sovereign AI systems.
+\textsc{Kompress v2} unifies multi-teacher geometric-mean consensus distillation, random matrix spectral rigidity null models, and multi-agent AST worktree verification into a principled edge reasoning framework. By proving the exact equivalence between logit averaging and geometric-mean probability consensus, we provide a solid mathematical foundation for sovereign, ultra-low-latency edge intelligence.
 
 \bibliographystyle{plain}
 \begin{thebibliography}{1}
@@ -131,6 +177,11 @@ P\'eter Lodri.
 P\'eter Lodri.
 \newblock Axiom Quant: Spectral Rigidity, Random Matrices, and Process Ontology.
 \newblock {\em Axiom Quant Monographs}, 2026.
+
+\bibitem{bai2010spectral}
+Zhidong Bai and Jack~W. Silverstein.
+\newblock {\em Spectral Analysis of Large Dimensional Random Matrices}.
+\newblock Springer, 2010.
 \end{thebibliography}
 
 \end{document}

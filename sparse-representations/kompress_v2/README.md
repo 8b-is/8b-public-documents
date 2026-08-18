@@ -19,7 +19,7 @@ model_name: KOMPRESS-v2-Quantal-Classroom
 arxiv: 2502.kompress-v2
 ---
 
-# KOMPRESS v2: Geometric-Mean Consensus Distillation & Spectral Rigidity for Edge Reasoning
+# KOMPRESS v2: Geometric-Mean Consensus Distillation, Spectral Rigidity, and Structural AST Invariants for Edge Reasoning
 
 [![Paper PDF](https://img.shields.io/badge/Paper-PDF-red?style=flat-square)](https://kompress.vaked.dev/paper/main_v2.pdf)
 [![Live Portal](https://img.shields.io/badge/Portal-kompress.vaked.dev-00d4ff?style=flat-square)](https://kompress.vaked.dev)
@@ -35,7 +35,7 @@ arxiv: 2502.kompress-v2
 
 ## 🔬 Overview
 
-**KOMPRESS v2** is a formal mathematical and empirical framework for distilling frontier large language models into ultra-compact, high-speed 1.7B edge student models without cognitive degradation or reward-hacking.
+**KOMPRESS v2** provides a mathematically rigorous framework for distilling frontier large language models into ultra-compact, high-speed 1.7B edge student models with ternary weights ($\{-1, 0, +1\}$) without cognitive degradation or reward-hacking.
 
 ```
              ┌──────────────────────────────────────────┐
@@ -53,39 +53,46 @@ arxiv: 2502.kompress-v2
 
 ---
 
-## 📐 Mathematical Formulation
+## 📐 Mathematical Foundations
 
-### 1. Geometric-Mean Consensus Loss ($\mathcal{L}_{\text{consensus}}$)
-Rather than arithmetic probability averaging (which over-weights uncalibrated overconfident outliers), each teacher $f_k \in F_x$ contributes via log-space consensus:
+### 1. Consensus Equivalence & Loss Minimization
+**Proposition 1 (Logit Mean Induces Normalized Geometric Mean):**  
+Let $p_k(i) \propto \exp(z_{k,i}/T)$. The softmax over the arithmetic mean of teacher logits $\bar{z} = \frac{1}{K}\sum_k z_k$ satisfies:
+$$\operatorname{softmax}\left(\frac{\bar{z}}{T}\right)_i = \frac{\prod_{k=1}^K p_k(i)^{1/K}}{\sum_{j=1}^V \prod_{k=1}^K p_k(j)^{1/K}} = \bar{p}(i)$$
 
-$$\bar{z}_i(x) = \frac{1}{|F_x|} \sum_{f_k \in F_x} z_{k, i}(x), \quad \forall i \in \mathcal{V}$$
+**Proposition 2 (Optimization Equivalence):**  
+Minimizing the mean reverse KL divergence to individual teachers is optimization-equivalent to minimizing reverse KL divergence against the normalized geometric-mean consensus $\bar{p}$:
+$$\frac{1}{K}\sum_{k=1}^K D_{\text{KL}}(q \,\|\, p_k) = D_{\text{KL}}(q \,\|\, \bar{p}) - \log Z \implies \arg\min_q \frac{1}{K}\sum_{k=1}^K D_{\text{KL}}(q \,\|\, p_k) = \arg\min_q D_{\text{KL}}(q \,\|\, \bar{p})$$
+where $Z = \sum_{j=1}^V \prod_{k=1}^K p_k(j)^{1/K}$ is student-independent.
 
-The overall student loss with linear warmup $\beta$-ramp schedule is:
+### 2. Spectral Rigidity & Random Matrix Null Models
+For the ternary null ensemble $W_{ij} \in \{-1, 0, +1\}$ with variance $p$ and aspect ratio $\gamma = m/n$, the empirical spectral distribution converges to the Marchenko-Pastur bulk with extreme singular value limits:
+$$\frac{s_{\max}(W)}{\sqrt{n}} \xrightarrow{\text{a.s.}} \sqrt{p}(1 + \sqrt{\gamma}), \quad \frac{s_{\min}(W)}{\sqrt{n}} \xrightarrow{\text{a.s.}} \sqrt{p}(1 - \sqrt{\gamma})$$
+To prevent both representation explosion and dimensional collapse, the trained layer preserves a restricted singular window on the active semantic subspace $\mathcal{S}$:
+$$0 < c \cdot \|x - y\|_2 \le \|W(x - y)\|_2 \le C \cdot \|x - y\|_2, \quad \forall x, y \in \mathcal{S}$$
 
-$$\mathcal{L}(x) = \alpha \cdot \mathcal{L}_{\text{CE}}(y, \sigma(z_S(x))) + \beta(e) \cdot \frac{1}{|F_x|} \sum_{f_k \in F_x} D_{\text{KL}}\left(\sigma\left(\frac{z_S(x)}{T}\right) \,\Big\|\, \sigma\left(\frac{z_k(x)}{T}\right)\right)$$
-
-### 2. Spectral Rigidity & Tracy-Widom Extremes
-For ternary projection matrices $W \in \{-1, 0, +1\}^{m \times n}$, the empirical spectral distribution obeys the Marchenko-Pastur law with bounded operator norm:
-
-$$s_{\max}(W) \le \sqrt{p n} \left(1 + \sqrt{\gamma}\right) + \mathcal{O}(n^{-1/6})$$
-
-This prevents spectral explosion and bounds hidden activation drift under high entropy.
+### 3. Four-Predicate Structural Admissibility
+$$ \mathcal{A}(c) = \mathcal{P}(c) \land \mathcal{S}(c) \land \mathcal{T}(c) \land \mathcal{G}(c) $$
+Decomposing reasoning fidelity into:
+- **Predictive Fidelity ($\mathcal{F}_{\text{pred}}$)**: Distributional consensus alignment.
+- **Structural Fidelity ($\mathcal{F}_{\text{struct}}$)**: AST invariant preservation.
+- **Behavioral Fidelity ($\mathcal{F}_{\text{behav}}$)**: Deterministic test execution.
 
 ---
 
 ## 📊 Empirical Benchmarks
 
-### Distillation Loss Comparison
-| Model / Pipeline | Distillation Strategy | Parameters | Best Val Cross-Entropy |
+### Distillation Performance
+| Configuration | Faculty Teachers | Parameters | Best Val Cross-Entropy |
 |---|---|---|---|
-| Baseline Student | Unquantized Base | 1.7B | 2.1369 |
-| Single-Teacher | Qwen3-14B KL | 1.7B | 1.8166 |
-| **KOMPRESS v2** | **Council of Elders (Qwen3-8B + 14B)** | **1.7B** | **1.6120** |
+| Base Student (Unquantized) | None | 1.7B | 2.1369 |
+| Single-Teacher KD | Qwen3-14B ($T=1.5$) | 1.7B | 1.8166 |
+| **KOMPRESS v2 (Council of Elders)** | **Qwen3-8B + Qwen3-14B ($T=1.5$)** | **1.7B** | **1.6120** |
 
-### Edge Execution & Verification Metrics
-- **Memory Footprint**: 3.4 GB $\to$ **0.42 GB** ($8.1\times$ reduction).
-- **Edge Inference**: 28 tok/s $\to$ **118 tok/s** on Apple Silicon ($4.2\times$ speedup).
-- **AST Worktree Verification**: **100.0% pass rate** across multi-case algorithmic suites ([`DeepSiper Enthea`](https://github.com/8b-is/deepsiper-enthea)).
+### Edge Execution & Verification
+- **Resident Memory**: $3.4\text{ GB} \to \mathbf{0.42\text{ GB}}$ ($8.1\times$ reduction).
+- **Edge Inference**: $28\text{ tok/s} \to \mathbf{118\text{ tok/s}}$ on Apple Silicon ($4.2\times$ speedup).
+- **AST Worktree Verification**: **100.0% pass rate** observed across algorithmic suites ([`DeepSiper Enthea`](https://github.com/8b-is/deepsiper-enthea)).
 
 ---
 
