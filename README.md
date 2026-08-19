@@ -7,6 +7,8 @@
 
 [Constraint as Ground](https://standardgalactic.github.io/memnet/sparse-representations/constraint_as_ground.pdf)
 
+* [Sparse Recursive Holographic Steganography](sparse-representations/Sparse_Recursion_Holographic_Steganography.md) — *Distributed secret fields under adaptive computational depth* — *Flyxion, 2026*
+
 * [Topological Intelligence](https://standardgalactic.github.io/memnet/sparse-representations/Topological_Intelligence.pdf)
 
 * [Notes](https://standardgalactic.github.io/memnet/sparse-representations/Constraint_as_Ground-notes.pdf)
