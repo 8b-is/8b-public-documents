@@ -1,5 +1,10 @@
 # MEMNET
 
+[Cinematic Reconstruction](cinematic-reconstruction.pdf)
+
+* [Plaintext Edition](cinematic-reconstruction.txt)
+* Canonical source, revision history, and build materials: [`standardgalactic/research-projects/major_projects/CrystalEconomy`](https://github.com/standardgalactic/research-projects/tree/main/major_projects/CrystalEconomy). This repository contains a distribution mirror of the compiled monograph.
+
 [Constraint as Ground](https://standardgalactic.github.io/memnet/sparse-representations/constraint_as_ground.pdf)
 
 * [Topological Intelligence](https://standardgalactic.github.io/memnet/sparse-representations/Topological_Intelligence.pdf)
