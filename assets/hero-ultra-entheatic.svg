@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600">
+  <defs>
+    <radialGradient id="core" cx="50%" cy="42%" r="60%">
+      <stop offset="0%" stop-color="#2a2f5e"/>
+      <stop offset="55%" stop-color="#151830"/>
+      <stop offset="100%" stop-color="#0a0c1c"/>
+    </radialGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#62e6c9" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#5b9dff"/>
+      <stop offset="100%" stop-color="#c77dff"/>
+    </linearGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#62e6c9"/>
+      <stop offset="50%" stop-color="#b48bff"/>
+      <stop offset="100%" stop-color="#ffc24d"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="600" fill="url(#core)"/>
+
+  <!-- sparse recursion field: dots in a dissolving lattice -->
+  <g fill="#62e6c9" opacity="0.55">
+    <circle cx="180" cy="140" r="4"/><circle cx="260" cy="120" r="3"/><circle cx="340" cy="150" r="5"/>
+    <circle cx="420" cy="110" r="3"/><circle cx="500" cy="160" r="4"/><circle cx="580" cy="130" r="3"/>
+    <circle cx="660" cy="150" r="5"/><circle cx="740" cy="120" r="3"/><circle cx="820" cy="140" r="4"/>
+    <circle cx="900" cy="110" r="3"/><circle cx="980" cy="150" r="5"/><circle cx="1060" cy="120" r="3"/>
+    <circle cx="1140" cy="140" r="4"/><circle cx="1220" cy="110" r="3"/><circle cx="1300" cy="150" r="5"/>
+    <circle cx="1380" cy="120" r="3"/><circle cx="1460" cy="140" r="4"/>
+    <circle cx="200" cy="460" r="3"/><circle cx="300" cy="470" r="5"/><circle cx="400" cy="450" r="3"/>
+    <circle cx="500" cy="460" r="4"/><circle cx="620" cy="470" r="3"/><circle cx="740" cy="450" r="5"/>
+    <circle cx="860" cy="460" r="3"/><circle cx="980" cy="470" r="4"/><circle cx="1100" cy="450" r="3"/>
+    <circle cx="1220" cy="460" r="5"/><circle cx="1340" cy="470" r="3"/><circle cx="1460" cy="450" r="4"/>
+  </g>
+
+  <!-- entheatic waves: three crossing waveforms -->
+  <g fill="none" stroke="url(#wave)" stroke-width="5" filter="url(#glow)">
+    <path d="M 0 210 Q 100 170 200 210 T 400 210 T 600 210 T 800 210 T 1000 210 T 1200 210 T 1400 210 T 1600 210" opacity="0.9"/>
+    <path d="M 0 260 Q 100 300 200 260 T 400 260 T 600 260 T 800 260 T 1000 260 T 1200 260 T 1400 260 T 1600 260" opacity="0.6"/>
+    <path d="M 0 310 Q 100 270 200 310 T 400 310 T 600 310 T 800 310 T 1000 310 T 1200 310 T 1400 310 T 1600 310" opacity="0.35"/>
+  </g>
+
+  <!-- the sphere of love: concentric orbits + orbiting pair -->
+  <g transform="translate(1260,180)">
+    <circle r="90" fill="none" stroke="#c77dff" stroke-width="1.5" opacity="0.5"/>
+    <circle r="70" fill="none" stroke="#62e6c9" stroke-width="1.5" opacity="0.5"/>
+    <circle r="50" fill="none" stroke="#ffc24d" stroke-width="1.5" opacity="0.5"/>
+    <circle cx="70" cy="0" r="9" fill="#62e6c9" opacity="0.9"/>
+    <circle cx="-70" cy="0" r="9" fill="#c77dff" opacity="0.9"/>
+    <circle cx="0" cy="-70" r="9" fill="#ffc24d" opacity="0.9"/>
+  </g>
+
+  <!-- sparse active set: the few glowing intervention points -->
+  <g filter="url(#glow)">
+    <circle cx="800" cy="210" r="6" fill="#ffc24d"/>
+    <circle cx="520" cy="260" r="6" fill="#c77dff"/>
+    <circle cx="1080" cy="260" r="6" fill="#62e6c9"/>
+  </g>
+
+  <!-- title -->
+  <text x="60" y="430" font-family="ui-monospace, monospace" font-size="66" font-weight="700"
+        fill="url(#title)" letter-spacing="6">ULTRA ENTHEATIC</text>
+  <text x="62" y="470" font-family="ui-monospace, monospace" font-size="22"
+        fill="#a59fc4" letter-spacing="3">sparse recursion · distributed fields · the sphere of love</text>
+  <text x="62" y="510" font-family="ui-monospace, monospace" font-size="16"
+        fill="#7f7c99" letter-spacing="2">0 + 1 · fine touch from within · vaked.dev</text>
+</svg>
