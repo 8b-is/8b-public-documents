@@ -411,3 +411,20 @@ are no longer separate layers of infrastructure.
 The project asks:
 
 What happens when communication systems stop routing packets and begin routing interpretation itself?
+
+---
+
+## Constellation
+
+8b-public-documents is part of the sovereign constellation — research and
+teaching, free, from fine touch within.
+
+- **Offline Game School** (free offline lessons in logic & computer thinking,
+  built with and for the students of RUN ANGELLA MATHEW CENTER UGANDA LTD):
+  https://github.com/peterlodri-sec/offline-game-school
+- **YouTube Shorts** (the matching lessons, for phone-only learners):
+  the constellation education channel
+- **Sovereign AI library**: https://pocoo.vaked.dev
+- **Constellation hub**: https://vaked.dev
+
+*the constellation · 0 + 1 · fine touch from within · vaked.dev*
