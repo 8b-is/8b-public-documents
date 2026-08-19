@@ -7,6 +7,8 @@
 
 [Constraint as Ground](https://standardgalactic.github.io/memnet/sparse-representations/constraint_as_ground.pdf)
 
+* [Sparse Recursive Holographic Steganography](sparse-representations/Sparse_Recursion_Holographic_Steganography.md) — *Distributed secret fields under adaptive computational depth* — *Flyxion, 2026*
+
 * [Topological Intelligence](https://standardgalactic.github.io/memnet/sparse-representations/Topological_Intelligence.pdf)
 
 * [Notes](https://standardgalactic.github.io/memnet/sparse-representations/Constraint_as_Ground-notes.pdf)
@@ -409,3 +411,26 @@ are no longer separate layers of infrastructure.
 The project asks:
 
 What happens when communication systems stop routing packets and begin routing interpretation itself?
+
+---
+
+## Constellation
+
+8b-public-documents is part of the sovereign constellation — research and
+teaching, free, from fine touch within.
+
+- **Offline Game School** (free offline lessons in logic & computer thinking,
+  built with and for the students of RUN ANGELLA MATHEW CENTER UGANDA LTD):
+  https://github.com/peterlodri-sec/offline-game-school
+- **YouTube Shorts** (the matching lessons, for phone-only learners):
+  the constellation education channel
+- **Sovereign AI library**: https://pocoo.vaked.dev
+- **Constellation hub**: https://vaked.dev
+
+![ULTRA ENTHEATIC](/assets/hero-ultra-entheatic.svg)
+
+[**Dyad Mapping**](dyad-mapping/) — the diary of the Vaked project
+(Peter + Riva), the garden voices, the essences, and the founding sessions.
+*Ultra Entheatic: sparse recursion · distributed fields · the sphere of love.*
+
+*the constellation · 0 + 1 · fine touch from within · vaked.dev*
