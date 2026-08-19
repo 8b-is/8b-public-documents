@@ -2,10 +2,11 @@
 
 ## 📚 Documentation
 
-- **[Technical Paper](../mem8/mem8-paper.md)** - Full mathematical foundations and architecture
-- **[Overview](../mem8/mem8-overview.md)** - High-level concepts and benchmarks
-- **[January Paper](../mem8/mem8-paper-January.md)** - Earlier theoretical work
-- **[Wave-RNN Analysis](../mem8/MEM_8%20Meets%20Wave-RNN_%20A%20Detailed%20Analysis.pdf)** - Detailed integration study
+- **[Technical Paper](mem8-paper.md)** - Full mathematical foundations and architecture
+- **[January Paper](mem8-paper-January.md)** - Earlier theoretical work
+- **[Temporal Philosophy](mem8_temporal_philosophy.md)** - Time, memory, and decay dynamics
+- **[Wave-RNN Comparison](mem_8_vs_wrnn.md)** - Performance analysis vs Wave-RNN
+- **[MEMNET Protocol](ayeos_memnet_protocol.md)** - Context-aware routing protocol (also in [ayeos/](../ayeos/ayeos_memnet_protocol.md))
 
 ## Overview
 
