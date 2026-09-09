@@ -2,7 +2,11 @@
 
 Public Reader, Explorer, and Guardian playground over the 8b.is document collection.
 
-Public URL: https://8b-is.github.io/8b-public-documents/
+Website target: https://8b-is.github.io/8b-public-documents/
+
+Hosting status: the source is public and the site is tested, but GitHub Actions is disabled for this repository by organization policy. A repository-level enable attempt returned HTTP409; organization-policy access returned HTTP403. An organization admin must allow Actions for this repository before the Pages workflow can execute. No organization policy was changed.
+
+An offline build is available in the `library-2026-09-09` GitHub release. Unzip it, run `python3 -m http.server 8000 --bind 127.0.0.1` from the extracted folder, and open `http://127.0.0.1:8000/8b-public-documents/`.
 
 ## Run locally
 
@@ -45,9 +49,11 @@ The model implements a declared subset of Guardian behavior, not a formal verifi
 
 ## Publish
 
-The `Publish 8b Library` workflow builds the static site and deploys it to GitHub
+Once permitted by organization policy, the `Publish 8b Library` workflow builds the static site and deploys it to GitHub
 Pages on `main` changes or a manual run. No custom domain or running application
 server is required. Set repository Pages source to GitHub Actions.
 
 Authorship and individual reuse terms stay attached to works. No new blanket
 license is assigned by ingestion. Private chat exports are not published.
+
+To package a verified build: `python3 scripts/package-offline.py /tmp/8b-library-offline.zip`. The archive includes a source revision and a SHA-256 sidecar.

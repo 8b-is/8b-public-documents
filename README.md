@@ -1,4 +1,4 @@
-> **Read the [8b Library](https://8b-is.github.io/8b-public-documents/)** — searchable papers, curated reading paths, source downloads, and a Guardian playground. See [the site guide](site/README.md) for local builds and [the curated catalog](library/catalog.json) for edition details.
+> **8b Library:** [Browse the curated documents](library/README.md) or [download the offline site](https://github.com/8b-is/8b-public-documents/releases/tag/library-2026-09-09). The tested Reader, Explorer, and Guardian playground are ready; [web hosting](https://8b-is.github.io/8b-public-documents/) is pending the organization’s GitHub Actions allowance. See [the site guide](site/README.md) for builds and [the catalog](library/catalog.json) for editions.
 
 # MEMNET
 

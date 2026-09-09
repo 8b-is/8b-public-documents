@@ -76,3 +76,18 @@ with Tectonic 0.17.0, while the companion PDFs are the supplied editions.
 Compression and retrieval derivatives must remain separate from these canonical
 sources. The trials under `../library-tools/` measure tool behavior without
 substituting a compressed summary for a reader or source manuscript.
+
+## Read the curated works
+
+| Work | Reading edition | Preserved download |
+| --- | --- | --- |
+| Unknown Is Not Don’t-Care | [Markdown](readers/unknown-not-dontcare.md) | [PDF](sources/unknown-not-dontcare/unknown-not-dontcare.pdf) |
+| From Vocabulary to Kernel | [Markdown](readers/vocabulary-to-kernel.md) | [PDF](sources/vocabulary-to-kernel/vocabulary-to-kernel.pdf) |
+| Two Meanings of Fixed Point | [Markdown](readers/fixed-point-essay.md) | [PDF](sources/fixed-point-essay/fixed-point-essay.pdf) |
+| Commitment Before Appearance | [Markdown](readers/commitment-before-appearance.md) | [PDF](sources/commitment-before-appearance/commitment-before-appearance.pdf) |
+| The Verification Boundary | [Markdown](readers/verification-boundary.md) | [PDF](sources/verification-boundary/verification-boundary.pdf) |
+| Field Before Spike | [Transcription and notes](readers/field-before-spike.md) | [Original image](sources/field-before-spike/field-before-spike.jpg) |
+
+Web-specific links in the reader Markdown target the library website. Use the
+PDF/source links above while hosting is pending, or download the offline site
+from the repository’s Releases page.

@@ -154,6 +154,7 @@ function rewriteLinks(body, fromFile, repoRoot) {
     const rel = path.relative(repoRoot, abs);
     if (rel.startsWith('..')) return all;
     const ext = path.extname(decoded).toLowerCase();
+    if (rel === 'library/README.md') return `${pre}/collections/${hash}${post}`;
     if (rel === 'library/catalog.json') return `${pre}/library/catalog.json${hash}${post}`;
     if (rel === 'site/README.md' || SKIP_MD.has(path.basename(rel).toLowerCase())) return `${pre}https://github.com/8b-is/8b-public-documents/blob/main/${encodeURI(rel)}${hash}${post}`;
     if (fs.statSync(abs).isDirectory() && fs.existsSync(path.join(abs, 'README.md'))) {
