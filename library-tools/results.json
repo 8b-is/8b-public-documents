@@ -1,0 +1,2277 @@
+{
+  "schema_version": 1,
+  "scope": "Three revised papers and a synthetic fidelity fixture; optional generated Markdown readers when present.",
+  "claims": "Byte measurements and exact comparisons only. Qualifier counts are diagnostics, not proof of semantic equivalence. No token or retrieval-quality benchmark was run.",
+  "tools": {
+    "gzip": {
+      "level": 9,
+      "mtime": 0
+    },
+    "marqant": {
+      "commit": "85c833e8e2394deae1227fa202b3289f2033a46b",
+      "working_tree_clean": true,
+      "binary_sha256": "02f7bb02c4a0fb4b5bc4f27c4b640922a51b05245c29fdf1d507e84d714b3d3a",
+      "timestamp_override": "MARQANT_TEST_TS=0",
+      "entrypoint": "src/cli.rs; locally built mq binary"
+    },
+    "kompress": {
+      "commit": "4cc890dbcf8cb4204495fdef1dfaaccd48bf3955",
+      "working_tree_clean": true,
+      "bun_version": "1.4.2",
+      "entrypoint": "src/rewriter.ts compressMessage; pure local rewriter, no pruning/circulator or hosted API"
+    }
+  },
+  "results": [
+    {
+      "path": "library/sources/unknown-not-dontcare/unknown-not-dontcare.tex",
+      "bytes": 21852,
+      "sha256": "1a3c9127a6b8422500e0033774cb7bd5d40f092fcd78d3f378b3a25a349dc4bc",
+      "modes": [
+        {
+          "mode": "gzip-9",
+          "encoded_bytes": 8678,
+          "operation": "roundtrip",
+          "output_sha256": "1a3c9127a6b8422500e0033774cb7bd5d40f092fcd78d3f378b3a25a349dc4bc",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 8,
+              "after": 8
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 15,
+            "retained_verbatim": 15
+          },
+          "size_percent_of_original": 39.71
+        },
+        {
+          "mode": "marqant-uni",
+          "encoded_bytes": 22095,
+          "operation": "roundtrip",
+          "output_sha256": "1a3c9127a6b8422500e0033774cb7bd5d40f092fcd78d3f378b3a25a349dc4bc",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 8,
+              "after": 8
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 15,
+            "retained_verbatim": 15
+          },
+          "size_percent_of_original": 101.11
+        },
+        {
+          "mode": "marqant-default",
+          "encoded_bytes": 21851,
+          "operation": "roundtrip",
+          "output_sha256": "729f5a66c58a8e3b8e6a36d374fbbb44d08a5f7d402757feeac7a0ce00345de0",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 8,
+              "after": 8
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 15,
+            "retained_verbatim": 15
+          },
+          "size_percent_of_original": 100.0
+        },
+        {
+          "mode": "marqant-binary",
+          "encoded_bytes": 11611,
+          "operation": "roundtrip",
+          "output_sha256": "1a3c9127a6b8422500e0033774cb7bd5d40f092fcd78d3f378b3a25a349dc4bc",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 8,
+              "after": 8
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 15,
+            "retained_verbatim": 15
+          },
+          "size_percent_of_original": 53.13
+        },
+        {
+          "mode": "marqant-semantic",
+          "encoded_bytes": 21861,
+          "operation": "roundtrip",
+          "output_sha256": "729f5a66c58a8e3b8e6a36d374fbbb44d08a5f7d402757feeac7a0ce00345de0",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 8,
+              "after": 8
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 15,
+            "retained_verbatim": 15
+          },
+          "size_percent_of_original": 100.04
+        },
+        {
+          "mode": "marqant-binary-semantic",
+          "encoded_bytes": 11621,
+          "operation": "roundtrip",
+          "output_sha256": "729f5a66c58a8e3b8e6a36d374fbbb44d08a5f7d402757feeac7a0ce00345de0",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 8,
+              "after": 8
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 15,
+            "retained_verbatim": 15
+          },
+          "size_percent_of_original": 53.18
+        },
+        {
+          "mode": "kompress-verbatim",
+          "encoded_bytes": 21852,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "1a3c9127a6b8422500e0033774cb7bd5d40f092fcd78d3f378b3a25a349dc4bc",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 8,
+              "after": 8
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 15,
+            "retained_verbatim": 15
+          },
+          "size_percent_of_original": 100.0
+        },
+        {
+          "mode": "kompress-lite",
+          "encoded_bytes": 20810,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "19c1bc042fbd13aca070397a45d2b2d1a565627128ecfb2ee8d2c0ff852441e8",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 8,
+              "after": 8
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 15,
+            "retained_verbatim": 13
+          },
+          "size_percent_of_original": 95.23
+        },
+        {
+          "mode": "kompress-ultra",
+          "encoded_bytes": 19276,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "6e90bb2d4f4381a38d32c05165ff55242560a9f0d9ddc1678c595f274fa88ec6",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 8,
+              "after": 8
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 0
+            },
+            "tests": {
+              "before": 2,
+              "after": 0
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 15,
+            "retained_verbatim": 10
+          },
+          "size_percent_of_original": 88.21
+        }
+      ]
+    },
+    {
+      "path": "library/sources/unknown-not-dontcare/unknown-not-dontcare.pdf",
+      "bytes": 66823,
+      "sha256": "18591eb72559eecd6a9f2d7a10542f9ca6eee0b1a05085678a1377a2617cee3a",
+      "modes": [
+        {
+          "mode": "gzip-9",
+          "encoded_bytes": 64780,
+          "operation": "roundtrip",
+          "output_sha256": "18591eb72559eecd6a9f2d7a10542f9ca6eee0b1a05085678a1377a2617cee3a",
+          "byte_identical": true,
+          "size_percent_of_original": 96.94
+        },
+        {
+          "mode": "marqant-uni",
+          "encoded_bytes": 66827,
+          "operation": "roundtrip",
+          "output_sha256": "18591eb72559eecd6a9f2d7a10542f9ca6eee0b1a05085678a1377a2617cee3a",
+          "byte_identical": true,
+          "size_percent_of_original": 100.01
+        }
+      ]
+    },
+    {
+      "path": "library/sources/vocabulary-to-kernel/vocabulary-to-kernel.tex",
+      "bytes": 20855,
+      "sha256": "36a575d10aadacd31b0dbad1a5ad2449fdaa9f4237b6bfd40bfd04416d4e8617",
+      "modes": [
+        {
+          "mode": "gzip-9",
+          "encoded_bytes": 8359,
+          "operation": "roundtrip",
+          "output_sha256": "36a575d10aadacd31b0dbad1a5ad2449fdaa9f4237b6bfd40bfd04416d4e8617",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 51,
+              "after": 51
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 40.08
+        },
+        {
+          "mode": "marqant-uni",
+          "encoded_bytes": 21093,
+          "operation": "roundtrip",
+          "output_sha256": "36a575d10aadacd31b0dbad1a5ad2449fdaa9f4237b6bfd40bfd04416d4e8617",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 51,
+              "after": 51
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 101.14
+        },
+        {
+          "mode": "marqant-default",
+          "encoded_bytes": 20850,
+          "operation": "roundtrip",
+          "output_sha256": "58781321aa0235a3191c594aaf157c6fa0c66817d8d3791d6242758c843a8383",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 51,
+              "after": 51
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 99.98
+        },
+        {
+          "mode": "marqant-binary",
+          "encoded_bytes": 11175,
+          "operation": "roundtrip",
+          "output_sha256": "36a575d10aadacd31b0dbad1a5ad2449fdaa9f4237b6bfd40bfd04416d4e8617",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 51,
+              "after": 51
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 53.58
+        },
+        {
+          "mode": "marqant-semantic",
+          "encoded_bytes": 20860,
+          "operation": "roundtrip",
+          "output_sha256": "58781321aa0235a3191c594aaf157c6fa0c66817d8d3791d6242758c843a8383",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 51,
+              "after": 51
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 100.02
+        },
+        {
+          "mode": "marqant-binary-semantic",
+          "encoded_bytes": 11185,
+          "operation": "roundtrip",
+          "output_sha256": "58781321aa0235a3191c594aaf157c6fa0c66817d8d3791d6242758c843a8383",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 51,
+              "after": 51
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 53.63
+        },
+        {
+          "mode": "kompress-verbatim",
+          "encoded_bytes": 20855,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "36a575d10aadacd31b0dbad1a5ad2449fdaa9f4237b6bfd40bfd04416d4e8617",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 51,
+              "after": 51
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 100.0
+        },
+        {
+          "mode": "kompress-lite",
+          "encoded_bytes": 19413,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "9a20a7d305f46f9f989db71b21d86b2bb753a7207faafdfc1260d8cab939c254",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 51,
+              "after": 51
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 3
+          },
+          "size_percent_of_original": 93.09
+        },
+        {
+          "mode": "kompress-ultra",
+          "encoded_bytes": 17761,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "fa40e63107795180271aadb0d63d9934f902eedb4d234edcb9e61377db08a4a9",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "don't-care": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 51,
+              "after": 51
+            },
+            "implementation": {
+              "before": 9,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 85.16
+        }
+      ]
+    },
+    {
+      "path": "library/sources/vocabulary-to-kernel/vocabulary-to-kernel.pdf",
+      "bytes": 61373,
+      "sha256": "d835e07bfcdeea08b389346f7a1f123e8ff7348be367db10408a2b1a23df2eda",
+      "modes": [
+        {
+          "mode": "gzip-9",
+          "encoded_bytes": 58729,
+          "operation": "roundtrip",
+          "output_sha256": "d835e07bfcdeea08b389346f7a1f123e8ff7348be367db10408a2b1a23df2eda",
+          "byte_identical": true,
+          "size_percent_of_original": 95.69
+        },
+        {
+          "mode": "marqant-uni",
+          "encoded_bytes": 61379,
+          "operation": "roundtrip",
+          "output_sha256": "d835e07bfcdeea08b389346f7a1f123e8ff7348be367db10408a2b1a23df2eda",
+          "byte_identical": true,
+          "size_percent_of_original": 100.01
+        }
+      ]
+    },
+    {
+      "path": "library/sources/fixed-point-essay/fixed-point-essay.tex",
+      "bytes": 10517,
+      "sha256": "696b71322b79ced2f7e6e00848266b43d76ebe2d7eb1e0fe796abc7f4933e8e3",
+      "modes": [
+        {
+          "mode": "gzip-9",
+          "encoded_bytes": 4457,
+          "operation": "roundtrip",
+          "output_sha256": "696b71322b79ced2f7e6e00848266b43d76ebe2d7eb1e0fe796abc7f4933e8e3",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 42.38
+        },
+        {
+          "mode": "marqant-uni",
+          "encoded_bytes": 10671,
+          "operation": "roundtrip",
+          "output_sha256": "696b71322b79ced2f7e6e00848266b43d76ebe2d7eb1e0fe796abc7f4933e8e3",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 101.46
+        },
+        {
+          "mode": "marqant-default",
+          "encoded_bytes": 10498,
+          "operation": "roundtrip",
+          "output_sha256": "3e58825f33c706a1f8f922c0d2f96c66b661caf26cf212d10baea40660933eeb",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 99.82
+        },
+        {
+          "mode": "marqant-binary",
+          "encoded_bytes": 5985,
+          "operation": "roundtrip",
+          "output_sha256": "696b71322b79ced2f7e6e00848266b43d76ebe2d7eb1e0fe796abc7f4933e8e3",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 56.91
+        },
+        {
+          "mode": "marqant-semantic",
+          "encoded_bytes": 10508,
+          "operation": "roundtrip",
+          "output_sha256": "3e58825f33c706a1f8f922c0d2f96c66b661caf26cf212d10baea40660933eeb",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 99.91
+        },
+        {
+          "mode": "marqant-binary-semantic",
+          "encoded_bytes": 5995,
+          "operation": "roundtrip",
+          "output_sha256": "3e58825f33c706a1f8f922c0d2f96c66b661caf26cf212d10baea40660933eeb",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 57.0
+        },
+        {
+          "mode": "kompress-verbatim",
+          "encoded_bytes": 10517,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "696b71322b79ced2f7e6e00848266b43d76ebe2d7eb1e0fe796abc7f4933e8e3",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 100.0
+        },
+        {
+          "mode": "kompress-lite",
+          "encoded_bytes": 9860,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "f53297fb0756a3ecdbf009abcd4a5a6e466268a146530f176edb8a6b0ae815cb",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 93.75
+        },
+        {
+          "mode": "kompress-ultra",
+          "encoded_bytes": 9084,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "a840036d7115d42bb9bbac25d2af6da9767c0aaacdf8740482b665f4e7a256d3",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 0
+          },
+          "size_percent_of_original": 86.37
+        }
+      ]
+    },
+    {
+      "path": "library/sources/fixed-point-essay/fixed-point-essay.pdf",
+      "bytes": 45646,
+      "sha256": "58d71c8731bcbe988165a3b2bf0954749962a4e25e482b5e5f5f8575c2ebd402",
+      "modes": [
+        {
+          "mode": "gzip-9",
+          "encoded_bytes": 43534,
+          "operation": "roundtrip",
+          "output_sha256": "58d71c8731bcbe988165a3b2bf0954749962a4e25e482b5e5f5f8575c2ebd402",
+          "byte_identical": true,
+          "size_percent_of_original": 95.37
+        },
+        {
+          "mode": "marqant-uni",
+          "encoded_bytes": 45650,
+          "operation": "roundtrip",
+          "output_sha256": "58d71c8731bcbe988165a3b2bf0954749962a4e25e482b5e5f5f8575c2ebd402",
+          "byte_identical": true,
+          "size_percent_of_original": 100.01
+        }
+      ]
+    },
+    {
+      "path": "library/readers/unknown-not-dontcare.md",
+      "bytes": 20301,
+      "sha256": "04e943c5c694088ca87c7fbba25e75ec6d5f3dc12af609cbf0f20f00356c8adf",
+      "modes": [
+        {
+          "mode": "gzip-9",
+          "encoded_bytes": 8089,
+          "operation": "roundtrip",
+          "output_sha256": "04e943c5c694088ca87c7fbba25e75ec6d5f3dc12af609cbf0f20f00356c8adf",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 7,
+              "after": 7
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 16,
+            "retained_verbatim": 16
+          },
+          "size_percent_of_original": 39.85
+        },
+        {
+          "mode": "marqant-uni",
+          "encoded_bytes": 20520,
+          "operation": "roundtrip",
+          "output_sha256": "04e943c5c694088ca87c7fbba25e75ec6d5f3dc12af609cbf0f20f00356c8adf",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 7,
+              "after": 7
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 16,
+            "retained_verbatim": 16
+          },
+          "size_percent_of_original": 101.08
+        },
+        {
+          "mode": "marqant-default",
+          "encoded_bytes": 20200,
+          "operation": "roundtrip",
+          "output_sha256": "8e0f0e7f10ffb5cac770d5d20c85c6755c4b22e3e2af4c7fa364efd2c4ef503f",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 7,
+              "after": 7
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 16,
+            "retained_verbatim": 16
+          },
+          "size_percent_of_original": 99.5
+        },
+        {
+          "mode": "marqant-binary",
+          "encoded_bytes": 10824,
+          "operation": "roundtrip",
+          "output_sha256": "04e943c5c694088ca87c7fbba25e75ec6d5f3dc12af609cbf0f20f00356c8adf",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 7,
+              "after": 7
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 16,
+            "retained_verbatim": 16
+          },
+          "size_percent_of_original": 53.32
+        },
+        {
+          "mode": "marqant-semantic",
+          "encoded_bytes": 20542,
+          "operation": "roundtrip",
+          "output_sha256": "8e0f0e7f10ffb5cac770d5d20c85c6755c4b22e3e2af4c7fa364efd2c4ef503f",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 7,
+              "after": 7
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 16,
+            "retained_verbatim": 16
+          },
+          "size_percent_of_original": 101.19
+        },
+        {
+          "mode": "marqant-binary-semantic",
+          "encoded_bytes": 10906,
+          "operation": "roundtrip",
+          "output_sha256": "8e0f0e7f10ffb5cac770d5d20c85c6755c4b22e3e2af4c7fa364efd2c4ef503f",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 7,
+              "after": 7
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 16,
+            "retained_verbatim": 16
+          },
+          "size_percent_of_original": 53.72
+        },
+        {
+          "mode": "kompress-verbatim",
+          "encoded_bytes": 20301,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "04e943c5c694088ca87c7fbba25e75ec6d5f3dc12af609cbf0f20f00356c8adf",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 7,
+              "after": 7
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 16,
+            "retained_verbatim": 16
+          },
+          "size_percent_of_original": 100.0
+        },
+        {
+          "mode": "kompress-lite",
+          "encoded_bytes": 19222,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "6cf0ef62635ed26172ef3939dca3d59c3fc4a17dbb22c777b9c3e5e2c193dc89",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 7,
+              "after": 7
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 18
+            },
+            "tests": {
+              "before": 2,
+              "after": 2
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 16,
+            "retained_verbatim": 14
+          },
+          "size_percent_of_original": 94.68
+        },
+        {
+          "mode": "kompress-ultra",
+          "encoded_bytes": 17658,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "35aca771018fbc24d5074a20fbbaa57c1195c81c068e0b675f0015629262fad2",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 10,
+              "after": 10
+            },
+            "unknown": {
+              "before": 7,
+              "after": 7
+            },
+            "not": {
+              "before": 56,
+              "after": 56
+            },
+            "implementation": {
+              "before": 18,
+              "after": 0
+            },
+            "tests": {
+              "before": 2,
+              "after": 0
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 16,
+            "retained_verbatim": 11
+          },
+          "size_percent_of_original": 86.98
+        }
+      ]
+    },
+    {
+      "path": "library/readers/vocabulary-to-kernel.md",
+      "bytes": 20083,
+      "sha256": "89e356f2141b408cf4bb877fc7ecdcf1895e2f209a57375af8930ef93aaa37c6",
+      "modes": [
+        {
+          "mode": "gzip-9",
+          "encoded_bytes": 8018,
+          "operation": "roundtrip",
+          "output_sha256": "89e356f2141b408cf4bb877fc7ecdcf1895e2f209a57375af8930ef93aaa37c6",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 47,
+              "after": 47
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 39.92
+        },
+        {
+          "mode": "marqant-uni",
+          "encoded_bytes": 20309,
+          "operation": "roundtrip",
+          "output_sha256": "89e356f2141b408cf4bb877fc7ecdcf1895e2f209a57375af8930ef93aaa37c6",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 47,
+              "after": 47
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 101.13
+        },
+        {
+          "mode": "marqant-default",
+          "encoded_bytes": 20062,
+          "operation": "roundtrip",
+          "output_sha256": "a075ad478c4e2ffc7dad9ac2b99ccecd24a5c49c854418975b8acd70090aeab1",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 47,
+              "after": 47
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 99.9
+        },
+        {
+          "mode": "marqant-binary",
+          "encoded_bytes": 10724,
+          "operation": "roundtrip",
+          "output_sha256": "89e356f2141b408cf4bb877fc7ecdcf1895e2f209a57375af8930ef93aaa37c6",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 47,
+              "after": 47
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 53.4
+        },
+        {
+          "mode": "marqant-semantic",
+          "encoded_bytes": 20658,
+          "operation": "roundtrip",
+          "output_sha256": "a075ad478c4e2ffc7dad9ac2b99ccecd24a5c49c854418975b8acd70090aeab1",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 47,
+              "after": 47
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 102.86
+        },
+        {
+          "mode": "marqant-binary-semantic",
+          "encoded_bytes": 10846,
+          "operation": "roundtrip",
+          "output_sha256": "a075ad478c4e2ffc7dad9ac2b99ccecd24a5c49c854418975b8acd70090aeab1",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 47,
+              "after": 47
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 54.01
+        },
+        {
+          "mode": "kompress-verbatim",
+          "encoded_bytes": 20083,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "89e356f2141b408cf4bb877fc7ecdcf1895e2f209a57375af8930ef93aaa37c6",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 47,
+              "after": 47
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 5
+          },
+          "size_percent_of_original": 100.0
+        },
+        {
+          "mode": "kompress-lite",
+          "encoded_bytes": 18639,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "86bf1786a64eefd6e76917ac142189a860a6927cbd46dab9fca904de5bfaa85c",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 47,
+              "after": 47
+            },
+            "implementation": {
+              "before": 9,
+              "after": 9
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 3
+          },
+          "size_percent_of_original": 92.81
+        },
+        {
+          "mode": "kompress-ultra",
+          "encoded_bytes": 16979,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "6723d3b6e8b98b4cdfaecd8e5f70779575380ba4f277f1ad4a470f34ae7cea3c",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 4,
+              "after": 4
+            },
+            "unknown": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 47,
+              "after": 47
+            },
+            "implementation": {
+              "before": 9,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 5,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 84.54
+        }
+      ]
+    },
+    {
+      "path": "library/readers/fixed-point-essay.md",
+      "bytes": 9518,
+      "sha256": "45e43d5f153505b7c6517cf67b9b40301edb8e33c572e7a114b4cd3f5909139d",
+      "modes": [
+        {
+          "mode": "gzip-9",
+          "encoded_bytes": 4024,
+          "operation": "roundtrip",
+          "output_sha256": "45e43d5f153505b7c6517cf67b9b40301edb8e33c572e7a114b4cd3f5909139d",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 42.28
+        },
+        {
+          "mode": "marqant-uni",
+          "encoded_bytes": 9643,
+          "operation": "roundtrip",
+          "output_sha256": "45e43d5f153505b7c6517cf67b9b40301edb8e33c572e7a114b4cd3f5909139d",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 101.31
+        },
+        {
+          "mode": "marqant-default",
+          "encoded_bytes": 9481,
+          "operation": "roundtrip",
+          "output_sha256": "f7303b675b76a388e74b9efdeb7b453cae1b9677bb60c7efa6cda5d06291f1d6",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 99.61
+        },
+        {
+          "mode": "marqant-binary",
+          "encoded_bytes": 5398,
+          "operation": "roundtrip",
+          "output_sha256": "45e43d5f153505b7c6517cf67b9b40301edb8e33c572e7a114b4cd3f5909139d",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 56.71
+        },
+        {
+          "mode": "marqant-semantic",
+          "encoded_bytes": 9811,
+          "operation": "roundtrip",
+          "output_sha256": "f7303b675b76a388e74b9efdeb7b453cae1b9677bb60c7efa6cda5d06291f1d6",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 103.08
+        },
+        {
+          "mode": "marqant-binary-semantic",
+          "encoded_bytes": 5488,
+          "operation": "roundtrip",
+          "output_sha256": "f7303b675b76a388e74b9efdeb7b453cae1b9677bb60c7efa6cda5d06291f1d6",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 57.66
+        },
+        {
+          "mode": "kompress-verbatim",
+          "encoded_bytes": 9518,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "45e43d5f153505b7c6517cf67b9b40301edb8e33c572e7a114b4cd3f5909139d",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 2
+          },
+          "size_percent_of_original": 100.0
+        },
+        {
+          "mode": "kompress-lite",
+          "encoded_bytes": 8873,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "87b8e3b7f36a6b4d09f64bab36494e4eb6fd85c4cfd91cf7ba9534f77b852a29",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 4
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 93.22
+        },
+        {
+          "mode": "kompress-ultra",
+          "encoded_bytes": 8097,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "5c89d5ca65912377ef12e99199b7ebdd8f7bfd373d28026d2d719cac478de9df",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not": {
+              "before": 18,
+              "after": 18
+            },
+            "implementation": {
+              "before": 4,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 2,
+            "retained_verbatim": 0
+          },
+          "size_percent_of_original": 85.07
+        }
+      ]
+    },
+    {
+      "path": "library-tools/fixtures/fidelity.md",
+      "bytes": 495,
+      "sha256": "81133e1f8e5bd06d626c57283c00d118830ba218cdfa523338f0ca32db4d80e7",
+      "modes": [
+        {
+          "mode": "gzip-9",
+          "encoded_bytes": 361,
+          "operation": "roundtrip",
+          "output_sha256": "81133e1f8e5bd06d626c57283c00d118830ba218cdfa523338f0ca32db4d80e7",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not yet verified": {
+              "before": 1,
+              "after": 1
+            },
+            "unknown": {
+              "before": 1,
+              "after": 1
+            },
+            "don't-care": {
+              "before": 1,
+              "after": 1
+            },
+            "not": {
+              "before": 6,
+              "after": 6
+            },
+            "implementation": {
+              "before": 1,
+              "after": 1
+            },
+            "tests": {
+              "before": 1,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 1,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 72.93
+        },
+        {
+          "mode": "marqant-uni",
+          "encoded_bytes": 508,
+          "operation": "roundtrip",
+          "output_sha256": "0e106024c9640a92038d2a6d52931c31384ae91fb2689163152aab6048ca7af3",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not yet verified": {
+              "before": 1,
+              "after": 1
+            },
+            "unknown": {
+              "before": 1,
+              "after": 1
+            },
+            "don't-care": {
+              "before": 1,
+              "after": 1
+            },
+            "not": {
+              "before": 6,
+              "after": 6
+            },
+            "implementation": {
+              "before": 1,
+              "after": 1
+            },
+            "tests": {
+              "before": 1,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 1,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 102.63
+        },
+        {
+          "mode": "marqant-default",
+          "encoded_bytes": 517,
+          "operation": "roundtrip",
+          "output_sha256": "3e8638dc2942c5d45dc8a6c3f4998e83f15cfb4fd63f7731744d49b6a91c8ce2",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not yet verified": {
+              "before": 1,
+              "after": 1
+            },
+            "unknown": {
+              "before": 1,
+              "after": 1
+            },
+            "don't-care": {
+              "before": 1,
+              "after": 1
+            },
+            "not": {
+              "before": 6,
+              "after": 6
+            },
+            "implementation": {
+              "before": 1,
+              "after": 1
+            },
+            "tests": {
+              "before": 1,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 1,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 104.44
+        },
+        {
+          "mode": "marqant-binary",
+          "encoded_bytes": 503,
+          "operation": "roundtrip",
+          "output_sha256": "81133e1f8e5bd06d626c57283c00d118830ba218cdfa523338f0ca32db4d80e7",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not yet verified": {
+              "before": 1,
+              "after": 1
+            },
+            "unknown": {
+              "before": 1,
+              "after": 1
+            },
+            "don't-care": {
+              "before": 1,
+              "after": 1
+            },
+            "not": {
+              "before": 6,
+              "after": 6
+            },
+            "implementation": {
+              "before": 1,
+              "after": 1
+            },
+            "tests": {
+              "before": 1,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 1,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 101.62
+        },
+        {
+          "mode": "marqant-semantic",
+          "encoded_bytes": 554,
+          "operation": "roundtrip",
+          "output_sha256": "3e8638dc2942c5d45dc8a6c3f4998e83f15cfb4fd63f7731744d49b6a91c8ce2",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not yet verified": {
+              "before": 1,
+              "after": 1
+            },
+            "unknown": {
+              "before": 1,
+              "after": 1
+            },
+            "don't-care": {
+              "before": 1,
+              "after": 1
+            },
+            "not": {
+              "before": 6,
+              "after": 6
+            },
+            "implementation": {
+              "before": 1,
+              "after": 1
+            },
+            "tests": {
+              "before": 1,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 1,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 111.92
+        },
+        {
+          "mode": "marqant-binary-semantic",
+          "encoded_bytes": 529,
+          "operation": "roundtrip",
+          "output_sha256": "3e8638dc2942c5d45dc8a6c3f4998e83f15cfb4fd63f7731744d49b6a91c8ce2",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not yet verified": {
+              "before": 1,
+              "after": 1
+            },
+            "unknown": {
+              "before": 1,
+              "after": 1
+            },
+            "don't-care": {
+              "before": 1,
+              "after": 1
+            },
+            "not": {
+              "before": 6,
+              "after": 6
+            },
+            "implementation": {
+              "before": 1,
+              "after": 1
+            },
+            "tests": {
+              "before": 1,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 1,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 106.87
+        },
+        {
+          "mode": "kompress-verbatim",
+          "encoded_bytes": 495,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "81133e1f8e5bd06d626c57283c00d118830ba218cdfa523338f0ca32db4d80e7",
+          "byte_identical": true,
+          "same_after_whitespace_normalization": true,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not yet verified": {
+              "before": 1,
+              "after": 1
+            },
+            "unknown": {
+              "before": 1,
+              "after": 1
+            },
+            "don't-care": {
+              "before": 1,
+              "after": 1
+            },
+            "not": {
+              "before": 6,
+              "after": 6
+            },
+            "implementation": {
+              "before": 1,
+              "after": 1
+            },
+            "tests": {
+              "before": 1,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 1,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 100.0
+        },
+        {
+          "mode": "kompress-lite",
+          "encoded_bytes": 477,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "a678b4da9fa48f0d842c07665fb38e887dfa8f3851de7f5fe8d33c0f977a642d",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not yet verified": {
+              "before": 1,
+              "after": 1
+            },
+            "unknown": {
+              "before": 1,
+              "after": 1
+            },
+            "don't-care": {
+              "before": 1,
+              "after": 1
+            },
+            "not": {
+              "before": 6,
+              "after": 6
+            },
+            "implementation": {
+              "before": 1,
+              "after": 1
+            },
+            "tests": {
+              "before": 1,
+              "after": 1
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 1,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 96.36
+        },
+        {
+          "mode": "kompress-ultra",
+          "encoded_bytes": 435,
+          "operation": "rewrite_only_no_decoder",
+          "output_sha256": "e9b37cb56f4e2a605ac958747c5d02fd4e8b2eaf97c264931ab6ea066fd04f69",
+          "byte_identical": false,
+          "same_after_whitespace_normalization": false,
+          "qualifier_substring_counts": {
+            "proposed": {
+              "before": 2,
+              "after": 2
+            },
+            "not yet verified": {
+              "before": 1,
+              "after": 1
+            },
+            "unknown": {
+              "before": 1,
+              "after": 1
+            },
+            "don't-care": {
+              "before": 1,
+              "after": 1
+            },
+            "not": {
+              "before": 6,
+              "after": 6
+            },
+            "implementation": {
+              "before": 1,
+              "after": 0
+            },
+            "tests": {
+              "before": 1,
+              "after": 0
+            }
+          },
+          "math_and_reference_spans": {
+            "before": 1,
+            "retained_verbatim": 1
+          },
+          "size_percent_of_original": 87.88
+        }
+      ]
+    }
+  ]
+}

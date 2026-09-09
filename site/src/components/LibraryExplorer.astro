@@ -1,0 +1,68 @@
+---
+import curatedCatalog from '../../../library/catalog.json';
+import legacyCatalog from '../../public/collection-catalog.json';
+import { withBase } from '../lib/base-links.mjs';
+const curated = curatedCatalog.documents;
+const legacy = legacyCatalog.documents;
+const documents = [...curated, ...legacy];
+const topics = [...new Set(documents.flatMap(d => d.topics))].sort();
+---
+<div class="library-explorer">
+  <form role="search" aria-label="Filter documents" onsubmit="return false">
+    <div><label for="library-query">Title, author, or idea</label><input type="search" id="library-query" placeholder="Try Guardian, memory, or fixed point" /></div>
+    <div><label for="library-topic">Topic</label><select id="library-topic"><option value="">All topics</option>{topics.map(topic => <option value={topic}>{topic}</option>)}</select></div>
+    <div><label for="library-edition">Collection</label><select id="library-edition"><option value="">All documents</option><option value="curated">Newly curated</option><option value="existing">Existing collection</option></select></div>
+  </form>
+  <p id="library-count" role="status" aria-live="polite">{documents.length} documents</p>
+  <noscript><p>Filtering needs JavaScript. All documents are listed below; you can use your browser’s Find command.</p></noscript>
+  <ul class="document-list" role="list">
+    {documents.map(doc => <li class="document" data-search={[doc.title, doc.summary, ...doc.authors, ...doc.topics].join(' ').toLocaleLowerCase()} data-topics={JSON.stringify(doc.topics)} data-edition={doc.status === 'existing-collection' ? 'existing' : 'curated'}>
+      <article>
+        <p class="edition">{doc.status === 'existing-collection' ? 'Existing collection' : doc.status.replaceAll('-', ' ')}{doc.authors.length > 0 && ` · ${doc.authors.join(', ')}`}</p>
+        <h2><a href={withBase(doc.reader)}>{doc.title}</a></h2>
+        <p>{doc.summary}</p><p class="topics">{doc.topics.join(' · ')}</p>
+        {doc.related?.length > 0 && <details><summary>Connected readings</summary><ul>{doc.related.map(id => curated.find(d => d.id === id)).filter(Boolean).map(other => <li><a href={withBase(other.reader)}>{other.title}</a></li>)}</ul></details>}
+      </article>
+    </li>)}
+  </ul>
+  <p id="library-empty" hidden>No documents match. Try a broader phrase or choose “All topics.”</p>
+</div>
+<script>
+const root = document.querySelector('.library-explorer');
+if (root) {
+  const query = root.querySelector<HTMLInputElement>('#library-query')!;
+  const topic = root.querySelector<HTMLSelectElement>('#library-topic')!;
+  const edition = root.querySelector<HTMLSelectElement>('#library-edition')!;
+  const params = new URLSearchParams(location.search);
+  query.value = params.get('q') || '';
+  if ([...topic.options].some(o => o.value === params.get('topic'))) topic.value = params.get('topic')!;
+  if (['curated', 'existing'].includes(params.get('edition') || '')) edition.value = params.get('edition')!;
+  function filter() {
+    let count = 0;
+    const terms = query.value.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
+    root!.querySelectorAll<HTMLElement>('.document').forEach(item => {
+      const match = terms.every(t => item.dataset.search!.includes(t)) && (!topic.value || JSON.parse(item.dataset.topics!).includes(topic.value)) && (!edition.value || item.dataset.edition === edition.value);
+      item.hidden = !match;
+      if (match) count++;
+    });
+    root!.querySelector('#library-count')!.textContent = `${count} document${count === 1 ? '' : 's'}`;
+    root!.querySelector<HTMLElement>('#library-empty')!.hidden = count > 0;
+    const next = new URLSearchParams();
+    if (query.value) next.set('q', query.value);
+    if (topic.value) next.set('topic', topic.value);
+    if (edition.value) next.set('edition', edition.value);
+    history.replaceState(null, '', location.pathname + (next.size ? '?' + next : '') + location.hash);
+  }
+  query.addEventListener('input', filter); topic.addEventListener('change', filter); edition.addEventListener('change', filter); filter();
+}
+</script>
+<style>
+form { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; margin-block: 1.5rem; }
+form > div { margin: 0; }
+label { display: block; margin-bottom: .35rem; font-weight: 600; } input, select { width: 100%; }
+.document-list { list-style: none; padding: 0; }.document { border-top: 1px solid var(--sl-color-gray-5); padding-block: 1.25rem; }
+h2 { margin: .2rem 0 .65rem !important; font-size: 1.25rem; }
+.edition { margin: 0; color: var(--sl-color-gray-2); font-size: .8rem; text-transform: uppercase; letter-spacing: .035em; }
+.topics { font-size: .9rem; color: var(--sl-color-gray-2); } summary { cursor: pointer; text-decoration: underline; text-underline-offset: .2em; }
+@media (max-width: 50rem) { form { grid-template-columns: 1fr; } }
+</style>

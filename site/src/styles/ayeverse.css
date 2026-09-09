@@ -1,0 +1,182 @@
+/* 8b.is / Ayeverse — warm dark, amber phosphor, not Starlight purple. */
+
+:root {
+  --aye-bg: #060402;
+  --aye-bg-raised: #100c08;
+  --aye-bg-inset: #1a1208;
+  --aye-amber: #ffb347;
+  --aye-amber-soft: #ffd089;
+  --aye-ink: #fff6e8;
+  --aye-muted: #c4b396;
+  --aye-line: rgba(255, 179, 71, 0.18);
+}
+
+:root,
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #3d2a12;
+  --sl-color-accent: #ffb347;
+  --sl-color-accent-high: #ffd089;
+  --sl-color-white: #fff6e8;
+  --sl-color-gray-1: #f5ead8;
+  --sl-color-gray-2: #e2d2b8;
+  --sl-color-gray-3: #b9a078;
+  --sl-color-gray-4: #6e5a3c;
+  --sl-color-gray-5: #3d2e1c;
+  --sl-color-gray-6: #1a1208;
+  --sl-color-gray-7: #100c08;
+  --sl-color-black: #060402;
+  --sl-color-bg: #0c0906;
+  --sl-color-bg-nav: #100c08;
+  --sl-color-bg-sidebar: #0e0a07;
+  --sl-color-bg-inline-code: #1a1208;
+  --sl-color-hairline-light: rgba(255, 179, 71, 0.14);
+  --sl-color-hairline-shade: rgba(255, 179, 71, 0.22);
+  --sl-color-text: #f5ead8;
+  --sl-color-text-accent: #ffd089;
+  --sl-color-text-invert: #060402;
+  --sl-font: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --sl-font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #ffe0b0;
+  --sl-color-accent: #b56a12;
+  --sl-color-accent-high: #6b3d08;
+  --sl-color-white: #1a1208;
+  --sl-color-gray-1: #2a1c10;
+  --sl-color-gray-2: #3d2e1c;
+  --sl-color-gray-3: #6e5a3c;
+  --sl-color-gray-4: #b9a078;
+  --sl-color-gray-5: #e2d2b8;
+  --sl-color-gray-6: #f5ead8;
+  --sl-color-gray-7: #fff6e8;
+  --sl-color-black: #fffaf0;
+  --sl-color-bg: #fbf6ee;
+  --sl-color-bg-nav: #fffaf0;
+  --sl-color-bg-sidebar: #f7f0e4;
+  --sl-font: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --sl-font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+html {
+  background: var(--aye-bg);
+}
+
+/* Heading personality — literary without costume. */
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.starlight-aside__title,
+site-title {
+  font-family: Newsreader, 'Iowan Old Style', Palatino, Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+site-title {
+  font-weight: 650;
+}
+
+.social-icons::after {
+  display: none;
+}
+
+/* Soft radial wash instead of a purple glow. */
+.page {
+  background:
+    radial-gradient(1200px 480px at 12% -10%, rgba(255, 179, 71, 0.07), transparent 55%),
+    radial-gradient(900px 420px at 110% 0%, rgba(255, 208, 137, 0.04), transparent 50%),
+    var(--sl-color-bg);
+}
+
+.sidebar-content {
+  border-inline-end: 1px solid var(--aye-line);
+}
+
+header.header {
+  background: color-mix(in srgb, var(--sl-color-bg-nav) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--aye-line);
+}
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+  text-underline-offset: 0.18em;
+}
+
+.sl-markdown-content code:not(:where(.not-content *)) {
+  background: var(--aye-bg-inset);
+  border: 1px solid var(--aye-line);
+}
+
+.sl-markdown-content table:not(:where(.not-content *)) {
+  font-size: 0.92rem;
+}
+
+.katex-html svg {
+  height: inherit;
+}
+
+.hero-kicker {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--aye-amber);
+  margin: 0 0 0.75rem;
+}
+
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin: 1.25rem 0 2rem;
+}
+
+.stack-card {
+  display: block;
+  padding: 1rem 1.05rem 1.1rem;
+  border: 1px solid var(--aye-line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--aye-bg-raised) 80%, transparent);
+  text-decoration: none !important;
+  color: inherit !important;
+  box-shadow: none;
+}
+
+.stack-card:hover {
+  border-color: color-mix(in srgb, var(--aye-amber) 55%, transparent);
+}
+
+.stack-card strong {
+  display: block;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 1.15rem;
+  margin-bottom: 0.25rem;
+  color: var(--aye-amber-soft);
+}
+
+.stack-card span {
+  color: var(--aye-muted);
+  font-size: 0.92rem;
+}
+
+.omni {
+  border-left: 3px solid var(--aye-amber);
+  padding: 0.35rem 0 0.35rem 1rem;
+  color: var(--aye-muted);
+  font-family: Newsreader, Georgia, serif;
+  font-style: italic;
+  font-size: 1.15rem;
+}
+
+/* Shared controls follow the active reading theme. */
+:root[data-theme='light'] { --aye-bg: #fbf6ee; --aye-bg-raised: #fffaf0; --aye-bg-inset: #f5ead8; --aye-amber: #754100; --aye-amber-soft: #6b3d08; --aye-muted: #57452e; --aye-line: #b9a078; }
+:focus-visible { outline: 3px solid var(--sl-color-text-accent); outline-offset: 4px; }
+input, select, button { font: inherit; }
+:where(.library-explorer, .guardian-lab) :is(input, select) { color: var(--sl-color-text); background: var(--sl-color-bg); border: 1px solid var(--sl-color-gray-3); border-radius: .35rem; padding: .65rem; max-width: 100%; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
+@media print { .stack-card { break-inside: avoid; } }
+
+:root[data-theme='light'] { --sl-color-text: #2a1c10; --sl-color-text-accent: #6b3d08; --sl-color-text-invert: #fffaf0; --sl-color-bg-inline-code: #f5ead8; }
+
+@media (max-width: 40rem) { .stack-grid { grid-template-columns: 1fr; } }

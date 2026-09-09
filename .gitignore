@@ -199,3 +199,13 @@ xtra/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# Docs site (Starlight)
+site/.astro/
+site/public/files/
+
+# Generated library editions and catalog
+site/public/library/
+site/public/collection-catalog.json
+site/src/content/docs/library/
+site/test-results/
+site/playwright-report/

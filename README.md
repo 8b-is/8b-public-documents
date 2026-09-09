@@ -1,3 +1,5 @@
+> **Read the [8b Library](https://8b-is.github.io/8b-public-documents/)** — searchable papers, curated reading paths, source downloads, and a Guardian playground. See [the site guide](site/README.md) for local builds and [the curated catalog](library/catalog.json) for edition details.
+
 # MEMNET
 
 [Cinematic Reconstruction](cinematic-reconstruction.pdf)

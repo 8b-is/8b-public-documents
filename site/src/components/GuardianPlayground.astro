@@ -1,0 +1,197 @@
+---
+const initialCards = [
+  { id: 'a', name: 'Instance A', stable: 63 },
+  { id: 'b', name: 'Instance B', stable: 0 },
+];
+---
+
+<guardian-playground class="guardian-lab not-content">
+  <p class="lab-intro"><strong>Same label. Different next step.</strong> Both instances begin as Infant. A has almost earned graduation; B has just begun.</p>
+  <noscript><p>The interactive controls need JavaScript. The worked example below remains readable: at a threshold of 64, one stable cycle graduates A from a streak of 63, while B advances from 0 to 1 and remains Infant.</p></noscript>
+  <form data-config>
+    <fieldset disabled data-interactive>
+      <legend>1. Choose thresholds</legend>
+      <div class="lab-controls">
+        <label>Stable cycles to graduate<input name="graduation" type="number" value="64" min="2" max="512" step="1" required inputmode="numeric" /></label>
+        <label>Nonviable cycles to Mercy<input name="mercy" type="number" value="512" min="1" max="512" step="1" required inputmode="numeric" /></label>
+        <button type="submit">Apply and reset</button>
+      </div>
+      <p class="lab-hint">A starts one cycle below the graduation threshold; B starts at zero. Smaller thresholds make short experiments possible.</p>
+    </fieldset>
+  </form>
+  <p data-config-summary>Active thresholds: graduation 64; Mercy 512.</p>
+  <fieldset disabled data-interactive>
+    <legend>2. Send the same input to both instances</legend>
+    <div class="lab-controls">
+      <label>Cycle input<select data-input>
+        <option value="stable">Stable · Safe, no jitter miss</option>
+        <option value="viable">Setback · Caution, no jitter miss</option>
+        <option value="nonviable">Nonviable · Warning, jitter miss</option>
+      </select></label>
+      <label>Cycles to send<input data-count type="number" value="1" min="1" max="512" step="1" required inputmode="numeric" /></label>
+      <button type="button" data-step>Send cycles</button>
+      <button type="button" data-reset>Reset current experiment</button>
+    </div>
+    <p class="lab-hint">Levels above are supplied after the watchdog update. This experiment does not calculate watchdog escalation.</p>
+  </fieldset>
+  <p role="status" aria-live="polite" aria-atomic="true" class="lab-status" data-status>Ready. Send one stable cycle to reveal the difference.</p>
+  <div class="lab-states">
+    {initialCards.map(({ id, name, stable }) => <section class="lab-state" aria-labelledby={`guardian-${id}`}>
+      <h3 id={`guardian-${id}`}>{name}</h3>
+      <dl>
+        <div><dt>Stage</dt><dd data-state={`${id}-stage`}>Infant</dd></div>
+        <div><dt>Stable streak</dt><dd data-state={`${id}-stable`}>{stable}</dd></div>
+        <div><dt>Nonviable streak</dt><dd data-state={`${id}-nonviable`}>0</dd></div>
+        <div><dt>Terminal latch</dt><dd data-state={`${id}-terminal`}>Not set</dd></div>
+        <div><dt>Safety verdict</dt><dd data-state={`${id}-verdict`}>Run</dd></div>
+      </dl>
+    </section>)}
+  </div>
+  <h3>Input trace</h3>
+  <p data-trace-caption>No cycles sent. The table shows the latest 12 cycles; download retains the whole experiment, up to 1,024 cycles.</p>
+  <div class="lab-table" tabindex="0" role="region" aria-label="Recent input trace; scroll horizontally if needed">
+    <table>
+      <caption>Post-cycle stage, stable streak, nonviable streak, and safety verdict</caption>
+      <thead><tr><th scope="col">Cycle</th><th scope="col">Input</th><th scope="col">Instance A</th><th scope="col">Instance B</th></tr></thead>
+      <tbody data-trace><tr><td colspan="4">No input yet.</td></tr></tbody>
+    </table>
+  </div>
+  <button type="button" data-download disabled>Download complete trace (JSON)</button>
+</guardian-playground>
+
+<script>
+  import { configuration, initialState, step, verdict, PRESETS } from '../lib/guardian-model.mjs';
+
+  class GuardianPlayground extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.initialized) return;
+      this.dataset.initialized = 'true';
+      const find = <T extends Element>(selector: string) => this.querySelector<T>(selector)!;
+      const form = find<HTMLFormElement>('[data-config]');
+      const graduation = find<HTMLInputElement>('[name="graduation"]');
+      const mercy = find<HTMLInputElement>('[name="mercy"]');
+      const inputChoice = find<HTMLSelectElement>('[data-input]');
+      const count = find<HTMLInputElement>('[data-count]');
+      const status = find<HTMLElement>('[data-status]');
+      const download = find<HTMLButtonElement>('[data-download]');
+      let config = configuration();
+      let a = initialState(config.graduation - 1);
+      let b = initialState();
+      let history: { cycle: number; input: { label: string; level: string; jitterViolation: boolean }; a: typeof a; b: typeof b }[] = [];
+      const summarize = (state: typeof a) => `${state.stage}; stable ${state.stable}; nonviable ${state.nonviable}; ${verdict(state)}`;
+
+      const render = () => {
+        for (const [id, state] of [['a', a], ['b', b]] as const) {
+          for (const [field, value] of Object.entries({
+            stage: state.stage, stable: state.stable, nonviable: state.nonviable,
+            terminal: state.terminal ? 'Set: NonViable' : 'Not set', verdict: verdict(state),
+          })) find<HTMLElement>(`[data-state="${id}-${field}"]`).textContent = String(value);
+        }
+        find<HTMLElement>('[data-config-summary]').textContent = `Active thresholds: graduation ${config.graduation}; Mercy ${config.mercy}.`;
+        const body = find<HTMLTableSectionElement>('[data-trace]');
+        body.replaceChildren();
+        for (const row of history.slice(-12)) {
+          const tr = document.createElement('tr');
+          for (const value of [row.cycle, row.input.label, summarize(row.a), summarize(row.b)]) {
+            const cell = document.createElement('td');
+            cell.textContent = String(value);
+            tr.append(cell);
+          }
+          body.append(tr);
+        }
+        if (!history.length) {
+          const row = body.insertRow();
+          const cell = row.insertCell();
+          cell.colSpan = 4;
+          cell.textContent = 'No input yet.';
+        }
+        find<HTMLElement>('[data-trace-caption]').textContent = `${history.length} cycles sent. Showing the latest ${Math.min(12, history.length)}; the download retains all cycles and the starting configuration. Limit: 1,024 cycles per experiment.`;
+        download.disabled = history.length === 0;
+      };
+
+      const reset = () => {
+        a = initialState(config.graduation - 1);
+        b = initialState();
+        history = [];
+        graduation.value = String(config.graduation);
+        mercy.value = String(config.mercy);
+        render();
+        status.textContent = `Reset. Both are Infant. A has ${a.stable} stable cycles; B has zero. Graduation requires ${config.graduation}.`;
+      };
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        config = configuration(graduation.valueAsNumber, mercy.valueAsNumber);
+        reset();
+      });
+      find<HTMLButtonElement>('[data-reset]').addEventListener('click', reset);
+      find<HTMLButtonElement>('[data-step]').addEventListener('click', () => {
+        if (!count.reportValidity()) return;
+        const amount = count.valueAsNumber;
+        if (history.length + amount > 1024) {
+          status.textContent = 'This experiment is limited to 1,024 cycles. Download your trace, then reset to begin another.';
+          return;
+        }
+        const input = PRESETS[inputChoice.value as keyof typeof PRESETS];
+        for (let i = 0; i < amount; i++) {
+          a = step(a, input, config);
+          b = step(b, input, config);
+          history.push({ cycle: history.length + 1, input, a: { ...a }, b: { ...b } });
+        }
+        render();
+        const comparison = a.stage === b.stage ? 'Their stage labels match.' : 'Their stage labels now differ.';
+        status.textContent = `After cycle ${history.length}: A ${summarize(a)}. B ${summarize(b)}. ${comparison}${a.terminal || b.terminal ? ' Termination stays latched even if later calls change counters or stage.' : ''}`;
+      });
+      download.addEventListener('click', () => {
+        const trace = {
+          model: 'Guardian educational projection; supplied post-watchdog levels, no watchdog simulation',
+          sourceRevision: '9d052392a673d6aeebc69f1846f4ed1fb728e3f4',
+          configuration: config,
+          initial: { a: initialState(config.graduation - 1), b: initialState() },
+          observations: 'After each note_cycle: stage, streaks, terminal latch, check_safety verdict',
+          cycles: history.map((row) => ({ ...row, a: { ...row.a, verdict: verdict(row.a) }, b: { ...row.b, verdict: verdict(row.b) } })),
+        };
+        const url = URL.createObjectURL(new Blob([JSON.stringify(trace, null, 2)], { type: 'application/json' }));
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'guardian-experiment.json';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      });
+      this.querySelectorAll<HTMLFieldSetElement>('[data-interactive]').forEach((element) => { element.disabled = false; });
+    }
+  }
+  if (!customElements.get('guardian-playground')) customElements.define('guardian-playground', GuardianPlayground);
+</script>
+
+<style>
+  .guardian-lab { display: block; border: 1px solid var(--sl-color-gray-4); border-radius: 0.75rem; padding: clamp(1rem, 3vw, 1.6rem); margin-block: 1.5rem; color: var(--sl-color-text); background: var(--sl-color-bg); }
+  .guardian-lab p { margin-block: 0.75rem; }
+  .guardian-lab h3 { font: 600 1.15rem var(--sl-font); margin-block: 1rem 0.5rem; }
+  .lab-intro { font-size: 1.1rem; }
+  fieldset { border: 1px solid var(--sl-color-gray-4); padding: 1rem; border-radius: 0.5rem; margin-block: 1rem; min-width: 0; }
+  legend { font-weight: 600; padding-inline: 0.35rem; }
+  .lab-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; }
+  label { display: flex; flex: 1 1 10rem; flex-direction: column; gap: 0.4rem; font-size: 0.95rem; min-width: 0; }
+  input, select, button { font: inherit; color: var(--sl-color-text); background: var(--sl-color-bg); border: 1px solid var(--sl-color-gray-3); border-radius: 0.35rem; padding: 0.65rem; min-height: 44px; max-width: 100%; }
+  input, select { width: 100%; }
+  button { cursor: pointer; font-weight: 600; }
+  button:hover:not(:disabled) { background: var(--sl-color-accent-low); }
+  button:disabled { cursor: default; opacity: 0.6; }
+  :is(input, select, button, .lab-table):focus-visible { outline: 3px solid var(--sl-color-text-accent); outline-offset: 3px; }
+  .lab-hint { font-size: 0.9rem; }
+  .lab-status { padding: 1rem; border-inline-start: 4px solid var(--sl-color-text-accent); background: var(--sl-color-accent-low); }
+  .lab-states { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; }
+  .lab-state { border: 1px solid var(--sl-color-gray-4); border-radius: 0.5rem; padding: 0 1rem 1rem; min-width: 0; }
+  dl { margin: 0; }
+  dl div { display: flex; justify-content: space-between; gap: 0.8rem; padding-block: 0.4rem; border-bottom: 1px solid var(--sl-color-gray-5); flex-wrap: wrap; }
+  dt { font-size: 0.92rem; }
+  dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+  .lab-table { overflow-x: auto; margin-bottom: 1rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.85rem; text-align: start; }
+  caption { text-align: start; font-weight: 600; padding-block: 0.5rem; }
+  table :global(th), table :global(td) { border-bottom: 1px solid var(--sl-color-gray-4); padding: 0.65rem; vertical-align: top; min-width: 5rem; }
+  table :global(th:nth-child(n+3)), table :global(td:nth-child(n+3)) { min-width: 11rem; }
+  @media print { form, fieldset, [data-download] { display: none; } .guardian-lab { break-inside: avoid; } }
+</style>

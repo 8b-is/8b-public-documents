@@ -1,0 +1,40 @@
+---
+title: Guardian playground
+description: Explore why two Infant stage labels can hide different next transitions, with explicit model limits and downloadable traces.
+---
+
+import GuardianPlayground from '../../../components/GuardianPlayground.astro';
+
+Two Guardians can share the label **Infant** and still respond differently to the same next cycle. The stable-cycle counter is part of the information needed to predict that transition.
+
+This browser experiment illustrates the counterexample in [*Unknown Is Not Don’t-Care*](/library/unknown-not-dontcare/). It runs locally and sends no experiment data to a server.
+
+<GuardianPlayground />
+
+## Try these experiments
+
+1. **Reveal the hidden state.** Keep the defaults and send one stable cycle. A graduates to EarlyChildhood; B remains Infant. Their initial stage labels were equal, but their next stage labels differ.
+2. **Interrupt a streak.** Reset, then send a setback before a stable cycle. Both stable streaks reset to zero, and the initial advantage disappears.
+3. **Explore a small threshold.** Set graduation to 3 and Mercy to 4, then apply and reset. Send three nonviable cycles: no terminal latch. Send a viable setback: the nonviability streak resets. Four consecutive nonviable cycles latch termination.
+4. **Inspect the terminal contract.** After Mercy, send stable cycles. The stage and counters may still change if calls continue; the safety verdict remains `Terminate(NonViable)`. Reset constructs fresh instances for a new experiment.
+
+The default worked example also stands without JavaScript:
+
+| Instance | Before the next stable cycle | After the next stable cycle |
+| --- | --- | --- |
+| A | Infant, stable streak 63 | EarlyChildhood, stable streak 0 |
+| B | Infant, stable streak 0 | Infant, stable streak 1 |
+
+## What the model includes
+
+The transition rules follow [`Guardian::note_cycle` and `check_safety` at revision 9d052392](https://github.com/8b-is/aye/blob/9d052392a673d6aeebc69f1846f4ed1fb728e3f4/crates/mem8-safety/src/guardian.rs): two maturation stages, stability and nonviability streaks, their thresholds, and the terminal latch. A stable cycle requires both no jitter violation and a Safe watchdog level. Caution can return `Run` while still breaking the stable streak.
+
+Inputs explicitly supply the **watchdog level after its cycle update**. The playground does not calculate periods, jitter detection, watchdog escalation, repetition history, or the other loop components. Its three presets are an educational input alphabet; it does not establish that every sequence of those presets is reachable through the real watchdog. The two starting states are comparison snapshots, rather than two claims about fresh production boots.
+
+The browser limits a run to 1,024 cycles, with thresholds from 2–512 for graduation and 1–512 for Mercy. The JSON download includes the initial states, active configuration, complete input sequence, observations after every cycle, and pinned source revision.
+
+## What this demonstrates
+
+**A stage label alone is an insufficient state abstraction for predicting graduation.** This differs from missing sensor evidence: the counter value exists and has been discarded by the abstraction. It also differs from a specification’s don’t-care entry, where the specification permits a choice of behavior.
+
+This is an executable teaching model, with tests for the illustrated boundaries and reset behavior. It is not a trace comparison against the Rust implementation, exhaustive verification of the Guardian, or evidence that Mercy preserves durable memory. The paper’s proposed bounded implementation experiment remains a separate task.

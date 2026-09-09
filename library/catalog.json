@@ -1,0 +1,338 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-09-09",
+  "documents": [
+    {
+      "id": "unknown-not-dontcare",
+      "title": "Unknown Is Not Don’t-Care",
+      "subtitle": "Necessary Distinctions in Guardian State Abstraction and Verification",
+      "status": "revised-draft",
+      "date": "2026-09-09",
+      "summary": "Distinguishes missing evidence, specification freedom, and inadequate state abstractions through the Guardian lifecycle, durable refusal, and a bounded verification proposal.",
+      "topics": [
+        "Guardian",
+        "AyeOS",
+        "State machines",
+        "Verification",
+        "Memory"
+      ],
+      "related": [
+        "vocabulary-to-kernel",
+        "commitment-before-appearance",
+        "verification-boundary",
+        "field-before-spike"
+      ],
+      "evidenceNote": "Guardian source was inspected at revision 9d052392. The bounded exploration, durable refusal, HOLD, and withdrawal safeguards remain proposed; this paper does not report those experiments as completed.",
+      "authors": [
+        "Flyxion"
+      ],
+      "kind": "paper",
+      "reader": "/library/unknown-not-dontcare/",
+      "rights": {
+        "status": "unspecified",
+        "note": "No work-specific redistribution license was supplied. Inclusion in the library does not assign the repository software license to this work."
+      },
+      "provenance": {
+        "sourceDescription": "Reviewed manuscript edition supplied for curation; LaTeX and compiled PDF are preserved as received.",
+        "ingested": "2026-09-09",
+        "implementationRevision": "9d052392a673d6aeebc69f1846f4ed1fb728e3f4"
+      },
+      "files": [
+        {
+          "format": "pdf",
+          "source": "library/sources/unknown-not-dontcare/unknown-not-dontcare.pdf",
+          "path": "/library/files/unknown-not-dontcare/unknown-not-dontcare.pdf",
+          "sha256": "18591eb72559eecd6a9f2d7a10542f9ca6eee0b1a05085678a1377a2617cee3a",
+          "bytes": 66823
+        },
+        {
+          "format": "tex",
+          "source": "library/sources/unknown-not-dontcare/unknown-not-dontcare.tex",
+          "path": "/library/files/unknown-not-dontcare/unknown-not-dontcare.tex",
+          "sha256": "1a3c9127a6b8422500e0033774cb7bd5d40f092fcd78d3f378b3a25a349dc4bc",
+          "bytes": 21852
+        },
+        {
+          "format": "markdown",
+          "source": "library/readers/unknown-not-dontcare.md",
+          "path": "/library/files/unknown-not-dontcare/unknown-not-dontcare.md",
+          "sha256": "04e943c5c694088ca87c7fbba25e75ec6d5f3dc12af609cbf0f20f00356c8adf",
+          "bytes": 20301
+        }
+      ]
+    },
+    {
+      "id": "vocabulary-to-kernel",
+      "title": "From Vocabulary to Kernel",
+      "subtitle": "Admissible Continuation as an Architectural Contract",
+      "status": "revised-draft",
+      "date": "2026-09-09",
+      "summary": "Connects admissible continuation, memory, and implementation boundaries while separating architectural correspondence from demonstrated runtime behavior.",
+      "topics": [
+        "AyeOS",
+        "Guardian",
+        "Architecture",
+        "Memory"
+      ],
+      "related": [
+        "unknown-not-dontcare",
+        "commitment-before-appearance",
+        "fixed-point-essay"
+      ],
+      "evidenceNote": "Reviewed implementation claims are scoped to inspected sources. Mercy termination does not demonstrate durable preservation or Guardian withdrawal.",
+      "authors": [
+        "Flyxion"
+      ],
+      "kind": "paper",
+      "reader": "/library/vocabulary-to-kernel/",
+      "rights": {
+        "status": "unspecified",
+        "note": "No work-specific redistribution license was supplied. Inclusion in the library does not assign the repository software license to this work."
+      },
+      "provenance": {
+        "sourceDescription": "Reviewed manuscript edition supplied for curation; LaTeX and compiled PDF are preserved as received.",
+        "ingested": "2026-09-09",
+        "implementationRevision": "9d052392a673d6aeebc69f1846f4ed1fb728e3f4"
+      },
+      "files": [
+        {
+          "format": "pdf",
+          "source": "library/sources/vocabulary-to-kernel/vocabulary-to-kernel.pdf",
+          "path": "/library/files/vocabulary-to-kernel/vocabulary-to-kernel.pdf",
+          "sha256": "d835e07bfcdeea08b389346f7a1f123e8ff7348be367db10408a2b1a23df2eda",
+          "bytes": 61373
+        },
+        {
+          "format": "tex",
+          "source": "library/sources/vocabulary-to-kernel/vocabulary-to-kernel.tex",
+          "path": "/library/files/vocabulary-to-kernel/vocabulary-to-kernel.tex",
+          "sha256": "36a575d10aadacd31b0dbad1a5ad2449fdaa9f4237b6bfd40bfd04416d4e8617",
+          "bytes": 20855
+        },
+        {
+          "format": "markdown",
+          "source": "library/readers/vocabulary-to-kernel.md",
+          "path": "/library/files/vocabulary-to-kernel/vocabulary-to-kernel.md",
+          "sha256": "89e356f2141b408cf4bb877fc7ecdcf1895e2f209a57375af8930ef93aaa37c6",
+          "bytes": 20083
+        }
+      ]
+    },
+    {
+      "id": "fixed-point-essay",
+      "title": "Two Meanings of Fixed Point",
+      "subtitle": "Quantizer Equilibria, Arithmetic Encodings, and the Case for Typed Decomposition",
+      "status": "revised-draft",
+      "date": "2026-09-09",
+      "summary": "Separates iterative quantizer equilibria from scaled-integer arithmetic, with a concrete Rust type distinction and qualified replay and provenance claims.",
+      "topics": [
+        "Fixed-point arithmetic",
+        "Rust",
+        "Types",
+        "Verification"
+      ],
+      "related": [
+        "vocabulary-to-kernel",
+        "unknown-not-dontcare"
+      ],
+      "evidenceNote": "The revised Rust example was compiled and run; deliberately substituting the wrong wrapper type was rejected with E0308. This verifies the type example, not convergence or a complete provenance implementation.",
+      "authors": [
+        "Flyxion"
+      ],
+      "kind": "paper",
+      "reader": "/library/fixed-point-essay/",
+      "rights": {
+        "status": "unspecified",
+        "note": "No work-specific redistribution license was supplied. Inclusion in the library does not assign the repository software license to this work."
+      },
+      "provenance": {
+        "sourceDescription": "Reviewed manuscript edition supplied for curation; LaTeX and compiled PDF are preserved as received.",
+        "ingested": "2026-09-09"
+      },
+      "files": [
+        {
+          "format": "pdf",
+          "source": "library/sources/fixed-point-essay/fixed-point-essay.pdf",
+          "path": "/library/files/fixed-point-essay/fixed-point-essay.pdf",
+          "sha256": "58d71c8731bcbe988165a3b2bf0954749962a4e25e482b5e5f5f8575c2ebd402",
+          "bytes": 45646
+        },
+        {
+          "format": "tex",
+          "source": "library/sources/fixed-point-essay/fixed-point-essay.tex",
+          "path": "/library/files/fixed-point-essay/fixed-point-essay.tex",
+          "sha256": "696b71322b79ced2f7e6e00848266b43d76ebe2d7eb1e0fe796abc7f4933e8e3",
+          "bytes": 10517
+        },
+        {
+          "format": "markdown",
+          "source": "library/readers/fixed-point-essay.md",
+          "path": "/library/files/fixed-point-essay/fixed-point-essay.md",
+          "sha256": "45e43d5f153505b7c6517cf67b9b40301edb8e33c572e7a114b4cd3f5909139d",
+          "bytes": 9518
+        }
+      ]
+    },
+    {
+      "id": "commitment-before-appearance",
+      "title": "Commitment Before Appearance",
+      "subtitle": "Event Histories, Material State, and the Two Folds of a Layered World",
+      "status": "companion-draft",
+      "date": "2026-09",
+      "summary": "Treats material and semantic state as two folds over committed history, with task-specific authority for history, operational state, and appearance.",
+      "topics": [
+        "History",
+        "Architecture",
+        "Memory",
+        "Provenance"
+      ],
+      "related": [
+        "unknown-not-dontcare",
+        "vocabulary-to-kernel",
+        "field-before-spike"
+      ],
+      "evidenceNote": "Unedited companion manuscript. Its conceptual model is not independent validation of an AyeOS implementation.",
+      "authors": [
+        "Flyxion"
+      ],
+      "kind": "paper",
+      "reader": "/library/commitment-before-appearance/",
+      "rights": {
+        "status": "unspecified",
+        "note": "No work-specific redistribution license was supplied. Inclusion in the library does not assign the repository software license to this work."
+      },
+      "provenance": {
+        "sourceDescription": "Unedited companion manuscript supplied for curation; LaTeX and PDF are preserved as received.",
+        "ingested": "2026-09-09"
+      },
+      "files": [
+        {
+          "format": "pdf",
+          "source": "library/sources/commitment-before-appearance/commitment-before-appearance.pdf",
+          "path": "/library/files/commitment-before-appearance/commitment-before-appearance.pdf",
+          "sha256": "3c35624a5e7607ad34ed164d820ec7ef15bfd7ccc23f30783ab2d804a74da580",
+          "bytes": 113972
+        },
+        {
+          "format": "tex",
+          "source": "library/sources/commitment-before-appearance/commitment-before-appearance.tex",
+          "path": "/library/files/commitment-before-appearance/commitment-before-appearance.tex",
+          "sha256": "e57f1d68c767b8eceba266d00915f2ba13fb7f6d1b14144c5208ac9a0ddfc9d4",
+          "bytes": 21925
+        },
+        {
+          "format": "markdown",
+          "source": "library/readers/commitment-before-appearance.md",
+          "path": "/library/files/commitment-before-appearance/commitment-before-appearance.md",
+          "sha256": "2c803e97320191a13a1494e04e26e943dfb6cfb2b6564edb61710282a63ae85a",
+          "bytes": 21138
+        }
+      ]
+    },
+    {
+      "id": "verification-boundary",
+      "title": "The Verification Boundary",
+      "subtitle": "Fluency, Expertise, and the Endogenous Construction of Epistemic Reliability",
+      "status": "companion-draft",
+      "date": "2026",
+      "summary": "Explores how plausible errors can enter the knowledge used to assess later claims, distinguishing competence, confidence, and constraint fidelity.",
+      "topics": [
+        "Verification",
+        "Epistemology",
+        "Learning"
+      ],
+      "related": [
+        "unknown-not-dontcare",
+        "commitment-before-appearance",
+        "field-before-spike"
+      ],
+      "evidenceNote": "Unedited companion manuscript. The formal sketch includes hypotheses and proposed empirical distinctions; inclusion does not represent independent experimental confirmation.",
+      "authors": [
+        "Flyxion"
+      ],
+      "kind": "paper",
+      "reader": "/library/verification-boundary/",
+      "rights": {
+        "status": "unspecified",
+        "note": "No work-specific redistribution license was supplied. Inclusion in the library does not assign the repository software license to this work."
+      },
+      "provenance": {
+        "sourceDescription": "Unedited companion manuscript supplied for curation; LaTeX and PDF are preserved as received.",
+        "ingested": "2026-09-09"
+      },
+      "files": [
+        {
+          "format": "pdf",
+          "source": "library/sources/verification-boundary/verification-boundary.pdf",
+          "path": "/library/files/verification-boundary/verification-boundary.pdf",
+          "sha256": "acb2d8cfe25b0295e854c786b6a981630be5037f6f2c33854ef9b804b9b76b32",
+          "bytes": 89311
+        },
+        {
+          "format": "tex",
+          "source": "library/sources/verification-boundary/verification-boundary.tex",
+          "path": "/library/files/verification-boundary/verification-boundary.tex",
+          "sha256": "de95a781d6fb1031525952a772cb6b7dfd231cc302735dd573ef2236ab598794",
+          "bytes": 47409
+        },
+        {
+          "format": "markdown",
+          "source": "library/readers/verification-boundary.md",
+          "path": "/library/files/verification-boundary/verification-boundary.md",
+          "sha256": "9db837a34be1ebbcc2995f1afbccec7957d581857e068a3577e00d5d35526944",
+          "bytes": 46574
+        }
+      ]
+    },
+    {
+      "id": "field-before-spike",
+      "title": "Field Before Spike",
+      "subtitle": "Synaptic Integration through POP, REFUSE, BIND, and COLLAPSE",
+      "status": "illustration",
+      "date": "2026-09-09",
+      "summary": "A four-panel neuronal illustration presents an explicitly scale-relative analogy, accompanied by a full text transcription and separate editorial interpretation.",
+      "topics": [
+        "Illustration",
+        "MEM8",
+        "Memory",
+        "History"
+      ],
+      "related": [
+        "unknown-not-dontcare",
+        "commitment-before-appearance",
+        "verification-boundary"
+      ],
+      "evidenceNote": "The figure calls itself a structural analogy across scales. Its creator and original publication source are unverified; the image alone does not establish a biological or software implementation.",
+      "authors": [
+        "Creator unverified"
+      ],
+      "kind": "illustration",
+      "reader": "/library/field-before-spike/",
+      "rights": {
+        "status": "unspecified",
+        "note": "No work-specific redistribution license was supplied. Inclusion in the library does not assign the repository software license to this work."
+      },
+      "provenance": {
+        "sourceDescription": "Original image supplied for the collection; transcription and editorial interpretation are separate reader content.",
+        "ingested": "2026-09-09",
+        "receivedVia": "Nate"
+      },
+      "files": [
+        {
+          "format": "jpg",
+          "source": "library/sources/field-before-spike/field-before-spike.jpg",
+          "path": "/library/files/field-before-spike/field-before-spike.jpg",
+          "sha256": "302602314b5fcfc243ec1d3d21cfd102a04551bf12dc5eb402441f8bb7639276",
+          "bytes": 432322
+        },
+        {
+          "format": "markdown",
+          "source": "library/readers/field-before-spike.md",
+          "path": "/library/files/field-before-spike/field-before-spike.md",
+          "sha256": "5e98c6715e760c2a50c5b5a89db7ce98cae55a8ca3249eca34e55c7f8fa3cbdb",
+          "bytes": 4587
+        }
+      ]
+    }
+  ]
+}
