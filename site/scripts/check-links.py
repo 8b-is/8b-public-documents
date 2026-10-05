@@ -35,9 +35,14 @@ for page in pages:
             missing.setdefault(link, []).append(str(page.relative_to(root)))
             continue
         target = root / path.lstrip('/') if path.startswith('/') else page.parent / path
+        # Only deployed files count; resolve encoded traversal and symlinks.
+        target = target.resolve()
+        if not target.is_relative_to(root.resolve()):
+            missing.setdefault(link, []).append(str(page.relative_to(root)))
+            continue
         if target.is_dir():
-            target /= 'index.html'
-        if not target.exists():
+            target = (target / 'index.html').resolve()
+        if not target.is_relative_to(root.resolve()) or not target.is_file():
             missing.setdefault(link, []).append(str(page.relative_to(root)))
 if missing:
     raise SystemExit(json.dumps(missing, indent=2))
