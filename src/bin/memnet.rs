@@ -189,6 +189,21 @@ fn serve_sanctuary(bind_addr: &str, node_id: &str, once: bool) {
     let offer = match node_id {
         "blu-g75" => ComputeOffer::blu_g75(),
         "galaxy-tab-s9-ultra" => ComputeOffer::galaxy_tab_s9_ultra(),
+        "dev-main-m3" => ComputeOffer {
+            provider_node_id: "dev-main-m3".to_string(),
+            endpoint: format!("m3://{}", bind_addr),
+            available_ram_mb: 16_384,
+            available_cores: 8,
+            link_mbps: 1_200,
+            maintained_health: 99,
+            capabilities: vec![
+                "mlx".to_string(),
+                "rust".to_string(),
+                "spherepop".to_string(),
+                "0o0-ssu".to_string(),
+                "ultrawhale".to_string(),
+            ],
+        },
         _ => ComputeOffer {
             provider_node_id: node_id.to_string(),
             endpoint: format!("m1://{}", bind_addr),
@@ -244,6 +259,8 @@ fn serve_sanctuary(bind_addr: &str, node_id: &str, once: bool) {
                                             sos.needed_cores,
                                             sos.required_capability
                                         );
+                                        mesh.compute_offers
+                                            .insert(offer.provider_node_id.clone(), offer.clone());
                                         mesh.pending_sos.push(sos);
                                         if let Ok(leases) =
                                             mesh.match_compute_for_friends(now_epoch_ms())
