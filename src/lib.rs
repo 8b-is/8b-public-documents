@@ -667,10 +667,11 @@ pub fn scan_payload_vigilance(payload: &[u8]) -> Result<(), MemnetError> {
 /// Sovereign dictionary codebook for `Kompress-Super-Ultra (0o0)` and
 /// `ULTRA-OMNI-BEERUS-CHAN<KOMPRESS-SUPER-SAIYAN-ULTRA> (0o0-SSU)` wire payloads.
 ///
-/// Indices `0..24` are locked for cross-language `0o0` v1 compatibility; indices `24..36`
-/// add `SpherePop` (`((( <( ? ~ ! @ > )> )))`) and **Galaxy Tab S9 Ultra** (`SM-X910` /
-/// `R52X104QZWE` / `192.168.11.12`) super-tokens.
-pub const KOMPRESS_CODEBOOK: [&[u8]; 36] = [
+/// Indices `0..24` are locked for cross-language `0o0` v1 compatibility; indices `24..40`
+/// add `SpherePop` (`((( <( ? ~ ! @ > )> )))`), **Galaxy Tab S9 Ultra** (`SM-X910` /
+/// `R52X104QZWE` / `192.168.11.12`), and **BLU G75** (`G75` / `G1170` / `1010305026000644` /
+/// `mt6768` / `192.168.11.24`) super-tokens.
+pub const KOMPRESS_CODEBOOK: [&[u8]; 40] = [
     b"OFFER|node=",
     b"SOS|friend=",
     b"GRANT|lease=",
@@ -695,7 +696,7 @@ pub const KOMPRESS_CODEBOOK: [&[u8]; 36] = [
     b"friend-air-8gb",
     b"uganda-school-pi",
     b"kokoro-tts",
-    // --- 0o0-SSU (KOMPRESS-SUPER-SAIYAN-ULTRA + SpherePop + Galaxy Tab S9 Ultra) ---
+    // --- 0o0-SSU (KOMPRESS-SUPER-SAIYAN-ULTRA + SpherePop + Galaxy Tab S9 Ultra + BLU G75) ---
     b"((( <( ? ",
     b" )> )))",
     b" ~ kompress:0o0-ssu ! soul_sig:verified",
@@ -708,6 +709,10 @@ pub const KOMPRESS_CODEBOOK: [&[u8]; 36] = [
     b" ! ct000:admissible @ ",
     b" > advertise:",
     b" > grant:",
+    b"blu-g75",
+    b"|ep=g75://192.168.11.24:8788",
+    b"mt6768,mali-g52,nnapi,rust,spherepop,0o0-ssu",
+    b"1010305026000644",
 ];
 
 // ============================================================================
@@ -1685,6 +1690,28 @@ impl ComputeOffer {
         }
     }
 
+    /// Canonical `ComputeOffer` profile for the **BLU G75** (`G75` / `G1170` ·
+    /// MediaTek Helio G85 `MT6769V/CB` `mt6768` 8-core ARM64 · `3,793,876 kB` RAM ·
+    /// USB ADB Serial `1010305026000644` · Wi-Fi LAN `192.168.11.24:8788`).
+    pub fn blu_g75() -> Self {
+        Self {
+            provider_node_id: "blu-g75".to_string(),
+            endpoint: "g75://192.168.11.24:8788".to_string(),
+            available_ram_mb: 2_048,
+            available_cores: 6,
+            link_mbps: 866,
+            maintained_health: 100,
+            capabilities: vec![
+                "mt6768".to_string(),
+                "mali-g52".to_string(),
+                "nnapi".to_string(),
+                "rust".to_string(),
+                "spherepop".to_string(),
+                "0o0-ssu".to_string(),
+            ],
+        }
+    }
+
     /// Renders this `ComputeOffer` as a canonical `SpherePop` triple-sphere witnessed
     /// transition expression (`((( <( ? ~ ! @ > )> )))`).
     pub fn to_spherepop_expr(&self) -> String {
@@ -1872,6 +1899,70 @@ pub struct ComputeSanctuaryLease {
     pub grant_capsule: M8Capsule,
     pub spherepop_expr: String,
     pub spherepop_witness: SpherePopWitness,
+}
+
+/// Query descriptor for evaluating `MEM|8` capsule retrieval quality (`P@1`, `MRR`, `NDCG@3`, margin).
+#[derive(Debug, Clone)]
+pub struct Mem8RetrievalQuery<'a> {
+    pub query_text: &'a str,
+    pub query_intent: Option<&'a IntentAddress>,
+    pub query_concept: Option<Concept>,
+    pub target_hz: Option<u16>,
+    pub relevant_idx: usize,
+}
+
+/// Quantitative retrieval quality receipt (`P@1`, `MRR`, `NDCG@3`, top-1 margin, and latency).
+#[derive(Debug, Clone, PartialEq)]
+pub struct Mem8RetrievalMetrics {
+    pub precision_at_1: f64,
+    pub mrr: f64,
+    pub ndcg_at_3: f64,
+    pub mean_top1_margin: f64,
+    pub elapsed_us: u64,
+}
+
+/// Comparative `MEM|8` retrieval evaluation receipt across Naive Overlap, Unigram BM25+Wave
+/// (`3f43e59` baseline), and Evolved `BM25F + Ordered-Bigram Proximity + VAD Phase-Coherence RRF`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Mem8RetrievalEvalReceipt {
+    pub queries_evaluated: usize,
+    pub corpus_size: usize,
+    pub naive_overlap: Mem8RetrievalMetrics,
+    pub bm25_unigram_baseline: Mem8RetrievalMetrics,
+    pub bm25f_proximity_rrf: Mem8RetrievalMetrics,
+}
+
+/// Sovereign `MEM|8` Safe Memory retrieval facade exposing resonant capsule ranking and evaluation.
+pub struct SafeMemory;
+
+impl SafeMemory {
+    /// Ranks `.m8` Experience Capsules using `BM25F` structured field weights, ordered-bigram +
+    /// minimum-span phrase proximity, continuous 3D `WaveVad` phase coherence, and Reciprocal Rank
+    /// Fusion (`RRF`, $k = 60$).
+    pub fn retrieve_resonant_ranked<'a>(
+        capsules: &'a [M8Capsule],
+        query_text: &str,
+        query_intent: Option<&IntentAddress>,
+        query_concept: Option<Concept>,
+        target_hz: Option<u16>,
+    ) -> Vec<(usize, f64, &'a M8Capsule)> {
+        MemnetMesh::retrieve_capsules_ranked(
+            capsules,
+            query_text,
+            query_intent,
+            query_concept,
+            target_hz,
+        )
+    }
+
+    /// Evaluates retrieval quality (`P@1`, `MRR`, `NDCG@3`, `mean_top1_margin`, `elapsed_us`)
+    /// across Naive Overlap, Unigram BM25+Wave, and `BM25F + Proximity + RRF`.
+    pub fn evaluate_retrieval_benchmark(
+        capsules: &[M8Capsule],
+        queries: &[Mem8RetrievalQuery<'_>],
+    ) -> Mem8RetrievalEvalReceipt {
+        MemnetMesh::evaluate_retrieval_benchmark(capsules, queries)
+    }
 }
 
 /// Sovereign `MEMNET` mesh router uniting all `8b-is` products with intent routing,
@@ -2957,5 +3048,27 @@ mod tests {
         assert_eq!(naive_p1, 0.0);
         assert_eq!(ranked_p1, 1.0);
         assert!(ranked_mrr > naive_mrr);
+    }
+
+    #[test]
+    fn blu_g75_offer_and_0o0_ssu_compression() {
+        let g75_offer = ComputeOffer::blu_g75();
+        assert_eq!(g75_offer.provider_node_id, "blu-g75");
+        assert_eq!(g75_offer.endpoint, "g75://192.168.11.24:8788");
+
+        let witness = g75_offer.evaluate_spherepop().unwrap();
+        assert_eq!(witness.sphere_depth, 3);
+        assert_eq!(witness.attributions, vec!["blu-g75"]);
+
+        let wire = g75_offer.to_wire_string();
+        let compressed = encode_kompress_super_ultra(wire.as_bytes());
+        assert!(
+            compressed.len() * 100 < wire.len() * 40,
+            "expected >60% 0o0-SSU compression for BLU G75 offer, got {}B from {}B",
+            compressed.len(),
+            wire.len()
+        );
+        let decompressed = decode_kompress_super_ultra(&compressed).unwrap();
+        assert_eq!(decompressed, wire.as_bytes());
     }
 }

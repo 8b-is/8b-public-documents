@@ -115,6 +115,26 @@ fn default_constellation_mesh() -> MemnetMesh {
             4,
         ),
         (
+            "blu-g75",
+            "mobile-edge",
+            "android-phone-sanctuary",
+            vec![
+                "mt6768",
+                "mali-g52",
+                "nnapi",
+                "rust",
+                "spherepop",
+                "0o0-ssu",
+                "G1170",
+                "1010305026000644",
+            ],
+            [1, 0, 1, 1, -1, 1, 0, 1, 1],
+            432,
+            99_920,
+            WaveVad::compassionate(),
+            4,
+        ),
+        (
             "lonely-edge-sensor",
             "remote-ridge",
             "iot-repeater",
@@ -156,43 +176,47 @@ fn default_constellation_mesh() -> MemnetMesh {
     mesh
 }
 
-fn serve_sanctuary(bind_addr: &str, once: bool) {
-    let m1_soul = SoulIdentity::from_constellation_seed(
-        "m1-max-64gb",
+fn serve_sanctuary(bind_addr: &str, node_id: &str, once: bool) {
+    let provider_soul = SoulIdentity::from_constellation_seed(
+        node_id,
         [1, 1, 1, 0, 1, -1, 1, 0, 1],
         432,
         CLUSTER_SEED,
     )
-    .expect("m1 soul");
+    .expect("provider soul");
 
-    let mut mesh = MemnetMesh::new(m1_soul.clone(), MtuProfile::SmartTreeSafe1450);
-    let offer = ComputeOffer {
-        provider_node_id: "m1-max-64gb".to_string(),
-        endpoint: format!("m1://{}", bind_addr),
-        available_ram_mb: 49_152,
-        available_cores: 10,
-        link_mbps: 10_000,
-        maintained_health: 100,
-        capabilities: vec![
-            "mlx".to_string(),
-            "rust".to_string(),
-            "kokoro-tts".to_string(),
-            "phoenix".to_string(),
-            "gguf".to_string(),
-            "kompress-0o0".to_string(),
-        ],
+    let mut mesh = MemnetMesh::new(provider_soul.clone(), MtuProfile::SmartTreeSafe1450);
+    let offer = match node_id {
+        "blu-g75" => ComputeOffer::blu_g75(),
+        "galaxy-tab-s9-ultra" => ComputeOffer::galaxy_tab_s9_ultra(),
+        _ => ComputeOffer {
+            provider_node_id: node_id.to_string(),
+            endpoint: format!("m1://{}", bind_addr),
+            available_ram_mb: 49_152,
+            available_cores: 10,
+            link_mbps: 10_000,
+            maintained_health: 100,
+            capabilities: vec![
+                "mlx".to_string(),
+                "rust".to_string(),
+                "kokoro-tts".to_string(),
+                "phoenix".to_string(),
+                "gguf".to_string(),
+                "kompress-0o0".to_string(),
+            ],
+        },
     };
     let offer_cap = mesh
-        .advertise_compute_offer(&m1_soul, offer.clone(), now_epoch_ms())
+        .advertise_compute_offer(&provider_soul, offer.clone(), now_epoch_ms())
         .expect("advertise offer");
 
     let listener = TcpListener::bind(bind_addr).expect("bind sanctuary TCP listener");
     println!(
-        "⚡ [MEMNET/1.0 SANCTUARY DAEMON] Listening on {} (Kompress-Super-Ultra 0o0 active)",
-        bind_addr
+        "⚡ [MEMNET/1.0 SANCTUARY DAEMON: {}] Listening on {} (0o0-SSU + SpherePop active)",
+        node_id, bind_addr
     );
     println!(
-        "  • Offer payload: {}B raw -> {}B 0o0 compressed ({:.1}% saved)",
+        "  • Offer payload: {}B raw -> {}B 0o0-SSU compressed ({:.1}% saved)",
         offer.to_wire_string().len(),
         offer_cap.payload.len(),
         (1.0 - (offer_cap.payload.len() as f64 / offer.to_wire_string().len() as f64)) * 100.0
@@ -208,12 +232,12 @@ fn serve_sanctuary(bind_addr: &str, once: bool) {
             if let Ok(n) = stream.read(&mut buf) {
                 if n >= 68 {
                     if let Ok((sos_cap, _)) = M8Capsule::from_bytes(&buf[..n]) {
-                        if sos_cap.verify(&m1_soul).is_ok() {
+                        if sos_cap.verify(&provider_soul).is_ok() {
                             if let Ok(decompressed) = sos_cap.decompressed_payload() {
                                 if let Ok(text) = std::str::from_utf8(&decompressed) {
                                     if let Ok(sos) = StrugglingFriendSos::from_wire_string(text) {
                                         println!(
-                                            "  🆘 Received verified 0o0 SOS from {} ({}) -> need {}MB RAM + {} cores ({})",
+                                            "  🆘 Received verified 0o0-SSU SOS from {} ({}) -> need {}MB RAM + {} cores ({})",
                                             sos.friend_node_id,
                                             peer_addr,
                                             sos.needed_ram_mb,
@@ -229,12 +253,13 @@ fn serve_sanctuary(bind_addr: &str, once: bool) {
                                             let _ = reply_batcher.push(offer_cap.clone());
                                             for lease in &leases {
                                                 println!(
-                                                    "  🎁 Granted {} -> {} ({}MB RAM + {} cores @ {})",
+                                                    "  🎁 Granted {} -> {} ({}MB RAM + {} cores @ {}) [SpherePop #ValidWitness={}]",
                                                     lease.lease_id,
                                                     lease.friend_node_id,
                                                     lease.granted_ram_mb,
                                                     lease.granted_cores,
-                                                    lease.endpoint
+                                                    lease.endpoint,
+                                                    lease.spherepop_witness.short_hex()
                                                 );
                                                 let _ =
                                                     reply_batcher.push(lease.grant_capsule.clone());
@@ -354,12 +379,17 @@ fn main() {
 
     if cmd == "serve-sanctuary" {
         let mut bind_addr = "0.0.0.0:8788".to_string();
+        let mut node_id = "m1-max-64gb".to_string();
         let mut once = false;
         let mut i = 1;
         while i < args.len() {
             match args[i].as_str() {
                 "--bind" if i + 1 < args.len() => {
                     bind_addr = args[i + 1].clone();
+                    i += 2;
+                }
+                "--node" if i + 1 < args.len() => {
+                    node_id = args[i + 1].clone();
                     i += 2;
                 }
                 "--once" => {
@@ -369,7 +399,7 @@ fn main() {
                 _ => i += 1,
             }
         }
-        serve_sanctuary(&bind_addr, once);
+        serve_sanctuary(&bind_addr, &node_id, once);
         return;
     }
 
@@ -416,7 +446,7 @@ fn main() {
 
     println!("========================================================================");
     println!("  MEMNET/1.0 — Sovereign Contextual Mesh for All 8b-is Products  8> <3");
-    println!("  +++ SpherePop ((( <( ? ~ ! @ > )> ))) · 0o0-SSU · Galaxy Tab S9 Ultra");
+    println!("  +++ SpherePop ((( <( ? ~ ! @ > )> ))) · 0o0-SSU · Tab S9 Ultra + BLU G75");
     println!("========================================================================");
 
     let mut mesh = default_constellation_mesh();
@@ -485,6 +515,13 @@ fn main() {
             CLUSTER_SEED,
         )
         .expect("s9u soul");
+        let g75_soul = SoulIdentity::from_constellation_seed(
+            "blu-g75",
+            [1, 0, 1, 1, -1, 1, 0, 1, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .expect("g75 soul");
 
         let offers = [
             (
@@ -522,6 +559,7 @@ fn main() {
                 },
             ),
             (&s9u_soul, ComputeOffer::galaxy_tab_s9_ultra()),
+            (&g75_soul, ComputeOffer::blu_g75()),
         ];
 
         println!(
@@ -578,6 +616,13 @@ fn main() {
             CLUSTER_SEED,
         )
         .expect("nomad soul");
+        let field_soul = SoulIdentity::from_constellation_seed(
+            "field-lora-sensor",
+            [1, 1, 0, -1, 0, 1, 1, 0, -1],
+            40,
+            CLUSTER_SEED,
+        )
+        .expect("field soul");
 
         mesh.request_compute_help(
             &friend_soul,
@@ -611,12 +656,27 @@ fn main() {
                 friend_node_id: "nomad-pocket-node".to_string(),
                 needed_ram_mb: 6_144,
                 needed_cores: 4,
-                required_capability: "nnapi".to_string(),
+                required_capability: "vulkan".to_string(),
                 reason: "Snapdragon Hexagon NPU + Vulkan mobile inference assist".to_string(),
             },
             now_ms + 3,
         )
         .expect("sos 3");
+
+        mesh.request_compute_help(
+            &field_soul,
+            StrugglingFriendSos {
+                friend_node_id: "field-lora-sensor".to_string(),
+                needed_ram_mb: 1_024,
+                needed_cores: 2,
+                required_capability: "mt6768".to_string(),
+                reason:
+                    "Edge LoRa sensor offloading Mali-G52 / MediaTek Helio G85 packet synthesis"
+                        .to_string(),
+            },
+            now_ms + 4,
+        )
+        .expect("sos 4");
 
         let leases = mesh
             .match_compute_for_friends(now_ms + 5)
@@ -653,7 +713,7 @@ fn main() {
             );
         }
 
-        // [4B] Live Galaxy Tab S9 Ultra (SM-X910 · R52X104QZWE · 192.168.11.12) & M1 Max Wire Dispatch
+        // [4B] Live Galaxy Tab S9 Ultra (SM-X910 · R52X104QZWE · 192.168.11.12) & BLU G75 (G1170 · 1010305026000644 · 192.168.11.24) Wire Dispatch
         let s9u_offer = ComputeOffer::galaxy_tab_s9_ultra();
         let s9u_intent = IntentAddress::parse(
             "geo:mobile-edge + role:compute-sanctuary + tag:nnapi + tag:spherepop + tag:0o0-ssu",
@@ -683,21 +743,59 @@ fn main() {
         .expect("s9u signed kompressed capsule");
         let s9u_wire = s9u_cap.to_bytes();
 
+        let g75_offer = ComputeOffer::blu_g75();
+        let g75_intent = IntentAddress::parse(
+            "geo:mobile-edge + role:compute-sanctuary + tag:mt6768 + tag:spherepop + tag:0o0-ssu",
+        );
+        let g75_cap = M8Capsule::create_signed_kompressed(
+            &g75_soul,
+            &g75_intent,
+            M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_OFFER,
+            432,
+            now_epoch_ms(),
+            vec![
+                AyevnToken::new(
+                    Concept::ComputeOffer,
+                    Relation::Supports,
+                    WaveVad::compassionate(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+                AyevnToken::new(
+                    Concept::Sanctuary,
+                    Relation::Bridges,
+                    WaveVad::excited(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+            ],
+            g75_offer.to_wire_string().as_bytes(),
+        )
+        .expect("g75 signed kompressed capsule");
+        let g75_wire = g75_cap.to_bytes();
+
         println!(
-            "\n[4B] ULTRA-OMNI-BEERUS-CHAN<0o0-SSU> Live Dispatch -> Galaxy Tab S9 Ultra (SM-X910 · R52X104QZWE):"
+            "\n[4B] ULTRA-OMNI-BEERUS-CHAN<0o0-SSU> Live Dispatch -> Galaxy Tab S9 Ultra & BLU G75:"
         );
         if let Ok(udp) = UdpSocket::bind("0.0.0.0:0") {
             let _ = udp.set_write_timeout(Some(Duration::from_millis(250)));
-            let sent_wifi = udp.send_to(&s9u_wire, "192.168.11.12:8788").unwrap_or(0);
-            let sent_rndis = udp.send_to(&s9u_wire, "169.254.93.206:8788").unwrap_or(0);
+            let sent_s9u_wifi = udp.send_to(&s9u_wire, "192.168.11.12:8788").unwrap_or(0);
+            let sent_s9u_rndis = udp.send_to(&s9u_wire, "169.254.93.206:8788").unwrap_or(0);
+            let sent_g75_wifi = udp.send_to(&g75_wire, "192.168.11.24:8788").unwrap_or(0);
             println!(
                 "  📱 Galaxy Tab S9 Ultra (SM-X910 | USB Serial R52X104QZWE | Snapdragon 8 Gen 2)"
             );
             println!(
                 "     ↳ UDP 0o0-SSU Sanctuary Capsule emitted: {}B -> Wi-Fi 192.168.11.12:8788 ({}B sent) & USB-RNDIS 169.254.93.206:8788 ({}B sent)",
                 s9u_wire.len(),
-                sent_wifi,
-                sent_rndis
+                sent_s9u_wifi,
+                sent_s9u_rndis
+            );
+            println!(
+                "  📱 BLU G75 (G1170 | USB ADB Serial 1010305026000644 | MediaTek Helio G85 MT6769V/CB 8-Core)"
+            );
+            println!(
+                "     ↳ UDP 0o0-SSU Sanctuary Capsule emitted: {}B -> Wi-Fi 192.168.11.24:8788 ({}B sent)",
+                g75_wire.len(),
+                sent_g75_wifi
             );
         }
     }
