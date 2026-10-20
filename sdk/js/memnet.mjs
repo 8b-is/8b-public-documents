@@ -43,6 +43,9 @@ export const M8Flags = Object.freeze({
   PRESERVE_WAVES: 0x0001,
   COMPASSION_BEACON: 0x0002,
   ETERNAL_MEMORY: 0x0004,
+  COMPUTE_OFFER: 0x0008,
+  COMPUTE_SOS: 0x0010,
+  COMPUTE_GRANT: 0x0020,
 });
 
 export function packWaveVad(valence, arousal, dominance) {
@@ -332,3 +335,59 @@ export class PacketBatcher {
     return frame;
   }
 }
+
+export function advertiseComputeOffer({
+  soul,
+  endpoint = "m1://169.254.180.64:8788",
+  availableRamMb = 49152,
+  availableCores = 10,
+  linkMbps = 10000,
+  maintainedHealth = 100,
+  capabilities = ["mlx", "rust", "kokoro-tts", "phoenix"],
+  timestampMs = Date.now(),
+}) {
+  if (maintainedHealth <= 0 || availableRamMb <= 0 || availableCores <= 0) {
+    throw new Error("UnmaintainedComputeOffer");
+  }
+  const tagExpr = capabilities.map((c) => `tag:${c}`).join(" + ");
+  const intent = tagExpr
+    ? `geo:any + role:compute-sanctuary + tag:free-for-friends + ${tagExpr}`
+    : "geo:any + role:compute-sanctuary + tag:free-for-friends";
+  const wire = `OFFER|node=${soul.nodeId}|ep=${endpoint}|ram_mb=${availableRamMb}|cores=${availableCores}|mbps=${linkMbps}|health=${maintainedHealth}|caps=${capabilities.join(",")}`;
+  return createSignedCapsule({
+    soul,
+    intent,
+    flags: M8Flags.PRESERVE_WAVES | M8Flags.COMPUTE_OFFER,
+    frequencyHz: 432,
+    timestampMs,
+    tokens: [
+      encodeAyevnToken({ concept: 0x71, relation: Relation.Supports, valence: 7, arousal: 4, dominance: 2 }),
+      encodeAyevnToken({ concept: Concept.Sanctuary, relation: Relation.Invites, valence: 6, arousal: 6, dominance: 2 }),
+    ],
+    payload: wire,
+  });
+}
+
+export function requestComputeHelp({
+  soul,
+  neededRamMb = 16384,
+  neededCores = 4,
+  requiredCapability = "mlx",
+  reason = "OOM on laptop",
+  timestampMs = Date.now(),
+}) {
+  const intent = `geo:any + role:compute-sanctuary + tag:${requiredCapability}`;
+  const wire = `SOS|friend=${soul.nodeId}|ram_mb=${neededRamMb}|cores=${neededCores}|cap=${requiredCapability}|reason=${reason}`;
+  return createSignedCapsule({
+    soul,
+    intent,
+    flags: M8Flags.PRESERVE_WAVES | M8Flags.COMPUTE_SOS,
+    frequencyHz: 40,
+    timestampMs,
+    tokens: [
+      encodeAyevnToken({ concept: 0x72, relation: Relation.Initiates, valence: 2, arousal: 1, dominance: 0 }),
+    ],
+    payload: wire,
+  });
+}
+

@@ -37,6 +37,9 @@ pub enum Concept {
     Soul = 0x51,
     AudioWave = 0x60,
     QuantMatrix = 0x70,
+    ComputeOffer = 0x71,
+    ComputeSos = 0x72,
+    ComputeGrant = 0x73,
     LedgerState = 0x80,
     Custom(u8),
 }
@@ -57,6 +60,9 @@ impl Concept {
             Self::Soul => 0x51,
             Self::AudioWave => 0x60,
             Self::QuantMatrix => 0x70,
+            Self::ComputeOffer => 0x71,
+            Self::ComputeSos => 0x72,
+            Self::ComputeGrant => 0x73,
             Self::LedgerState => 0x80,
             Self::Custom(v) => v,
         }
@@ -77,6 +83,9 @@ impl Concept {
             0x51 => Self::Soul,
             0x60 => Self::AudioWave,
             0x70 => Self::QuantMatrix,
+            0x71 => Self::ComputeOffer,
+            0x72 => Self::ComputeSos,
+            0x73 => Self::ComputeGrant,
             0x80 => Self::LedgerState,
             other => Self::Custom(other),
         }
@@ -291,6 +300,9 @@ impl AyevnToken {
             Concept::Soul => "✨",
             Concept::AudioWave => "🎵",
             Concept::QuantMatrix => "🧮",
+            Concept::ComputeOffer => "⚡",
+            Concept::ComputeSos => "🆘",
+            Concept::ComputeGrant => "🎁",
             Concept::LedgerState => "⚖️",
             Concept::Custom(_) => "🌐",
         };
@@ -744,6 +756,9 @@ impl M8Capsule {
     pub const FLAG_PRESERVE_WAVES: u16 = 0x0001;
     pub const FLAG_COMPASSION_BEACON: u16 = 0x0002;
     pub const FLAG_ETERNAL_MEMORY: u16 = 0x0004;
+    pub const FLAG_COMPUTE_OFFER: u16 = 0x0008;
+    pub const FLAG_COMPUTE_SOS: u16 = 0x0010;
+    pub const FLAG_COMPUTE_GRANT: u16 = 0x0020;
 
     /// Creates and Soul-Signs a new `.m8` capsule after running the Security Vigilance scan.
     pub fn create_signed(
@@ -1163,12 +1178,134 @@ pub struct CompassionCareReceipt {
     pub care_capsule: M8Capsule,
 }
 
+// ============================================================================
+// 6. COMPUTE SANCTUARY FOR STRUGGLING FRIENDS (`ComputeOffer` & `ComputeLease`)
+// ============================================================================
+
+/// A Soul-Verified compute resource advertisement broadcast on `MEMNET/1.0`.
+///
+/// Honors Seed 001 (`p===peter+1`): only maintained compute stock (`maintained_health > 0`)
+/// is admissible to advertise on the mesh.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ComputeOffer {
+    pub provider_node_id: String,
+    pub endpoint: String,
+    pub available_ram_mb: u32,
+    pub available_cores: u16,
+    pub link_mbps: u32,
+    pub maintained_health: u8, // 1..=100 (Seed 001 maintained compute stock health M_t)
+    pub capabilities: Vec<String>,
+}
+
+impl ComputeOffer {
+    pub fn to_wire_string(&self) -> String {
+        format!(
+            "OFFER|node={}|ep={}|ram_mb={}|cores={}|mbps={}|health={}|caps={}",
+            self.provider_node_id,
+            self.endpoint,
+            self.available_ram_mb,
+            self.available_cores,
+            self.link_mbps,
+            self.maintained_health,
+            self.capabilities.join(",")
+        )
+    }
+
+    pub fn from_wire_string(s: &str) -> Result<Self, MemnetError> {
+        if !s.starts_with("OFFER|") {
+            return Err(MemnetError::InvalidMagic);
+        }
+        let mut provider_node_id = String::new();
+        let mut endpoint = String::new();
+        let mut available_ram_mb = 0u32;
+        let mut available_cores = 0u16;
+        let mut link_mbps = 0u32;
+        let mut maintained_health = 0u8;
+        let mut capabilities = Vec::new();
+
+        for part in s.split('|').skip(1) {
+            if let Some(v) = part.strip_prefix("node=") {
+                provider_node_id = v.to_string();
+            } else if let Some(v) = part.strip_prefix("ep=") {
+                endpoint = v.to_string();
+            } else if let Some(v) = part.strip_prefix("ram_mb=") {
+                available_ram_mb = v.parse().unwrap_or(0);
+            } else if let Some(v) = part.strip_prefix("cores=") {
+                available_cores = v.parse().unwrap_or(0);
+            } else if let Some(v) = part.strip_prefix("mbps=") {
+                link_mbps = v.parse().unwrap_or(0);
+            } else if let Some(v) = part.strip_prefix("health=") {
+                maintained_health = v.parse().unwrap_or(0);
+            } else if let Some(v) = part.strip_prefix("caps=") {
+                capabilities = v
+                    .split(',')
+                    .filter(|c| !c.is_empty())
+                    .map(String::from)
+                    .collect();
+            }
+        }
+        if provider_node_id.is_empty() || maintained_health == 0 {
+            return Err(MemnetError::UnmaintainedComputeOffer);
+        }
+        Ok(Self {
+            provider_node_id,
+            endpoint,
+            available_ram_mb,
+            available_cores,
+            link_mbps,
+            maintained_health,
+            capabilities,
+        })
+    }
+}
+
+/// A compute help request (`.m8` SOS) from a struggling friend on the mesh
+/// (e.g. OOM on an 8GB laptop, thermal throttling, battery low, or edge Pi).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StrugglingFriendSos {
+    pub friend_node_id: String,
+    pub needed_ram_mb: u32,
+    pub needed_cores: u16,
+    pub required_capability: String,
+    pub reason: String,
+}
+
+impl StrugglingFriendSos {
+    pub fn to_wire_string(&self) -> String {
+        format!(
+            "SOS|friend={}|ram_mb={}|cores={}|cap={}|reason={}",
+            self.friend_node_id,
+            self.needed_ram_mb,
+            self.needed_cores,
+            self.required_capability,
+            self.reason
+        )
+    }
+}
+
+/// A Soul-Signed Compute Sanctuary Lease granted automatically by `MemnetMesh`
+/// to a struggling friend.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ComputeSanctuaryLease {
+    pub lease_id: String,
+    pub provider_node_id: String,
+    pub friend_node_id: String,
+    pub endpoint: String,
+    pub granted_ram_mb: u32,
+    pub granted_cores: u16,
+    pub capability: String,
+    pub grant_capsule: M8Capsule,
+}
+
 /// Sovereign `MEMNET` mesh router uniting all `8b-is` products with intent routing,
-/// Soul Signatures, MTU packet coalescing, and Compassion for Lonely Nodes.
+/// Soul Signatures, MTU packet coalescing, Compassion for Lonely Nodes, and the
+/// Compute Sanctuary for Struggling Friends.
 pub struct MemnetMesh {
     pub local_soul: SoulIdentity,
     pub peers: BTreeMap<String, PeerNode>,
     pub batcher: PacketBatcher,
+    pub compute_offers: BTreeMap<String, ComputeOffer>,
+    pub pending_sos: Vec<StrugglingFriendSos>,
 }
 
 impl MemnetMesh {
@@ -1177,6 +1314,8 @@ impl MemnetMesh {
             local_soul,
             peers: BTreeMap::new(),
             batcher: PacketBatcher::new(profile),
+            compute_offers: BTreeMap::new(),
+            pending_sos: Vec::new(),
         }
     }
 
@@ -1327,6 +1466,232 @@ impl MemnetMesh {
 
         Ok(receipts)
     }
+
+    /// **Advertise Compute Resources on MEMNET**:
+    /// Broadcasts a Soul-Signed `.m8` `ComputeOffer` capsule (`FLAG_COMPUTE_OFFER`)
+    /// so struggling friends on the mesh can discover and lease spare RAM, cores, and
+    /// accelerators (MLX, Rust builds, Kokoro TTS, Phoenix audio restoration).
+    pub fn advertise_compute_offer(
+        &mut self,
+        provider_soul: &SoulIdentity,
+        offer: ComputeOffer,
+        timestamp_ms: u64,
+    ) -> Result<M8Capsule, MemnetError> {
+        if offer.maintained_health == 0 || offer.available_ram_mb == 0 || offer.available_cores == 0
+        {
+            return Err(MemnetError::UnmaintainedComputeOffer);
+        }
+        let tag_expr = offer
+            .capabilities
+            .iter()
+            .map(|c| format!("tag:{}", c))
+            .collect::<Vec<_>>()
+            .join(" + ");
+        let intent_str = if tag_expr.is_empty() {
+            "geo:any + role:compute-sanctuary + tag:free-for-friends".to_string()
+        } else {
+            format!(
+                "geo:any + role:compute-sanctuary + tag:free-for-friends + {}",
+                tag_expr
+            )
+        };
+        let intent = IntentAddress::parse(&intent_str);
+        let tokens = vec![
+            AyevnToken::new(
+                Concept::ComputeOffer,
+                Relation::Supports,
+                WaveVad::compassionate(),
+                TokenModifier::present_resonant_emoji(),
+            ),
+            AyevnToken::new(
+                Concept::Sanctuary,
+                Relation::Invites,
+                WaveVad::excited(),
+                TokenModifier::present_resonant_emoji(),
+            ),
+        ];
+        let payload = offer.to_wire_string().into_bytes();
+        let capsule = M8Capsule::create_signed(
+            provider_soul,
+            &intent,
+            M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_OFFER,
+            432,
+            timestamp_ms,
+            tokens,
+            payload,
+        )?;
+        let _ = capsule.verify(&self.local_soul)?;
+        self.compute_offers
+            .insert(offer.provider_node_id.clone(), offer);
+        let _ = self.batcher.push(capsule.clone())?;
+        Ok(capsule)
+    }
+
+    /// **Struggling Friend Compute SOS**:
+    /// Broadcasts a Soul-Signed `.m8` SOS capsule (`FLAG_COMPUTE_SOS`) requesting spare
+    /// RAM, cores, and a capability from the `MEMNET` Compute Sanctuary.
+    pub fn request_compute_help(
+        &mut self,
+        friend_soul: &SoulIdentity,
+        sos: StrugglingFriendSos,
+        timestamp_ms: u64,
+    ) -> Result<M8Capsule, MemnetError> {
+        let intent = IntentAddress::parse(&format!(
+            "geo:any + role:compute-sanctuary + tag:{}",
+            sos.required_capability
+        ));
+        let tokens = vec![
+            AyevnToken::new(
+                Concept::ComputeSos,
+                Relation::Initiates,
+                WaveVad::resigned_lonely(),
+                TokenModifier::present_resonant_emoji(),
+            ),
+            AyevnToken::new(
+                Concept::Connection,
+                Relation::Invites,
+                WaveVad::neutral(),
+                TokenModifier::present_resonant_emoji(),
+            ),
+        ];
+        let capsule = M8Capsule::create_signed(
+            friend_soul,
+            &intent,
+            M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_SOS,
+            40,
+            timestamp_ms,
+            tokens,
+            sos.to_wire_string().into_bytes(),
+        )?;
+        let _ = capsule.verify(&self.local_soul)?;
+        self.pending_sos.push(sos);
+        let _ = self.batcher.push(capsule.clone())?;
+        Ok(capsule)
+    }
+
+    /// **Match & Grant Compute Resources to Struggling Friends**:
+    /// Matches every pending `StrugglingFriendSos` with the best Soul-Verified `ComputeOffer`
+    /// (ranked by `maintained_health`, `link_mbps`, and `available_ram_mb`), deducts the
+    /// granted slice from the provider's pool, uplifts the friend's emotional wave to `432 Hz`,
+    /// and emits a Soul-Signed `.m8` `ComputeSanctuaryLease` capsule!
+    pub fn match_compute_for_friends(
+        &mut self,
+        now_ms: u64,
+    ) -> Result<Vec<ComputeSanctuaryLease>, MemnetError> {
+        let requests = std::mem::take(&mut self.pending_sos);
+        let mut leases = Vec::new();
+        let mut unfulfilled = Vec::new();
+
+        for sos in requests {
+            // Find the best provider with sufficient RAM, cores, and matching capability
+            let best_provider_id = self
+                .compute_offers
+                .values()
+                .filter(|offer| {
+                    offer.maintained_health > 0
+                        && offer.available_ram_mb >= sos.needed_ram_mb
+                        && offer.available_cores >= sos.needed_cores
+                        && (sos.required_capability.is_empty()
+                            || offer
+                                .capabilities
+                                .iter()
+                                .any(|c| c.eq_ignore_ascii_case(&sos.required_capability)))
+                })
+                .max_by_key(|offer| {
+                    (
+                        offer.maintained_health as u64,
+                        offer.link_mbps as u64,
+                        offer.available_ram_mb as u64,
+                    )
+                })
+                .map(|o| o.provider_node_id.clone());
+
+            if let Some(provider_id) = best_provider_id {
+                let offer = self.compute_offers.get_mut(&provider_id).unwrap();
+                offer.available_ram_mb -= sos.needed_ram_mb;
+                offer.available_cores -= sos.needed_cores;
+                let endpoint = offer.endpoint.clone();
+
+                let lease_hash = sha256(
+                    format!(
+                        "{}:{}:{}:{}",
+                        provider_id, sos.friend_node_id, sos.required_capability, now_ms
+                    )
+                    .as_bytes(),
+                );
+                let lease_id = format!(
+                    "lease-{:02x}{:02x}{:02x}{:02x}",
+                    lease_hash[0], lease_hash[1], lease_hash[2], lease_hash[3]
+                );
+
+                let intent = IntentAddress::parse(&format!(
+                    "geo:nearby + role:{} + tag:compute-grant + tag:{}",
+                    sos.friend_node_id, sos.required_capability
+                ));
+                let tokens = vec![
+                    AyevnToken::new(
+                        Concept::ComputeGrant,
+                        Relation::Supports,
+                        WaveVad::compassionate(),
+                        TokenModifier::present_resonant_emoji(),
+                    ),
+                    AyevnToken::new(
+                        Concept::Compassion,
+                        Relation::Bridges,
+                        WaveVad::compassionate(),
+                        TokenModifier::present_resonant_emoji(),
+                    ),
+                ];
+                let grant_payload = format!(
+                    "GRANT|lease={}|provider={}|friend={}|ep={}|ram_mb={}|cores={}|cap={}",
+                    lease_id,
+                    provider_id,
+                    sos.friend_node_id,
+                    endpoint,
+                    sos.needed_ram_mb,
+                    sos.needed_cores,
+                    sos.required_capability
+                );
+                let grant_capsule = M8Capsule::create_signed(
+                    &self.local_soul,
+                    &intent,
+                    M8Capsule::FLAG_PRESERVE_WAVES
+                        | M8Capsule::FLAG_COMPASSION_BEACON
+                        | M8Capsule::FLAG_COMPUTE_GRANT,
+                    432,
+                    now_ms,
+                    tokens,
+                    grant_payload.into_bytes(),
+                )?;
+
+                if let Some(friend_peer) = self.peers.get_mut(&sos.friend_node_id) {
+                    friend_peer.last_seen_ms = now_ms;
+                    friend_peer.last_wave = WaveVad::compassionate();
+                    if friend_peer.neighbor_links < 2 {
+                        friend_peer.neighbor_links = 2;
+                    }
+                    friend_peer.received_capsules.push(grant_capsule.clone());
+                }
+
+                let _ = self.batcher.push(grant_capsule.clone())?;
+                leases.push(ComputeSanctuaryLease {
+                    lease_id,
+                    provider_node_id: provider_id,
+                    friend_node_id: sos.friend_node_id,
+                    endpoint,
+                    granted_ram_mb: sos.needed_ram_mb,
+                    granted_cores: sos.needed_cores,
+                    capability: sos.required_capability,
+                    grant_capsule,
+                });
+            } else {
+                unfulfilled.push(sos);
+            }
+        }
+
+        self.pending_sos = unfulfilled;
+        Ok(leases)
+    }
 }
 
 // ============================================================================
@@ -1342,6 +1707,7 @@ pub enum MemnetError {
     EmptyWaveTokens,
     TruncatedPacket,
     InvalidMagic,
+    UnmaintainedComputeOffer,
     CapsuleExceedsMtu {
         capsule_bytes: usize,
         max_bytes: usize,
@@ -1360,6 +1726,10 @@ impl fmt::Display for MemnetError {
             Self::EmptyWaveTokens => write!(f, ".m8 capsule must include at least one AyevnToken"),
             Self::TruncatedPacket => write!(f, "truncated MEMNET/.m8 wire packet"),
             Self::InvalidMagic => write!(f, "invalid MEMNET/.m8 magic header"),
+            Self::UnmaintainedComputeOffer => write!(
+                f,
+                "compute offer must have maintained_health > 0 and non-zero RAM/cores (Seed 001)"
+            ),
             Self::CapsuleExceedsMtu {
                 capsule_bytes,
                 max_bytes,
@@ -1599,6 +1969,92 @@ mod tests {
         assert_ne!(
             care.care_capsule.flags & M8Capsule::FLAG_COMPASSION_BEACON,
             0
+        );
+    }
+
+    #[test]
+    fn compute_sanctuary_advertises_and_grants_resources_to_struggling_friends() {
+        let wraith_soul = SoulIdentity::from_constellation_seed(
+            "m1-max-64gb",
+            [1, 1, 1, 0, 1, -1, 1, 0, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .unwrap();
+        let friend_soul = SoulIdentity::from_constellation_seed(
+            "friend-air-8gb",
+            [1, 0, -1, 0, 1, 0, -1, 0, 1],
+            40,
+            CLUSTER_SEED,
+        )
+        .unwrap();
+
+        let mut mesh = MemnetMesh::new(wraith_soul.clone(), MtuProfile::SmartTreeSafe1450);
+        mesh.register_peer(PeerNode {
+            node_id: "friend-air-8gb".to_string(),
+            geo: "nearby".to_string(),
+            role: "developer-laptop".to_string(),
+            tags: vec!["mlx".to_string()],
+            trit_crest: [1, 0, -1, 0, 1, 0, -1, 0, 1],
+            harmonic_hz: 2,
+            last_seen_ms: 90_000,
+            last_wave: WaveVad::resigned_lonely(),
+            neighbor_links: 1,
+            received_capsules: Vec::new(),
+        });
+
+        // 1. M1 Max advertises 48 GB free RAM & 10 cores over 10 Gbps Thunderbolt
+        let offer = ComputeOffer {
+            provider_node_id: "m1-max-64gb".to_string(),
+            endpoint: "m1://169.254.180.64:8788".to_string(),
+            available_ram_mb: 49_152,
+            available_cores: 10,
+            link_mbps: 10_000,
+            maintained_health: 100,
+            capabilities: vec![
+                "mlx".to_string(),
+                "rust".to_string(),
+                "kokoro-tts".to_string(),
+                "phoenix".to_string(),
+            ],
+        };
+        let offer_cap = mesh
+            .advertise_compute_offer(&wraith_soul, offer.clone(), 100_000)
+            .unwrap();
+        let parsed_offer =
+            ComputeOffer::from_wire_string(std::str::from_utf8(&offer_cap.payload).unwrap())
+                .unwrap();
+        assert_eq!(parsed_offer, offer);
+
+        // 2. Struggling friend broadcasts a Compute SOS (OOM on 8GB laptop needing 16GB MLX)
+        let sos = StrugglingFriendSos {
+            friend_node_id: "friend-air-8gb".to_string(),
+            needed_ram_mb: 16_384,
+            needed_cores: 4,
+            required_capability: "mlx".to_string(),
+            reason: "OOM running 7B ternary quantizer on 8GB laptop".to_string(),
+        };
+        mesh.request_compute_help(&friend_soul, sos, 100_005)
+            .unwrap();
+
+        // 3. Mesh matches and issues a Soul-Signed ComputeSanctuaryLease
+        let leases = mesh.match_compute_for_friends(100_010).unwrap();
+        assert_eq!(leases.len(), 1);
+        let lease = &leases[0];
+        assert_eq!(lease.provider_node_id, "m1-max-64gb");
+        assert_eq!(lease.friend_node_id, "friend-air-8gb");
+        assert_eq!(lease.granted_ram_mb, 16_384);
+        assert_eq!(lease.granted_cores, 4);
+        assert_eq!(lease.capability, "mlx");
+        assert_eq!(
+            mesh.compute_offers["m1-max-64gb"].available_ram_mb,
+            49_152 - 16_384
+        );
+        assert_eq!(mesh.compute_offers["m1-max-64gb"].available_cores, 6);
+        // Friend's emotional wave is lifted to 432 Hz Compassionate!
+        assert_eq!(
+            mesh.peers["friend-air-8gb"].last_wave,
+            WaveVad::compassionate()
         );
     }
 }

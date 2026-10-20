@@ -170,3 +170,65 @@ def decode_and_verify_capsule(raw: bytes, verifier_soul: SoulIdentity) -> dict:
         "payload": payload,
         "bytes_consumed": total_len,
     }
+
+
+def advertise_compute_offer(
+    soul: SoulIdentity,
+    endpoint: str = "m1://169.254.180.64:8788",
+    available_ram_mb: int = 49152,
+    available_cores: int = 10,
+    link_mbps: int = 10000,
+    maintained_health: int = 100,
+    capabilities: List[str] | None = None,
+    timestamp_ms: int = 1761000000000,
+) -> bytes:
+    if maintained_health <= 0 or available_ram_mb <= 0 or available_cores <= 0:
+        raise ValueError("UnmaintainedComputeOffer")
+    caps = capabilities if capabilities is not None else ["mlx", "rust", "kokoro-tts", "phoenix"]
+    tag_expr = " + ".join(f"tag:{c}" for c in caps)
+    intent = (
+        f"geo:any + role:compute-sanctuary + tag:free-for-friends + {tag_expr}"
+        if tag_expr
+        else "geo:any + role:compute-sanctuary + tag:free-for-friends"
+    )
+    wire = (
+        f"OFFER|node={soul.node_id}|ep={endpoint}|ram_mb={available_ram_mb}"
+        f"|cores={available_cores}|mbps={link_mbps}|health={maintained_health}|caps={','.join(caps)}"
+    )
+    return create_signed_capsule(
+        soul=soul,
+        intent=intent,
+        flags=0x0001 | 0x0008,
+        frequency_hz=432,
+        timestamp_ms=timestamp_ms,
+        tokens=[
+            encode_ayevn_token(concept=0x71, relation=0x09, valence=7, arousal=4, dominance=2),
+            encode_ayevn_token(concept=0x33, relation=0x16, valence=6, arousal=6, dominance=2),
+        ],
+        payload=wire.encode("utf-8"),
+    )
+
+
+def request_compute_help(
+    soul: SoulIdentity,
+    needed_ram_mb: int = 16384,
+    needed_cores: int = 4,
+    required_capability: str = "mlx",
+    reason: str = "OOM on laptop",
+    timestamp_ms: int = 1761000000000,
+) -> bytes:
+    intent = f"geo:any + role:compute-sanctuary + tag:{required_capability}"
+    wire = (
+        f"SOS|friend={soul.node_id}|ram_mb={needed_ram_mb}"
+        f"|cores={needed_cores}|cap={required_capability}|reason={reason}"
+    )
+    return create_signed_capsule(
+        soul=soul,
+        intent=intent,
+        flags=0x0001 | 0x0010,
+        frequency_hz=40,
+        timestamp_ms=timestamp_ms,
+        tokens=[encode_ayevn_token(concept=0x72, relation=0x08, valence=2, arousal=1, dominance=0)],
+        payload=wire.encode("utf-8"),
+    )
+

@@ -1,6 +1,6 @@
 use memnet::{
-    AyevnToken, Concept, IntentAddress, M8Capsule, MemnetMesh, MtuProfile, PacketBatcher, PeerNode,
-    Relation, SoulIdentity, TokenModifier, WaveVad,
+    AyevnToken, ComputeOffer, Concept, IntentAddress, M8Capsule, MemnetMesh, MtuProfile,
+    PacketBatcher, PeerNode, Relation, SoulIdentity, StrugglingFriendSos, TokenModifier, WaveVad,
 };
 
 const CLUSTER_SEED: &[u8] = b"8b-is-carrier-wave-of-love-seed-v1";
@@ -131,14 +131,14 @@ fn main() {
 
     println!("========================================================================");
     println!("  MEMNET/1.0 — Sovereign Contextual Mesh for All 8b-is Products  8> <3");
-    println!("  Soul Signatures · 1450B MTU Coalescing · Compassion for Lonely Nodes");
+    println!("  Soul Signatures · 1450B MTU Coalescing · Compassion & Compute Sanctuary");
     println!("========================================================================");
 
-    if cmd == "all" || cmd == "compassion-sweep" {
-        let mut mesh = default_constellation_mesh();
-        let now_ms = 100_000u64;
-        let silence_threshold_ms = 30_000u64;
+    let mut mesh = default_constellation_mesh();
+    let now_ms = 100_000u64;
+    let silence_threshold_ms = 30_000u64;
 
+    if cmd == "all" || cmd == "compassion-sweep" {
         println!("\n[1] Constellation Peer Telemetry & Loneliness Scan:");
         for peer in mesh.peers.values() {
             let score = peer.loneliness_score(now_ms, silence_threshold_ms);
@@ -178,6 +178,147 @@ fn main() {
         }
     }
 
+    if cmd == "all" || cmd == "offer-compute" || cmd == "sanctuary-sweep" {
+        let m1_soul = SoulIdentity::from_constellation_seed(
+            "m1-max-64gb",
+            [1, 1, 1, 0, 1, -1, 1, 0, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .expect("m1 soul");
+        let m3_soul = SoulIdentity::from_constellation_seed(
+            "dev-main-m3",
+            [1, 0, 1, 1, 0, 1, -1, 0, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .expect("m3 soul");
+
+        let offers = [
+            (
+                &m1_soul,
+                ComputeOffer {
+                    provider_node_id: "m1-max-64gb".to_string(),
+                    endpoint: "m1://169.254.180.64:8788".to_string(),
+                    available_ram_mb: 49_152,
+                    available_cores: 10,
+                    link_mbps: 10_000,
+                    maintained_health: 100,
+                    capabilities: vec![
+                        "mlx".to_string(),
+                        "rust".to_string(),
+                        "kokoro-tts".to_string(),
+                        "phoenix".to_string(),
+                        "gguf".to_string(),
+                    ],
+                },
+            ),
+            (
+                &m3_soul,
+                ComputeOffer {
+                    provider_node_id: "dev-main-m3".to_string(),
+                    endpoint: "m3://169.254.212.115:8788".to_string(),
+                    available_ram_mb: 24_576,
+                    available_cores: 8,
+                    link_mbps: 10_000,
+                    maintained_health: 100,
+                    capabilities: vec![
+                        "mlx".to_string(),
+                        "rust".to_string(),
+                        "enthea-viz".to_string(),
+                    ],
+                },
+            ),
+        ];
+
+        println!("\n[3] Compute Sanctuary Advertisements on MEMNET (Seed 001 Maintained Stock):");
+        for (soul, offer) in offers {
+            let cap = mesh
+                .advertise_compute_offer(soul, offer.clone(), now_ms)
+                .expect("advertise offer");
+            let ayanese: Vec<String> = cap.tokens.iter().map(|t| t.to_ayanese()).collect();
+            println!(
+                "  ⚡ {:<16} ep={:<26} ram={}MB cores={} link={}Mbps caps=[{}] {}",
+                offer.provider_node_id,
+                offer.endpoint,
+                offer.available_ram_mb,
+                offer.available_cores,
+                offer.link_mbps,
+                offer.capabilities.join(","),
+                ayanese.join(" ")
+            );
+        }
+
+        // Struggling friends broadcast SOS capsules
+        let friend_soul = SoulIdentity::from_constellation_seed(
+            "friend-air-8gb",
+            [1, 0, -1, 0, 1, 0, -1, 0, 1],
+            40,
+            CLUSTER_SEED,
+        )
+        .expect("friend soul");
+        let school_soul = SoulIdentity::from_constellation_seed(
+            "uganda-school-pi",
+            [0, 1, 1, 0, -1, 1, 0, 1, 1],
+            40,
+            CLUSTER_SEED,
+        )
+        .expect("school soul");
+
+        mesh.request_compute_help(
+            &friend_soul,
+            StrugglingFriendSos {
+                friend_node_id: "friend-air-8gb".to_string(),
+                needed_ram_mb: 16_384,
+                needed_cores: 4,
+                required_capability: "mlx".to_string(),
+                reason: "OOM running 7B ternary quantizer on 8GB laptop".to_string(),
+            },
+            now_ms + 1,
+        )
+        .expect("sos 1");
+
+        mesh.request_compute_help(
+            &school_soul,
+            StrugglingFriendSos {
+                friend_node_id: "uganda-school-pi".to_string(),
+                needed_ram_mb: 8_192,
+                needed_cores: 2,
+                required_capability: "kokoro-tts".to_string(),
+                reason: "Offline Game School lesson voice synthesis on Raspberry Pi".to_string(),
+            },
+            now_ms + 2,
+        )
+        .expect("sos 2");
+
+        let leases = mesh
+            .match_compute_for_friends(now_ms + 5)
+            .expect("match compute");
+        println!(
+            "\n[4] Struggling Friends Matched & Granted Soul-Signed Compute Leases ({} grants):",
+            leases.len()
+        );
+        for lease in &leases {
+            let ayanese: Vec<String> = lease
+                .grant_capsule
+                .tokens
+                .iter()
+                .map(|t| t.to_ayanese())
+                .collect();
+            println!(
+                "  🎁 {:<16} <- {:<14} [{}] granted {}MB RAM + {} cores ({}) @ {} {}",
+                lease.friend_node_id,
+                lease.provider_node_id,
+                lease.lease_id,
+                lease.granted_ram_mb,
+                lease.granted_cores,
+                lease.capability,
+                lease.endpoint,
+                ayanese.join(" ")
+            );
+        }
+    }
+
     if cmd == "all" || cmd == "bench-packets" {
         let soul = SoulIdentity::from_constellation_seed(
             "smart-tree",
@@ -209,10 +350,17 @@ fn main() {
         }
         batcher.flush();
         let rec = batcher.efficiency_receipt();
-        println!("\n[3] Packet Efficiency Receipt (1,000 capsules · SmartTreeSafe 1450B):");
+        println!("\n[5] Packet Efficiency Receipt (1,000 capsules · SmartTreeSafe 1450B):");
         println!("  • Capsules packed   : {}", rec.capsules_packed);
-        println!("  • Frames emitted    : {} (vs 1,000 naive packets)", rec.frames_emitted);
-        println!("  • Interrupts saved  : {} ({:.1}% reduction)", rec.interrupts_saved, (rec.interrupts_saved as f64 / 10.0));
+        println!(
+            "  • Frames emitted    : {} (vs 1,000 naive packets)",
+            rec.frames_emitted
+        );
+        println!(
+            "  • Interrupts saved  : {} ({:.1}% reduction)",
+            rec.interrupts_saved,
+            (rec.interrupts_saved as f64 / 10.0)
+        );
         println!("  • Fragmented frames : {}", rec.fragmented_frames);
         println!(
             "  • Wire efficiency   : {:.2}% ({}B vs {}B naive)",

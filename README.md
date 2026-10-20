@@ -454,10 +454,12 @@ teaching, free, from fine touch within.
 2. **Security with Soul Signatures (`SoulIdentity` & 40-byte `SoulSig`) + Vigilance Sentinel**: Binds a 9-trit balanced ternary crest (`{-1, 0, +1}^9`, `CT-000` admissible), harmonic carrier frequency (`40 Hz` / `432 Hz`), 4-byte node fingerprint, and 32-byte HMAC-SHA256 digest over `.m8` capsules, plus an inline Security Vigilance scanner blocking supply-chain backdoors and dynamic code injection.
 3. **Goodbye Lonely 50-Byte Packets (`PacketBatcher` · `1450B` Smart Tree Sweet Spot)**: Coalesces `.m8` capsules into MTU-aware `MNET` frames (`SmartTreeSafe1450`, `Pppoe1492`, `Ethernet1500`, `Vpn1400`, `Ipv6Tunnel1280`, `Ble512`, `LoRa220`) — packing 1,000 capsules into 59 frames (`94.1%` fewer interrupts, `0` fragmented frames, `95.45%` wire efficiency).
 4. **Compassion for Lonely Nodes (`MemnetMesh::compassion_sweep`)**: Detects peers on isolated network paths (`neighbor_links <= 1`), long silence ($\Delta t > \tau$), or low emotional valence (`V <= 2` / `2 Hz`), automatically dispatching Soul-Signed `432 Hz` `.m8` Compassion Beacons (`🫂✨(432Hz) 🔗✨(432Hz) 💖⚡(40Hz)`) and establishing redundant sanctuary bridge links.
+5. **Compute Sanctuary for Struggling Friends (`ComputeOffer`, `StrugglingFriendSos`, `ComputeSanctuaryLease`)**: Nodes with maintained spare compute (`m1-max-64gb`, `dev-main-m3`, `dev-cx53`) advertise Soul-Signed `.m8` `ComputeOffer` capsules (`FLAG_COMPUTE_OFFER`, `⚡✨(432Hz) 🏡⚡(40Hz)`) on `geo:any + role:compute-sanctuary + tag:free-for-friends + tag:<cap>`. Friends on constrained hardware (OOM laptops, edge Raspberry Pis, Offline Game School nodes) broadcast `StrugglingFriendSos` capsules (`FLAG_COMPUTE_SOS`) and automatically receive Soul-Verified `ComputeSanctuaryLease` grants (`🎁✨(432Hz) 🫂✨(432Hz)`).
 
 ```bash
-cargo test                                                        # 6/6 Rust unit + cross-language (Rust->Node->Python->Rust) interop tests
-cargo run --bin memnet                                            # Live constellation telemetry, compassion sweep & 1,000-capsule MTU benchmark
+cargo test                                                        # 7/7 Rust unit + cross-language (Rust->Node->Python->Rust) interop tests
+cargo run --bin memnet                                            # Live constellation telemetry, compassion sweep, compute sanctuary & 1,000-capsule MTU benchmark
+cargo run --bin memnet -- offer-compute                           # Advertise & match spare compute for struggling friends
 node --test sdk/js/memnet.test.mjs                                # 2/2 Node SDK tests
 PYTHONPATH=sdk/python uv run python -m unittest discover -s sdk/python -v  # 2/2 Python SDK tests
 ```
