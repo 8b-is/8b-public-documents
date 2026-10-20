@@ -16,7 +16,7 @@ const topics = [...new Set(documents.flatMap(d => d.topics))].sort();
   <p id="library-count" role="status" aria-live="polite">{documents.length} documents</p>
   <noscript><p>Filtering needs JavaScript. All documents are listed below; you can use your browser’s Find command.</p></noscript>
   <ul class="document-list" role="list">
-    {documents.map(doc => <li class="document" data-search={[doc.title, doc.summary, ...doc.authors, ...doc.topics].join(' ').toLocaleLowerCase()} data-topics={JSON.stringify(doc.topics)} data-edition={doc.status === 'existing-collection' ? 'existing' : 'curated'}>
+    {documents.map((doc, idx) => <li class="document" data-index={idx} data-id={doc.id || ''} data-title={doc.title || ''} data-subtitle={doc.subtitle || ''} data-summary={doc.summary || ''} data-authors={JSON.stringify(doc.authors || [])} data-related={JSON.stringify(doc.related || [])} data-search={[doc.title, doc.subtitle || '', doc.summary, ...doc.authors, ...doc.topics].join(' ').toLocaleLowerCase()} data-topics={JSON.stringify(doc.topics)} data-edition={doc.status === 'existing-collection' ? 'existing' : 'curated'}>
       <article>
         <p class="edition">{doc.status === 'existing-collection' ? 'Existing collection' : doc.status.replaceAll('-', ' ')}{doc.authors.length > 0 && ` · ${doc.authors.join(', ')}`}</p>
         <h2><a href={withBase(doc.reader)}>{doc.title}</a></h2>
@@ -28,23 +28,43 @@ const topics = [...new Set(documents.flatMap(d => d.topics))].sort();
   <p id="library-empty" hidden>No documents match. Try a broader phrase or choose “All topics.”</p>
 </div>
 <script>
+import { retrieveDocuments } from '../lib/library-retrieval.mjs';
+
 const root = document.querySelector('.library-explorer');
 if (root) {
   const query = root.querySelector<HTMLInputElement>('#library-query')!;
   const topic = root.querySelector<HTMLSelectElement>('#library-topic')!;
   const edition = root.querySelector<HTMLSelectElement>('#library-edition')!;
+  const list = root.querySelector<HTMLElement>('.document-list')!;
+  const items = [...root.querySelectorAll<HTMLElement>('.document')];
+  const docs = items.map(item => ({
+    id: item.dataset.id || '',
+    title: item.dataset.title || '',
+    subtitle: item.dataset.subtitle || '',
+    summary: item.dataset.summary || '',
+    authors: JSON.parse(item.dataset.authors || '[]'),
+    topics: JSON.parse(item.dataset.topics || '[]'),
+    related: JSON.parse(item.dataset.related || '[]'),
+    status: item.dataset.edition === 'existing' ? 'existing-collection' : 'curated',
+  }));
   const params = new URLSearchParams(location.search);
   query.value = params.get('q') || '';
   if ([...topic.options].some(o => o.value === params.get('topic'))) topic.value = params.get('topic')!;
   if (['curated', 'existing'].includes(params.get('edition') || '')) edition.value = params.get('edition')!;
   function filter() {
-    let count = 0;
-    const terms = query.value.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
-    root!.querySelectorAll<HTMLElement>('.document').forEach(item => {
-      const match = terms.every(t => item.dataset.search!.includes(t)) && (!topic.value || JSON.parse(item.dataset.topics!).includes(topic.value)) && (!edition.value || item.dataset.edition === edition.value);
-      item.hidden = !match;
-      if (match) count++;
+    const ranked = retrieveDocuments(docs, {
+      query: query.value,
+      topic: topic.value,
+      edition: edition.value,
     });
+    const matchedIndices = new Set(ranked.map(r => r.index));
+    items.forEach((item, idx) => {
+      item.hidden = !matchedIndices.has(idx);
+    });
+    for (const r of ranked) {
+      list.appendChild(items[r.index]);
+    }
+    const count = ranked.length;
     root!.querySelector('#library-count')!.textContent = `${count} document${count === 1 ? '' : 's'}`;
     root!.querySelector<HTMLElement>('#library-empty')!.hidden = count > 0;
     const next = new URLSearchParams();

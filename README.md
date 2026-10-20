@@ -435,4 +435,11 @@ teaching, free, from fine touch within.
 (Peter + Riva), the garden voices, the essences, and the founding sessions.
 *Ultra Entheatic: sparse recursion · distributed fields · the sphere of love.*
 
+---
+
+## Library Retrieval Quality (`site/src/lib/library-retrieval.mjs`)
+
+- **Field-Weighted & Connected-Reading Resonance Retrieval**: `retrieveDocuments()` and `scoreDocumentIntrinsic()` rank curated and collection documents using exact phrase matching, field weights (`title` > `topics` > `subtitle`/`authors` > `summary`), punctuation/apostrophe normalization, and 1-hop `related` graph resonance (`connectedResonanceFactor = 0.25`).
+- Verified by `node --test tests/*.test.mjs` in `site/` (15/15 tests passing).
+
 *the constellation · 0 + 1 · fine touch from within · vaked.dev*
