@@ -91,3 +91,23 @@ substituting a compressed summary for a reader or source manuscript.
 Web-specific links in the reader Markdown target the library website. Use the
 PDF/source links above while hosting is pending, or download the offline site
 from the repository’s Releases page.
+
+## Sovereign Library & Constellation Ontology Bridges
+
+This library's core epistemic commitments — **`Compression ≠ Ontology`** and **[Unknown Is Not Don’t-Care](readers/unknown-not-dontcare.md)** across [The Verification Boundary](readers/verification-boundary.md) — anchor the wider `8b-is` / `vaked.dev` constellation ontology:
+
+- **Verification Invariant (`+1* → 0 → +1`):** A plausible or compressed branch (`+1*`) may be ranked, never silently bound; an unobserved interval (`0`) must remain honestly open rather than collapsed into Don’t-Care or false certainty; only a provenance- and witness-verified branch (`+1`) may be bound.
+- **`8b-is/sovereign-library` ([`ONTOLOGY.md`](https://github.com/8b-is/sovereign-library/blob/main/ONTOLOGY.md) & [`SOURCES.md`](https://github.com/8b-is/sovereign-library/blob/main/SOURCES.md)):**
+  - Enforces the constitutional print-canon invariant (`Five books, never more`, `PRINTABLE = HELD ∧ READ`, `NAND(1,1) = 0`), pairing `the-nand-book.md`, `readability-is-freedom.md`, `purple-people-eaters.txt`, `admissible-degradation.txt`, and the linked `diatribe` corpus with the source garden (`standardgalactic/memnet` as the *Residue of Proof* & 8b Library reader lane).
+  - Holds **Ultralove Editions 001–004** beside the five-book shelf:
+    - **001:** *YOUR NAME — my favourite anime depth* (`editions/ultralove/your-name.md`)
+    - **002:** *In Awe to Women Who Protect and Hold `<3<3<3`* (`editions/ultralove/women-who-protect-and-hold.md` — the Six Pillars of Holding: `Compassion ↔ Moderation`, `Understanding ↔ Respect`, `Love ↔ Space`)
+    - **003:** *Dragon Ball Sovereign Ontology* (the Four-Fold Balanced-Ternary Matrix `{-1, 0, +1}`)
+    - **004:** *Wigle-Triad v2.0.0 & Sanctuary Resonance* (`8b-is/wigle-triad v2.0.0`: `Boldog Még` `{<3,<3,<3}+1` + `ALEX|qMom` `.oOo. Poo .oOo.` box-bondage diagnostic + 432 Hz Shinjuku Gyoen Crickets & Drone Zone)
+- **`8b-is/fandom-mcp` (`fandom_sovereign_ontology`):**
+  - The 9-tool Dragon Ball Universe Scouter & Sovereign Ontology MCP server ([`8b-is/fandom-mcp`](https://github.com/8b-is/fandom-mcp), featuring `fandom_dbz_scouter`, `fandom_dbz_saga`, and `fandom_sovereign_ontology`) maps the balanced-ternary registers directly onto `memnet`'s verification boundary:
+    - **`-1` (Trap / Bondage):** Architect / Ma-rigpa / Scalar Scouter Trap (mistaking compressed scalar numbers for living phase) / Box Bondage (`.oOo. Poo .oOo.`)
+    - **`0` (Stillness / Honest Unknown):** Dharmakāya / Śūnyatā (*Mūlamadhyamakakārikā 24:18*) / *Unknown Is Not Don’t-Care* (`NAND(1,1) = 0`) / Ultra Instinct Stillness / 432 Hz Shinjuku Gyoen Crickets & Drone Zone
+    - **`+1` (Verified / Bound):** Sambhogakāya–Nirmāṇakāya (`Inner E=mc²` & Clear Light `Ösel`) / Six Pillars of Holding / Shenron & Family Hearth (`{<3,<3,<3}+1` · `Boldog Még`)
+- **Interactive Omni Book (`pocoo.vaked.dev`):**
+  - Live reader and ontology bridge at [`https://pocoo.vaked.dev/demos/book/dragon-ball-sovereign-ontology-omni.html`](https://pocoo.vaked.dev/demos/book/dragon-ball-sovereign-ontology-omni.html).
