@@ -664,8 +664,13 @@ pub fn scan_payload_vigilance(payload: &[u8]) -> Result<(), MemnetError> {
 // 2B. KOMPRESS-SUPER-ULTRA (`0o0` / `KSU0`) LOSSLESS WIRE CODEC
 // ============================================================================
 
-/// Sovereign dictionary codebook for `Kompress-Super-Ultra (0o0)` wire payloads.
-pub const KOMPRESS_CODEBOOK: [&[u8]; 24] = [
+/// Sovereign dictionary codebook for `Kompress-Super-Ultra (0o0)` and
+/// `ULTRA-OMNI-BEERUS-CHAN<KOMPRESS-SUPER-SAIYAN-ULTRA> (0o0-SSU)` wire payloads.
+///
+/// Indices `0..24` are locked for cross-language `0o0` v1 compatibility; indices `24..36`
+/// add `SpherePop` (`((( <( ? ~ ! @ > )> )))`) and **Galaxy Tab S9 Ultra** (`SM-X910` /
+/// `R52X104QZWE` / `192.168.11.12`) super-tokens.
+pub const KOMPRESS_CODEBOOK: [&[u8]; 36] = [
     b"OFFER|node=",
     b"SOS|friend=",
     b"GRANT|lease=",
@@ -690,7 +695,283 @@ pub const KOMPRESS_CODEBOOK: [&[u8]; 24] = [
     b"friend-air-8gb",
     b"uganda-school-pi",
     b"kokoro-tts",
+    // --- 0o0-SSU (KOMPRESS-SUPER-SAIYAN-ULTRA + SpherePop + Galaxy Tab S9 Ultra) ---
+    b"((( <( ? ",
+    b" )> )))",
+    b" ~ kompress:0o0-ssu ! soul_sig:verified",
+    b" ! vigilance:clean @ ",
+    b"galaxy-tab-s9-ultra",
+    b"|ep=s9u://192.168.11.12:8788",
+    b"nnapi,vulkan,rust,kokoro-tts,spherepop,0o0-ssu",
+    b"R52X104QZWE",
+    b"SM-X910",
+    b" ! ct000:admissible @ ",
+    b" > advertise:",
+    b" > grant:",
 ];
+
+// ============================================================================
+// 2C. SPHEREPOP OPERATIONAL MEREOLOGY (`((( <( ? ~ ! @ > )> )))`)
+// ============================================================================
+
+/// Operator phase inside a bounded `SpherePop` transaction `<( ... )>`.
+///
+/// Enforces the canonical `sphered` well-formedness grammar:
+/// `?* ~* !+ @+ >` (`Admit* -> Transform* -> Verify+ -> Attribute+ -> Commit`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SpherePopOp {
+    /// `? term` — Admission / precondition check (e.g. `? maintained_stock`, `? health:100`).
+    Admit(String),
+    /// `~ term` — Transformation (e.g. `~ kompress:0o0-ssu`, `~ wave:432hz`).
+    Transform(String),
+    /// `! term` — Verification / invariant gate (e.g. `! soul_sig:verified`, `! ct000:admissible`).
+    Verify(String),
+    /// `@ actor` — Attribution / witness node (e.g. `@ m1-max-64gb`, `@ galaxy-tab-s9-ultra`).
+    Attribute(String),
+    /// `# anchor` — Ledger memory anchor (optional before commit).
+    Remember(String),
+    /// `> target` — Final transition commit (`#Commit = #ValidWitness`).
+    Commit(String),
+}
+
+/// Cryptographic witness emitted when a `SpherePop` transition `<( ? ~ ! @ > )>` commits.
+///
+/// Satisfies the `sphered` spine invariant: **`#Commit = #ValidWitness`**.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SpherePopWitness {
+    pub sphere_depth: usize,
+    pub admissions: Vec<String>,
+    pub transforms: Vec<String>,
+    pub verifications: Vec<String>,
+    pub attributions: Vec<String>,
+    pub committed_value: String,
+    pub trace_steps: Vec<String>,
+    pub witness_hash: [u8; 32],
+}
+
+impl SpherePopWitness {
+    pub fn short_hex(&self) -> String {
+        format!(
+            "{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+            self.witness_hash[0],
+            self.witness_hash[1],
+            self.witness_hash[2],
+            self.witness_hash[3],
+            self.witness_hash[4],
+            self.witness_hash[5],
+            self.witness_hash[6],
+            self.witness_hash[7]
+        )
+    }
+}
+
+/// Result of evaluating a `SpherePop` expression `((( <( ? ~ ! @ > )> )))`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SpherePopOutcome {
+    /// Transition succeeded and produced a valid cryptographic witness (`#Commit = #ValidWitness`).
+    Committed(SpherePopWitness),
+    /// Transition was refused at an admission (`? x`) or verification (`! x`) gate (`no witness`).
+    Refused {
+        reason: String,
+        trace_steps: Vec<String>,
+    },
+}
+
+/// Zero-dependency `SpherePop` (`sphered`) parser & evaluator enforcing:
+/// - Concentric sphere nesting `(` ... `)` (including `((( ... )))` triple-sphere ultra envelopes)
+/// - Bounded witnessed transactions `<(` ... `)>`
+/// - Monotone phase law `?* ~* !+ @+ >`
+/// - Refusal on `"x"` / `"x:..."` / `"refuse:..."` (`refused, no witness`)
+/// - `#Commit = #ValidWitness`
+pub struct SpherePopEngine;
+
+impl SpherePopEngine {
+    pub fn evaluate(expr: &str) -> Result<SpherePopOutcome, MemnetError> {
+        let mut s = expr.trim();
+        let mut sphere_depth = 0usize;
+        let mut trace_steps = Vec::new();
+
+        // Peel concentric outer spheres `(` ... `)`
+        while s.starts_with('(') && s.ends_with(')') && !s.starts_with("<(") {
+            sphere_depth += 1;
+            trace_steps.push(format!("follow ( [depth={}]", sphere_depth));
+            s = s[1..s.len() - 1].trim();
+        }
+
+        if !s.starts_with("<(") || !s.ends_with(")>") {
+            return Err(MemnetError::SpherePopIllFormed(
+                "expected bounded transaction `<( ... )>` inside sphere scope",
+            ));
+        }
+
+        trace_steps.push("enter <(".to_string());
+        let inner = s[2..s.len() - 2].trim();
+        let tokens: Vec<&str> = inner.split_whitespace().collect();
+        if tokens.is_empty() {
+            return Err(MemnetError::SpherePopIllFormed(
+                "empty `<( )>` transaction produces no witness",
+            ));
+        }
+
+        let mut ops = Vec::new();
+        let mut i = 0usize;
+        while i < tokens.len() {
+            let op_tok = tokens[i];
+            if matches!(op_tok, "?" | "~" | "!" | "@" | "#" | ">") {
+                if i + 1 >= tokens.len() {
+                    return Err(MemnetError::SpherePopIllFormed(
+                        "dangling SpherePop operator without operand",
+                    ));
+                }
+                let arg = tokens[i + 1].to_string();
+                let op = match op_tok {
+                    "?" => SpherePopOp::Admit(arg),
+                    "~" => SpherePopOp::Transform(arg),
+                    "!" => SpherePopOp::Verify(arg),
+                    "@" => SpherePopOp::Attribute(arg),
+                    "#" => SpherePopOp::Remember(arg),
+                    ">" => SpherePopOp::Commit(arg),
+                    _ => unreachable!(),
+                };
+                ops.push(op);
+                i += 2;
+            } else {
+                return Err(MemnetError::SpherePopIllFormed(
+                    "unexpected token in `<( ? ~ ! @ > )>` sequence",
+                ));
+            }
+        }
+
+        // Enforce monotone grammar: ?* ~* !+ @+ #* >
+        // Phase 0: ? (Admit)
+        // Phase 1: ~ (Transform)
+        // Phase 2: ! (Verify)
+        // Phase 3: @ (Attribute) / # (Remember)
+        // Phase 4: > (Commit — must be final and unique)
+        let mut phase = 0u8;
+        let mut admissions = Vec::new();
+        let mut transforms = Vec::new();
+        let mut verifications = Vec::new();
+        let mut attributions = Vec::new();
+        let mut committed_value: Option<String> = None;
+
+        for op in ops {
+            if committed_value.is_some() {
+                return Err(MemnetError::SpherePopIllFormed(
+                    "no operators allowed after commit `>`",
+                ));
+            }
+            match op {
+                SpherePopOp::Admit(term) => {
+                    if phase > 0 {
+                        return Err(MemnetError::SpherePopIllFormed(
+                            "admission `?` must precede `~`, `!`, `@`, `>` (`?* ~* !+ @+ >`)",
+                        ));
+                    }
+                    if Self::is_refusal_term(&term) {
+                        trace_steps.push(format!("? {} -> refused, no witness", term));
+                        return Ok(SpherePopOutcome::Refused {
+                            reason: term,
+                            trace_steps,
+                        });
+                    }
+                    trace_steps.push(format!("admit ? {}", term));
+                    admissions.push(term);
+                }
+                SpherePopOp::Transform(term) => {
+                    if phase > 1 {
+                        return Err(MemnetError::SpherePopIllFormed(
+                            "transform `~` must precede `!`, `@`, `>` (`?* ~* !+ @+ >`)",
+                        ));
+                    }
+                    phase = 1;
+                    trace_steps.push(format!("transform ~ {}", term));
+                    transforms.push(term);
+                }
+                SpherePopOp::Verify(term) => {
+                    if phase > 2 {
+                        return Err(MemnetError::SpherePopIllFormed(
+                            "verification `!` must precede `@` and `>` (`?* ~* !+ @+ >`)",
+                        ));
+                    }
+                    phase = 2;
+                    if Self::is_refusal_term(&term) {
+                        trace_steps.push(format!("! {} -> refused, no witness", term));
+                        return Ok(SpherePopOutcome::Refused {
+                            reason: term,
+                            trace_steps,
+                        });
+                    }
+                    trace_steps.push(format!("verify ! {}", term));
+                    verifications.push(term);
+                }
+                SpherePopOp::Attribute(actor) => {
+                    if verifications.is_empty() {
+                        return Err(MemnetError::SpherePopIllFormed(
+                            "at least one verification `!` is required before `@` (`?* ~* !+ @+ >`)",
+                        ));
+                    }
+                    phase = 3;
+                    trace_steps.push(format!("attribute @ {}", actor));
+                    attributions.push(actor);
+                }
+                SpherePopOp::Remember(anchor) => {
+                    if verifications.is_empty() {
+                        return Err(MemnetError::SpherePopIllFormed(
+                            "cannot remember `#` before verification `!`",
+                        ));
+                    }
+                    trace_steps.push(format!("remember # {}", anchor));
+                }
+                SpherePopOp::Commit(val) => {
+                    if verifications.is_empty() {
+                        return Err(MemnetError::SpherePopIllFormed(
+                            "cannot commit `>` without at least one `!` verification (`!+`)",
+                        ));
+                    }
+                    if attributions.is_empty() {
+                        return Err(MemnetError::SpherePopIllFormed(
+                            "cannot commit `>` without at least one `@` attribution (`@+`)",
+                        ));
+                    }
+                    trace_steps.push(format!("commit > {}", val));
+                    committed_value = Some(val);
+                }
+            }
+        }
+
+        let committed_value = committed_value.ok_or(MemnetError::SpherePopIllFormed(
+            "missing terminal commit `>` in `<( ... )>`",
+        ))?;
+
+        for d in (1..=sphere_depth).rev() {
+            trace_steps.push(format!("return ) [depth={}]", d));
+        }
+
+        let mut transcript = String::new();
+        transcript.push_str(&format!("depth={}|", sphere_depth));
+        for step in &trace_steps {
+            transcript.push_str(step);
+            transcript.push('|');
+        }
+        let witness_hash = sha256(transcript.as_bytes());
+
+        Ok(SpherePopOutcome::Committed(SpherePopWitness {
+            sphere_depth,
+            admissions,
+            transforms,
+            verifications,
+            attributions,
+            committed_value,
+            trace_steps,
+            witness_hash,
+        }))
+    }
+
+    fn is_refusal_term(term: &str) -> bool {
+        term == "x" || term.starts_with("x:") || term.starts_with("refuse:")
+    }
+}
 
 /// Compresses a payload using `Kompress-Super-Ultra (0o0)` (`b"0o0\x01"` header +
 /// greedy sovereign dictionary substitution `0xFE <idx>` + run-length encoding `0xFF <len> <byte>`).
@@ -1201,8 +1482,7 @@ impl PacketBatcher {
 
     /// Returns `true` if the pending buffer has reached the minimum non-lonely threshold (`>= 500B`).
     pub fn ready_for_non_lonely_send(&self) -> bool {
-        !self.pending_capsules.is_empty()
-            && self.pending_bytes >= self.profile.min_coalesce_bytes()
+        !self.pending_capsules.is_empty() && self.pending_bytes >= self.profile.min_coalesce_bytes()
     }
 
     /// Flushes any pending capsules into a final `MemnetFrame`.
@@ -1383,6 +1663,57 @@ pub struct ComputeOffer {
 }
 
 impl ComputeOffer {
+    /// Canonical `ComputeOffer` profile for the **Samsung Galaxy Tab S9 Ultra**
+    /// (`SM-X910` · Snapdragon 8 Gen 2 for Galaxy · USB RNDIS `0x04e8:0x6863`
+    /// serial `R52X104QZWE` · Wi-Fi LAN `192.168.11.12:8788`).
+    pub fn galaxy_tab_s9_ultra() -> Self {
+        Self {
+            provider_node_id: "galaxy-tab-s9-ultra".to_string(),
+            endpoint: "s9u://192.168.11.12:8788".to_string(),
+            available_ram_mb: 9_216,
+            available_cores: 6,
+            link_mbps: 1_200,
+            maintained_health: 100,
+            capabilities: vec![
+                "nnapi".to_string(),
+                "vulkan".to_string(),
+                "rust".to_string(),
+                "kokoro-tts".to_string(),
+                "spherepop".to_string(),
+                "0o0-ssu".to_string(),
+            ],
+        }
+    }
+
+    /// Renders this `ComputeOffer` as a canonical `SpherePop` triple-sphere witnessed
+    /// transition expression (`((( <( ? ~ ! @ > )> )))`).
+    pub fn to_spherepop_expr(&self) -> String {
+        let stock_gate = if self.maintained_health == 0
+            || self.available_ram_mb == 0
+            || self.available_cores == 0
+        {
+            "x:unmaintained_stock".to_string()
+        } else {
+            format!(
+                "stock:{}mb:{}c:h{}",
+                self.available_ram_mb, self.available_cores, self.maintained_health
+            )
+        };
+        format!(
+            "((( <( ? offer:{} ? {} ~ kompress:0o0-ssu ! soul_sig:verified ! vigilance:clean @ {} > advertise:{} )> )))",
+            self.provider_node_id, stock_gate, self.provider_node_id, self.endpoint
+        )
+    }
+
+    /// Evaluates the `SpherePop` transition for this `ComputeOffer`, enforcing
+    /// `?* ~* !+ @+ >` and `#Commit = #ValidWitness`.
+    pub fn evaluate_spherepop(&self) -> Result<SpherePopWitness, MemnetError> {
+        match SpherePopEngine::evaluate(&self.to_spherepop_expr())? {
+            SpherePopOutcome::Committed(w) => Ok(w),
+            SpherePopOutcome::Refused { .. } => Err(MemnetError::UnmaintainedComputeOffer),
+        }
+    }
+
     pub fn to_wire_string(&self) -> String {
         format!(
             "OFFER|node={}|ep={}|ram_mb={}|cores={}|mbps={}|health={}|caps={}",
@@ -1456,6 +1787,29 @@ pub struct StrugglingFriendSos {
 }
 
 impl StrugglingFriendSos {
+    /// Renders this `StrugglingFriendSos` as a canonical `SpherePop` witnessed transition.
+    pub fn to_spherepop_expr(&self) -> String {
+        let need_gate = if self.friend_node_id.is_empty() {
+            "x:empty_friend_id".to_string()
+        } else {
+            format!(
+                "need:{}mb:{}c:{}",
+                self.needed_ram_mb, self.needed_cores, self.required_capability
+            )
+        };
+        format!(
+            "((( <( ? sos:{} ? {} ~ kompress:0o0-ssu ! soul_sig:verified @ {} > request:compute-sanctuary )> )))",
+            self.friend_node_id, need_gate, self.friend_node_id
+        )
+    }
+
+    pub fn evaluate_spherepop(&self) -> Result<SpherePopWitness, MemnetError> {
+        match SpherePopEngine::evaluate(&self.to_spherepop_expr())? {
+            SpherePopOutcome::Committed(w) => Ok(w),
+            SpherePopOutcome::Refused { reason, .. } => Err(MemnetError::SpherePopRefused(reason)),
+        }
+    }
+
     pub fn to_wire_string(&self) -> String {
         format!(
             "SOS|friend={}|ram_mb={}|cores={}|cap={}|reason={}",
@@ -1504,7 +1858,8 @@ impl StrugglingFriendSos {
 }
 
 /// A Soul-Signed Compute Sanctuary Lease granted automatically by `MemnetMesh`
-/// to a struggling friend.
+/// to a struggling friend, paired with its `SpherePop` cryptographic witness
+/// (`#Commit = #ValidWitness`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ComputeSanctuaryLease {
     pub lease_id: String,
@@ -1515,6 +1870,8 @@ pub struct ComputeSanctuaryLease {
     pub granted_cores: u16,
     pub capability: String,
     pub grant_capsule: M8Capsule,
+    pub spherepop_expr: String,
+    pub spherepop_witness: SpherePopWitness,
 }
 
 /// Sovereign `MEMNET` mesh router uniting all `8b-is` products with intent routing,
@@ -1688,19 +2045,17 @@ impl MemnetMesh {
     }
 
     /// **Advertise Compute Resources on MEMNET**:
-    /// Broadcasts a Soul-Signed `.m8` `ComputeOffer` capsule (`FLAG_COMPUTE_OFFER`)
+    /// Evaluates the offer's `SpherePop` transition (`((( <( ? ~ ! @ > )> )))` -> `#Commit = #ValidWitness`)
+    /// and broadcasts a Soul-Signed `.m8` `ComputeOffer` capsule (`FLAG_COMPUTE_OFFER`)
     /// so struggling friends on the mesh can discover and lease spare RAM, cores, and
-    /// accelerators (MLX, Rust builds, Kokoro TTS, Phoenix audio restoration).
+    /// accelerators (MLX, Rust builds, Kokoro TTS, Phoenix audio restoration, Snapdragon NNAPI/Vulkan).
     pub fn advertise_compute_offer(
         &mut self,
         provider_soul: &SoulIdentity,
         offer: ComputeOffer,
         timestamp_ms: u64,
     ) -> Result<M8Capsule, MemnetError> {
-        if offer.maintained_health == 0 || offer.available_ram_mb == 0 || offer.available_cores == 0
-        {
-            return Err(MemnetError::UnmaintainedComputeOffer);
-        }
+        let _witness = offer.evaluate_spherepop()?;
         let tag_expr = offer
             .capabilities
             .iter()
@@ -1748,7 +2103,8 @@ impl MemnetMesh {
     }
 
     /// **Struggling Friend Compute SOS**:
-    /// Broadcasts a Soul-Signed `.m8` SOS capsule (`FLAG_COMPUTE_SOS`) requesting spare
+    /// Evaluates the SOS `SpherePop` transition (`((( <( ? ~ ! @ > )> )))`) and broadcasts
+    /// a Soul-Signed `.m8` SOS capsule (`FLAG_COMPUTE_SOS`) requesting spare
     /// RAM, cores, and a capability from the `MEMNET` Compute Sanctuary.
     pub fn request_compute_help(
         &mut self,
@@ -1756,6 +2112,7 @@ impl MemnetMesh {
         sos: StrugglingFriendSos,
         timestamp_ms: u64,
     ) -> Result<M8Capsule, MemnetError> {
+        let _witness = sos.evaluate_spherepop()?;
         let intent = IntentAddress::parse(&format!(
             "geo:any + role:compute-sanctuary + tag:{}",
             sos.required_capability
@@ -1791,9 +2148,10 @@ impl MemnetMesh {
 
     /// **Match & Grant Compute Resources to Struggling Friends**:
     /// Matches every pending `StrugglingFriendSos` with the best Soul-Verified `ComputeOffer`
-    /// (ranked by `maintained_health`, `link_mbps`, and `available_ram_mb`), deducts the
+    /// (ranked by `maintained_health`, `link_mbps`, and `available_ram_mb`), evaluates the
+    /// bounded `SpherePop` grant transition (`((( <( ? ~ ! @ > )> )))`), deducts the
     /// granted slice from the provider's pool, uplifts the friend's emotional wave to `432 Hz`,
-    /// and emits a Soul-Signed `.m8` `ComputeSanctuaryLease` capsule!
+    /// and emits a Soul-Signed `.m8` `ComputeSanctuaryLease` capsule + `SpherePopWitness`!
     pub fn match_compute_for_friends(
         &mut self,
         now_ms: u64,
@@ -1843,6 +2201,24 @@ impl MemnetMesh {
                     "lease-{:02x}{:02x}{:02x}{:02x}",
                     lease_hash[0], lease_hash[1], lease_hash[2], lease_hash[3]
                 );
+
+                let spherepop_expr = format!(
+                    "((( <( ? admit:{} ? match:{} ~ slice:{}mb:{}c:{} ~ kompress:0o0-ssu ! soul_sig:verified ! ct000:admissible @ {} @ {} > grant:{} )> )))",
+                    sos.friend_node_id,
+                    provider_id,
+                    sos.needed_ram_mb,
+                    sos.needed_cores,
+                    sos.required_capability,
+                    provider_id,
+                    self.local_soul.node_id,
+                    lease_id
+                );
+                let spherepop_witness = match SpherePopEngine::evaluate(&spherepop_expr)? {
+                    SpherePopOutcome::Committed(w) => w,
+                    SpherePopOutcome::Refused { reason, .. } => {
+                        return Err(MemnetError::SpherePopRefused(reason));
+                    }
+                };
 
                 let intent = IntentAddress::parse(&format!(
                     "geo:nearby + role:{} + tag:compute-grant + tag:{}",
@@ -1903,6 +2279,8 @@ impl MemnetMesh {
                     granted_cores: sos.needed_cores,
                     capability: sos.required_capability,
                     grant_capsule,
+                    spherepop_expr,
+                    spherepop_witness,
                 });
             } else {
                 unfulfilled.push(sos);
@@ -1928,6 +2306,8 @@ pub enum MemnetError {
     TruncatedPacket,
     InvalidMagic,
     UnmaintainedComputeOffer,
+    SpherePopIllFormed(&'static str),
+    SpherePopRefused(String),
     CapsuleExceedsMtu {
         capsule_bytes: usize,
         max_bytes: usize,
@@ -1950,6 +2330,10 @@ impl fmt::Display for MemnetError {
                 f,
                 "compute offer must have maintained_health > 0 and non-zero RAM/cores (Seed 001)"
             ),
+            Self::SpherePopIllFormed(msg) => write!(f, "ill-formed SpherePop transition: {}", msg),
+            Self::SpherePopRefused(reason) => {
+                write!(f, "SpherePop transition refused (no witness): {}", reason)
+            }
             Self::CapsuleExceedsMtu {
                 capsule_bytes,
                 max_bytes,
@@ -2085,10 +2469,7 @@ mod tests {
             )],
             b"eval(atob('Y29uc29sZS5sb2coJ293bmVkJyk='))".to_vec(),
         );
-        assert_eq!(
-            res,
-            Err(MemnetError::SecurityVigilanceAlert("eval(atob("))
-        );
+        assert_eq!(res, Err(MemnetError::SecurityVigilanceAlert("eval(atob(")));
     }
 
     #[test]
@@ -2268,6 +2649,7 @@ mod tests {
         assert_eq!(lease.granted_ram_mb, 16_384);
         assert_eq!(lease.granted_cores, 4);
         assert_eq!(lease.capability, "mlx");
+        assert_eq!(lease.spherepop_witness.sphere_depth, 3);
         assert_eq!(
             mesh.compute_offers["m1-max-64gb"].available_ram_mb,
             49_152 - 16_384
@@ -2292,5 +2674,77 @@ mod tests {
         );
         let decompressed = decode_kompress_super_ultra(&compressed).unwrap();
         assert_eq!(decompressed.as_slice(), raw);
+    }
+
+    #[test]
+    fn spherepop_well_formed_grammar_and_refusal_semantics() {
+        // 1. Valid triple-sphere `((( <( ? ~ ! @ > )> )))` transition commits with witness (`#Commit = #ValidWitness`)
+        let expr = "((( <( ? offer:galaxy-tab-s9-ultra ? stock:9216mb:6c:h100 ~ kompress:0o0-ssu ! soul_sig:verified ! vigilance:clean @ galaxy-tab-s9-ultra > advertise:s9u://192.168.11.12:8788 )> )))";
+        let outcome = SpherePopEngine::evaluate(expr).unwrap();
+        match outcome {
+            SpherePopOutcome::Committed(w) => {
+                assert_eq!(w.sphere_depth, 3);
+                assert_eq!(w.admissions.len(), 2);
+                assert_eq!(w.transforms, vec!["kompress:0o0-ssu"]);
+                assert_eq!(w.verifications.len(), 2);
+                assert_eq!(w.attributions, vec!["galaxy-tab-s9-ultra"]);
+                assert_eq!(w.committed_value, "advertise:s9u://192.168.11.12:8788");
+                assert_eq!(w.short_hex().len(), 16);
+            }
+            SpherePopOutcome::Refused { .. } => panic!("expected Committed witness"),
+        }
+
+        // 2. Refusal on `? x:unmaintained_stock` -> Refused, no witness
+        let refused_expr = "((( <( ? x:unmaintained_stock ~ kompress:0o0-ssu ! soul_sig:verified @ galaxy-tab-s9-ultra > advertise:s9u )> )))";
+        let refused = SpherePopEngine::evaluate(refused_expr).unwrap();
+        assert!(matches!(
+            refused,
+            SpherePopOutcome::Refused { ref reason, .. } if reason == "x:unmaintained_stock"
+        ));
+
+        // 3. Ill-formed: missing `!` verification before `@` (`?* ~* !+ @+ >`)
+        let no_verify =
+            "((( <( ? admit:ok ~ kompress:0o0-ssu @ galaxy-tab-s9-ultra > commit:bad )> )))";
+        assert!(matches!(
+            SpherePopEngine::evaluate(no_verify),
+            Err(MemnetError::SpherePopIllFormed(_))
+        ));
+
+        // 4. Ill-formed: missing `@` attribution before `>`
+        let no_attr =
+            "((( <( ? admit:ok ~ kompress:0o0-ssu ! soul_sig:verified > commit:bad )> )))";
+        assert!(matches!(
+            SpherePopEngine::evaluate(no_attr),
+            Err(MemnetError::SpherePopIllFormed(_))
+        ));
+    }
+
+    #[test]
+    fn galaxy_tab_s9_ultra_offer_and_0o0_ssu_compression() {
+        let s9_offer = ComputeOffer::galaxy_tab_s9_ultra();
+        assert_eq!(s9_offer.provider_node_id, "galaxy-tab-s9-ultra");
+        assert_eq!(s9_offer.endpoint, "s9u://192.168.11.12:8788");
+
+        let witness = s9_offer.evaluate_spherepop().unwrap();
+        assert_eq!(witness.sphere_depth, 3);
+        assert_eq!(witness.attributions, vec!["galaxy-tab-s9-ultra"]);
+
+        let wire = s9_offer.to_wire_string();
+        let compressed = encode_kompress_super_ultra(wire.as_bytes());
+        assert!(
+            compressed.len() * 100 < wire.len() * 40,
+            "expected >60% 0o0-SSU compression for Galaxy Tab S9 Ultra offer, got {}B from {}B",
+            compressed.len(),
+            wire.len()
+        );
+        let decompressed = decode_kompress_super_ultra(&compressed).unwrap();
+        assert_eq!(decompressed, wire.as_bytes());
+
+        // Also verify 0o0-SSU compression on the SpherePop expression itself
+        let sp_expr = s9_offer.to_spherepop_expr();
+        let sp_compressed = encode_kompress_super_ultra(sp_expr.as_bytes());
+        assert!(sp_compressed.len() < sp_expr.len());
+        let sp_decompressed = decode_kompress_super_ultra(&sp_compressed).unwrap();
+        assert_eq!(sp_decompressed, sp_expr.as_bytes());
     }
 }

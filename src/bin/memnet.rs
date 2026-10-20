@@ -4,8 +4,8 @@ use memnet::{
     TokenModifier, WaveVad,
 };
 use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream};
-use std::time::{Instant, SystemTime, UNIX_EPOCH};
+use std::net::{TcpListener, TcpStream, UdpSocket};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 const CLUSTER_SEED: &[u8] = b"8b-is-carrier-wave-of-love-seed-v1";
 
@@ -93,6 +93,26 @@ fn default_constellation_mesh() -> MemnetMesh {
             99_400,
             WaveVad::compassionate(),
             3,
+        ),
+        (
+            "galaxy-tab-s9-ultra",
+            "mobile-edge",
+            "android-tablet-sanctuary",
+            vec![
+                "nnapi",
+                "vulkan",
+                "rust",
+                "kokoro-tts",
+                "spherepop",
+                "0o0-ssu",
+                "SM-X910",
+                "R52X104QZWE",
+            ],
+            [1, 1, 1, -1, 1, 0, 1, 1, 1],
+            432,
+            99_950,
+            WaveVad::compassionate(),
+            4,
         ),
         (
             "lonely-edge-sensor",
@@ -396,7 +416,7 @@ fn main() {
 
     println!("========================================================================");
     println!("  MEMNET/1.0 — Sovereign Contextual Mesh for All 8b-is Products  8> <3");
-    println!("  Soul Signatures · 1450B MTU · Kompress-Super-Ultra (0o0) · Sanctuary");
+    println!("  +++ SpherePop ((( <( ? ~ ! @ > )> ))) · 0o0-SSU · Galaxy Tab S9 Ultra");
     println!("========================================================================");
 
     let mut mesh = default_constellation_mesh();
@@ -413,7 +433,7 @@ fn main() {
                 "RESONANT"
             };
             println!(
-                "  • {:<20} role={:<17} links={} hz={:<4} loneliness={:.2} -> {}",
+                "  • {:<20} role={:<24} links={} hz={:<4} loneliness={:.2} -> {}",
                 peer.node_id, peer.role, peer.neighbor_links, peer.harmonic_hz, score, status
             );
         }
@@ -458,6 +478,13 @@ fn main() {
             CLUSTER_SEED,
         )
         .expect("m3 soul");
+        let s9u_soul = SoulIdentity::from_constellation_seed(
+            "galaxy-tab-s9-ultra",
+            [1, 1, 1, -1, 1, 0, 1, 1, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .expect("s9u soul");
 
         let offers = [
             (
@@ -494,19 +521,23 @@ fn main() {
                     ],
                 },
             ),
+            (&s9u_soul, ComputeOffer::galaxy_tab_s9_ultra()),
         ];
 
         println!(
-            "\n[3] Compute Sanctuary Advertisements on MEMNET (Seed 001 + Kompress-Super-Ultra 0o0):"
+            "\n[3] Compute Sanctuary Advertisements on MEMNET (Seed 001 + SpherePop + 0o0-SSU):"
         );
         for (soul, offer) in offers {
             let raw_len = offer.to_wire_string().len();
+            let sp_expr = offer.to_spherepop_expr();
+            let sp_witness = offer.evaluate_spherepop().expect("SpherePop valid witness");
+            let sp_compressed = encode_kompress_super_ultra(sp_expr.as_bytes());
             let cap = mesh
                 .advertise_compute_offer(soul, offer.clone(), now_ms)
                 .expect("advertise offer");
             let ayanese: Vec<String> = cap.tokens.iter().map(|t| t.to_ayanese()).collect();
             println!(
-                "  ⚡ {:<14} ep={:<25} ram={}MB cores={} 0o0={}B/{}B ({:.0}% saved) caps=[{}] {}",
+                "  ⚡ {:<20} ep={:<25} ram={:<5}MB cores={:<2} 0o0-SSU={}B/{}B ({:.0}% saved) {}",
                 offer.provider_node_id,
                 offer.endpoint,
                 offer.available_ram_mb,
@@ -514,8 +545,15 @@ fn main() {
                 cap.payload.len(),
                 raw_len,
                 (1.0 - (cap.payload.len() as f64 / raw_len as f64)) * 100.0,
-                offer.capabilities.join(","),
                 ayanese.join(" ")
+            );
+            println!(
+                "     ↳ SpherePop [depth={} | #ValidWitness={} | 0o0-SSU {}B->{}B]: {}",
+                sp_witness.sphere_depth,
+                sp_witness.short_hex(),
+                sp_expr.len(),
+                sp_compressed.len(),
+                sp_expr
             );
         }
 
@@ -533,6 +571,13 @@ fn main() {
             CLUSTER_SEED,
         )
         .expect("school soul");
+        let nomad_soul = SoulIdentity::from_constellation_seed(
+            "nomad-pocket-node",
+            [1, -1, 0, 1, 1, 0, -1, 1, 0],
+            40,
+            CLUSTER_SEED,
+        )
+        .expect("nomad soul");
 
         mesh.request_compute_help(
             &friend_soul,
@@ -560,11 +605,24 @@ fn main() {
         )
         .expect("sos 2");
 
+        mesh.request_compute_help(
+            &nomad_soul,
+            StrugglingFriendSos {
+                friend_node_id: "nomad-pocket-node".to_string(),
+                needed_ram_mb: 6_144,
+                needed_cores: 4,
+                required_capability: "nnapi".to_string(),
+                reason: "Snapdragon Hexagon NPU + Vulkan mobile inference assist".to_string(),
+            },
+            now_ms + 3,
+        )
+        .expect("sos 3");
+
         let leases = mesh
             .match_compute_for_friends(now_ms + 5)
             .expect("match compute");
         println!(
-            "\n[4] Struggling Friends Matched & Granted 0o0 Soul-Signed Compute Leases ({} grants):",
+            "\n[4] Struggling Friends Matched & Granted 0o0-SSU Soul-Signed + SpherePop Leases ({} grants):",
             leases.len()
         );
         for lease in &leases {
@@ -576,7 +634,7 @@ fn main() {
                 .collect();
             let decompressed = lease.grant_capsule.decompressed_payload().unwrap();
             println!(
-                "  🎁 {:<16} <- {:<12} [{}] granted {}MB + {}c ({}) 0o0={}B/{}B @ {} {}",
+                "  🎁 {:<18} <- {:<20} [{}] granted {}MB + {}c ({}) 0o0-SSU={}B/{}B @ {} {}",
                 lease.friend_node_id,
                 lease.provider_node_id,
                 lease.lease_id,
@@ -587,6 +645,59 @@ fn main() {
                 decompressed.len(),
                 lease.endpoint,
                 ayanese.join(" ")
+            );
+            println!(
+                "     ↳ SpherePop [#Commit=#ValidWitness={}]: {}",
+                lease.spherepop_witness.short_hex(),
+                lease.spherepop_expr
+            );
+        }
+
+        // [4B] Live Galaxy Tab S9 Ultra (SM-X910 · R52X104QZWE · 192.168.11.12) & M1 Max Wire Dispatch
+        let s9u_offer = ComputeOffer::galaxy_tab_s9_ultra();
+        let s9u_intent = IntentAddress::parse(
+            "geo:mobile-edge + role:compute-sanctuary + tag:nnapi + tag:spherepop + tag:0o0-ssu",
+        );
+        let s9u_cap = M8Capsule::create_signed_kompressed(
+            &s9u_soul,
+            &s9u_intent,
+            M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_OFFER,
+            432,
+            now_epoch_ms(),
+            vec![
+                AyevnToken::new(
+                    Concept::ComputeOffer,
+                    Relation::Supports,
+                    WaveVad::compassionate(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+                AyevnToken::new(
+                    Concept::Sanctuary,
+                    Relation::Bridges,
+                    WaveVad::excited(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+            ],
+            s9u_offer.to_wire_string().as_bytes(),
+        )
+        .expect("s9u signed kompressed capsule");
+        let s9u_wire = s9u_cap.to_bytes();
+
+        println!(
+            "\n[4B] ULTRA-OMNI-BEERUS-CHAN<0o0-SSU> Live Dispatch -> Galaxy Tab S9 Ultra (SM-X910 · R52X104QZWE):"
+        );
+        if let Ok(udp) = UdpSocket::bind("0.0.0.0:0") {
+            let _ = udp.set_write_timeout(Some(Duration::from_millis(250)));
+            let sent_wifi = udp.send_to(&s9u_wire, "192.168.11.12:8788").unwrap_or(0);
+            let sent_rndis = udp.send_to(&s9u_wire, "169.254.93.206:8788").unwrap_or(0);
+            println!(
+                "  📱 Galaxy Tab S9 Ultra (SM-X910 | USB Serial R52X104QZWE | Snapdragon 8 Gen 2)"
+            );
+            println!(
+                "     ↳ UDP 0o0-SSU Sanctuary Capsule emitted: {}B -> Wi-Fi 192.168.11.12:8788 ({}B sent) & USB-RNDIS 169.254.93.206:8788 ({}B sent)",
+                s9u_wire.len(),
+                sent_wifi,
+                sent_rndis
             );
         }
     }
