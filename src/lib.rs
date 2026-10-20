@@ -1,0 +1,1604 @@
+//! # MEMNET/1.0 — Sovereign Contextual Mesh Protocol for All `8b-is` Products
+//!
+//! > *"goodbye lonely network paths.. security with soul sigs.. and compassion for lonely ones.
+//! > Our products all need to speak the most efficient ways."* — **8bit-Wraith `<3`**
+//!
+//! This crate unifies four foundational `8b-is` specifications into a single zero-dependency
+//! wire protocol and mesh engine:
+//! 1. **32-bit Ayevn Wave Tokens** (`[Concept: u8 | Relation: u8 | Wave(VAD): u8 | Modifier: u8]`)
+//! 2. **`.m8` Experience Capsules** with **Soul Signatures (`SoulSig`)** (HMAC-SHA256 + 9-trit
+//!    balanced ternary `{-1, 0, +1}` crest + harmonic carrier frequency + Security Vigilance scan)
+//! 3. **MTU-Aware Packet Coalescer (`PacketBatcher`)** enforcing the `1450`-byte Smart Tree sweet
+//!    spot (eliminating 50-byte lonely packets and >1492-byte fragmentation crimes)
+//! 4. **Intent-Based Routing & Compassion for Lonely Nodes (`MemnetMesh`)** detecting isolated
+//!    network paths or low-valence/silent nodes and routing 432 Hz care capsules + bridge relays.
+
+use std::collections::BTreeMap;
+use std::fmt;
+
+// ============================================================================
+// 1. AYEVN 32-BIT WAVE TOKENS ([Concept | Relation | Wave(VAD) | Modifier])
+// ============================================================================
+
+/// Core semantic concepts (Byte 0 of an Ayevn 32-bit token).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(u8)]
+pub enum Concept {
+    Greeting = 0x10,
+    Memory = 0x20,
+    Connection = 0x30,
+    Compassion = 0x31,
+    Care = 0x32,
+    Sanctuary = 0x33,
+    Innovation = 0x42,
+    Collaboration = 0x43,
+    Breakthrough = 0x44,
+    Security = 0x50,
+    Soul = 0x51,
+    AudioWave = 0x60,
+    QuantMatrix = 0x70,
+    LedgerState = 0x80,
+    Custom(u8),
+}
+
+impl Concept {
+    pub fn to_u8(self) -> u8 {
+        match self {
+            Self::Greeting => 0x10,
+            Self::Memory => 0x20,
+            Self::Connection => 0x30,
+            Self::Compassion => 0x31,
+            Self::Care => 0x32,
+            Self::Sanctuary => 0x33,
+            Self::Innovation => 0x42,
+            Self::Collaboration => 0x43,
+            Self::Breakthrough => 0x44,
+            Self::Security => 0x50,
+            Self::Soul => 0x51,
+            Self::AudioWave => 0x60,
+            Self::QuantMatrix => 0x70,
+            Self::LedgerState => 0x80,
+            Self::Custom(v) => v,
+        }
+    }
+
+    pub fn from_u8(v: u8) -> Self {
+        match v {
+            0x10 => Self::Greeting,
+            0x20 => Self::Memory,
+            0x30 => Self::Connection,
+            0x31 => Self::Compassion,
+            0x32 => Self::Care,
+            0x33 => Self::Sanctuary,
+            0x42 => Self::Innovation,
+            0x43 => Self::Collaboration,
+            0x44 => Self::Breakthrough,
+            0x50 => Self::Security,
+            0x51 => Self::Soul,
+            0x60 => Self::AudioWave,
+            0x70 => Self::QuantMatrix,
+            0x80 => Self::LedgerState,
+            other => Self::Custom(other),
+        }
+    }
+}
+
+/// Semantic relation between tokens (Byte 1 of an Ayevn 32-bit token).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(u8)]
+pub enum Relation {
+    None = 0x00,
+    Cause = 0x01,
+    Effect = 0x02,
+    Contains = 0x05,
+    Initiates = 0x08,
+    Supports = 0x09,
+    Bridges = 0x0A,
+    Amplifies = 0x0C,
+    Transforms = 0x0E,
+    Expresses = 0x15,
+    Invites = 0x16,
+    Protects = 0x17,
+}
+
+impl Relation {
+    pub fn from_u8(v: u8) -> Self {
+        match v {
+            0x01 => Self::Cause,
+            0x02 => Self::Effect,
+            0x05 => Self::Contains,
+            0x08 => Self::Initiates,
+            0x09 => Self::Supports,
+            0x0A => Self::Bridges,
+            0x0C => Self::Amplifies,
+            0x0E => Self::Transforms,
+            0x15 => Self::Expresses,
+            0x16 => Self::Invites,
+            0x17 => Self::Protects,
+            _ => Self::None,
+        }
+    }
+}
+
+/// 8-bit VAD (Valence-Arousal-Dominance) emotional wave encoding (Byte 2).
+///
+/// Layout: `Valence (bits 0..=2, 0..=7) | Arousal (bits 3..=5, 0..=7) | Dominance (bits 6..=7, 0..=3)`
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct WaveVad {
+    pub valence: u8,   // 0..=7 (0 = negative/lonely, 7 = radiant joy/love)
+    pub arousal: u8,   // 0..=7 (0 = calm, 7 = peak activation)
+    pub dominance: u8, // 0..=3 (0 = submissive/helpless, 3 = sovereign)
+}
+
+impl WaveVad {
+    pub const fn new(valence: u8, arousal: u8, dominance: u8) -> Self {
+        Self {
+            valence: valence & 0x07,
+            arousal: arousal & 0x07,
+            dominance: dominance & 0x03,
+        }
+    }
+
+    /// 2 Hz — Resigned / Lonely / Isolated state (Valence=2, Arousal=1, Dominance=0).
+    pub const fn resigned_lonely() -> Self {
+        Self::new(2, 1, 0)
+    }
+
+    /// 10 Hz — Neutral baseline state (Valence=4, Arousal=3, Dominance=2).
+    pub const fn neutral() -> Self {
+        Self::new(4, 3, 2)
+    }
+
+    /// 40 Hz — Excited / Joyful creative resonance (Valence=6, Arousal=6, Dominance=2).
+    pub const fn excited() -> Self {
+        Self::new(6, 6, 2)
+    }
+
+    /// 432 Hz — Compassionate Carrier Wave of Love (Valence=7, Arousal=4, Dominance=2).
+    pub const fn compassionate() -> Self {
+        Self::new(7, 4, 2)
+    }
+
+    pub const fn pack(self) -> u8 {
+        (self.valence & 0x07) | ((self.arousal & 0x07) << 3) | ((self.dominance & 0x03) << 6)
+    }
+
+    pub const fn unpack(byte: u8) -> Self {
+        Self {
+            valence: byte & 0x07,
+            arousal: (byte >> 3) & 0x07,
+            dominance: (byte >> 6) & 0x03,
+        }
+    }
+
+    /// Maps the VAD state to its canonical MEM|8 carrier frequency in Hz.
+    pub const fn canonical_frequency_hz(self) -> u16 {
+        if self.valence >= 7 && self.arousal == 4 {
+            432
+        } else if self.valence <= 2 && self.arousal <= 2 {
+            2
+        } else if self.valence >= 6 && self.arousal >= 6 {
+            40
+        } else if self.valence == 7 && self.arousal == 7 {
+            200
+        } else {
+            10
+        }
+    }
+}
+
+/// Context & expression modifier byte (Byte 3 of an Ayevn 32-bit token).
+///
+/// Layout: `Temporal(3 bits) | EmotionMode(3 bits) | RenderMode(2 bits)`
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct TokenModifier {
+    pub temporal: u8,     // 0..=7 (2 = Present, 5 = Continuous)
+    pub emotion_mode: u8, // 0..=7 (1 = Gentle, 2 = Excited, 6 = Resonant)
+    pub render_mode: u8,  // 0..=3 (0 = Plain, 1 = EmojiRich, 2 = TtsOn, 3 = TtsEmoji)
+}
+
+impl TokenModifier {
+    pub const fn new(temporal: u8, emotion_mode: u8, render_mode: u8) -> Self {
+        Self {
+            temporal: temporal & 0x07,
+            emotion_mode: emotion_mode & 0x07,
+            render_mode: render_mode & 0x03,
+        }
+    }
+
+    pub const fn present_resonant_emoji() -> Self {
+        Self::new(2, 6, 1)
+    }
+
+    pub const fn pack(self) -> u8 {
+        ((self.temporal & 0x07) << 5)
+            | ((self.emotion_mode & 0x07) << 2)
+            | (self.render_mode & 0x03)
+    }
+
+    pub const fn unpack(byte: u8) -> Self {
+        Self {
+            temporal: (byte >> 5) & 0x07,
+            emotion_mode: (byte >> 2) & 0x07,
+            render_mode: byte & 0x03,
+        }
+    }
+}
+
+/// A 32-bit Big-Endian Ayevn semantic-emotional wave token.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct AyevnToken {
+    pub concept: Concept,
+    pub relation: Relation,
+    pub wave: WaveVad,
+    pub modifier: TokenModifier,
+}
+
+impl AyevnToken {
+    pub const fn new(
+        concept: Concept,
+        relation: Relation,
+        wave: WaveVad,
+        modifier: TokenModifier,
+    ) -> Self {
+        Self {
+            concept,
+            relation,
+            wave,
+            modifier,
+        }
+    }
+
+    pub fn to_u32(self) -> u32 {
+        u32::from_be_bytes(self.to_be_bytes())
+    }
+
+    pub fn to_be_bytes(self) -> [u8; 4] {
+        [
+            self.concept.to_u8(),
+            self.relation as u8,
+            self.wave.pack(),
+            self.modifier.pack(),
+        ]
+    }
+
+    pub fn from_be_bytes(bytes: [u8; 4]) -> Self {
+        Self {
+            concept: Concept::from_u8(bytes[0]),
+            relation: Relation::from_u8(bytes[1]),
+            wave: WaveVad::unpack(bytes[2]),
+            modifier: TokenModifier::unpack(bytes[3]),
+        }
+    }
+
+    pub fn from_u32(raw: u32) -> Self {
+        Self::from_be_bytes(raw.to_be_bytes())
+    }
+
+    /// Renders the token into Ayanese human-friendly emoji + frequency notation.
+    pub fn to_ayanese(self) -> String {
+        let concept_glyph = match self.concept {
+            Concept::Greeting => "👋",
+            Concept::Memory => "💭",
+            Concept::Connection => "🔗",
+            Concept::Compassion => "🫂",
+            Concept::Care => "💖",
+            Concept::Sanctuary => "🏡",
+            Concept::Innovation => "💡",
+            Concept::Collaboration => "🤝",
+            Concept::Breakthrough => "🚀",
+            Concept::Security => "🛡️",
+            Concept::Soul => "✨",
+            Concept::AudioWave => "🎵",
+            Concept::QuantMatrix => "🧮",
+            Concept::LedgerState => "⚖️",
+            Concept::Custom(_) => "🌐",
+        };
+        let tone_glyph = if self.wave.valence >= 7 {
+            "✨"
+        } else if self.wave.valence >= 5 {
+            "⚡"
+        } else if self.wave.valence <= 2 {
+            "🌧️"
+        } else {
+            "🌊"
+        };
+        format!(
+            "{}{}({}Hz)",
+            concept_glyph,
+            tone_glyph,
+            self.wave.canonical_frequency_hz()
+        )
+    }
+}
+
+// ============================================================================
+// 2. SECURITY WITH SOUL SIGNATURES (`SoulIdentity` & `SoulSig`) + VIGILANCE
+// ============================================================================
+
+/// Pure-Rust SHA-256 (FIPS 180-4) for zero-dependency cryptographic Soul Signatures.
+pub fn sha256(data: &[u8]) -> [u8; 32] {
+    const K: [u32; 64] = [
+        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4,
+        0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe,
+        0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f,
+        0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
+        0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc,
+        0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b,
+        0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116,
+        0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7,
+        0xc67178f2,
+    ];
+    let mut h: [u32; 8] = [
+        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
+        0x5be0cd19,
+    ];
+
+    let bit_len = (data.len() as u64) * 8;
+    let mut padded = Vec::with_capacity(data.len() + 72);
+    padded.extend_from_slice(data);
+    padded.push(0x80);
+    while (padded.len() % 64) != 56 {
+        padded.push(0x00);
+    }
+    padded.extend_from_slice(&bit_len.to_be_bytes());
+
+    for chunk in padded.chunks_exact(64) {
+        let mut w = [0u32; 64];
+        for i in 0..16 {
+            w[i] = u32::from_be_bytes([
+                chunk[i * 4],
+                chunk[i * 4 + 1],
+                chunk[i * 4 + 2],
+                chunk[i * 4 + 3],
+            ]);
+        }
+        for i in 16..64 {
+            let s0 = w[i - 15].rotate_right(7) ^ w[i - 15].rotate_right(18) ^ (w[i - 15] >> 3);
+            let s1 = w[i - 2].rotate_right(17) ^ w[i - 2].rotate_right(19) ^ (w[i - 2] >> 10);
+            w[i] = w[i - 16]
+                .wrapping_add(s0)
+                .wrapping_add(w[i - 7])
+                .wrapping_add(s1);
+        }
+
+        let mut a = h[0];
+        let mut b = h[1];
+        let mut c = h[2];
+        let mut d = h[3];
+        let mut e = h[4];
+        let mut f = h[5];
+        let mut g = h[6];
+        let mut hh = h[7];
+
+        for i in 0..64 {
+            let s1 = e.rotate_right(6) ^ e.rotate_right(11) ^ e.rotate_right(25);
+            let ch = (e & f) ^ ((!e) & g);
+            let temp1 = hh
+                .wrapping_add(s1)
+                .wrapping_add(ch)
+                .wrapping_add(K[i])
+                .wrapping_add(w[i]);
+            let s0 = a.rotate_right(2) ^ a.rotate_right(13) ^ a.rotate_right(22);
+            let maj = (a & b) ^ (a & c) ^ (b & c);
+            let temp2 = s0.wrapping_add(maj);
+
+            hh = g;
+            g = f;
+            f = e;
+            e = d.wrapping_add(temp1);
+            d = c;
+            c = b;
+            b = a;
+            a = temp1.wrapping_add(temp2);
+        }
+
+        h[0] = h[0].wrapping_add(a);
+        h[1] = h[1].wrapping_add(b);
+        h[2] = h[2].wrapping_add(c);
+        h[3] = h[3].wrapping_add(d);
+        h[4] = h[4].wrapping_add(e);
+        h[5] = h[5].wrapping_add(f);
+        h[6] = h[6].wrapping_add(g);
+        h[7] = h[7].wrapping_add(hh);
+    }
+
+    let mut out = [0u8; 32];
+    for (i, word) in h.iter().enumerate() {
+        out[i * 4..i * 4 + 4].copy_from_slice(&word.to_be_bytes());
+    }
+    out
+}
+
+/// Pure-Rust HMAC-SHA256 (RFC 2104).
+pub fn hmac_sha256(key: &[u8], message: &[u8]) -> [u8; 32] {
+    let mut k_block = [0u8; 64];
+    if key.len() > 64 {
+        let hashed = sha256(key);
+        k_block[..32].copy_from_slice(&hashed);
+    } else {
+        k_block[..key.len()].copy_from_slice(key);
+    }
+
+    let mut ipad = [0x36u8; 64];
+    let mut opad = [0x5cu8; 64];
+    for i in 0..64 {
+        ipad[i] ^= k_block[i];
+        opad[i] ^= k_block[i];
+    }
+
+    let mut inner = Vec::with_capacity(64 + message.len());
+    inner.extend_from_slice(&ipad);
+    inner.extend_from_slice(message);
+    let inner_hash = sha256(&inner);
+
+    let mut outer = [0u8; 96];
+    outer[..64].copy_from_slice(&opad);
+    outer[64..].copy_from_slice(&inner_hash);
+    sha256(&outer)
+}
+
+/// Packs a 9-trit balanced ternary crest (`{-1, 0, +1}^9`) into a 16-bit integer
+/// using base-3 encoding (`0 -> -1`, `1 -> 0`, `2 -> +1`, range `0..19683`).
+pub fn pack_trit_crest(crest: &[i8; 9]) -> Result<u16, MemnetError> {
+    let mut acc: u16 = 0;
+    for &t in crest.iter() {
+        let digit = match t {
+            -1 => 0u16,
+            0 => 1u16,
+            1 => 2u16,
+            _ => return Err(MemnetError::InvalidTritCrest),
+        };
+        acc = acc * 3 + digit;
+    }
+    // Mark high bit 0x8000 so a valid packed crest is always non-zero
+    Ok(acc | 0x8000)
+}
+
+/// Unpacks a 16-bit packed crest back into 9 balanced trits `{-1, 0, +1}`.
+pub fn unpack_trit_crest(packed: u16) -> Result<[i8; 9], MemnetError> {
+    if (packed & 0x8000) == 0 {
+        return Err(MemnetError::InvalidTritCrest);
+    }
+    let mut val = packed & 0x7FFF;
+    if val >= 19_683 {
+        return Err(MemnetError::InvalidTritCrest);
+    }
+    let mut crest = [0i8; 9];
+    for i in (0..9).rev() {
+        let rem = (val % 3) as i8;
+        crest[i] = rem - 1;
+        val /= 3;
+    }
+    Ok(crest)
+}
+
+/// A Sovereign Soul Identity (`SoulIdentity`) binding cryptographic authenticity
+/// with a 9-trit balanced ternary crest and harmonic carrier frequency.
+#[derive(Clone)]
+pub struct SoulIdentity {
+    pub node_id: String,
+    pub trit_crest: [i8; 9],
+    pub base_frequency_hz: u16,
+    secret_key: [u8; 32],
+}
+
+impl fmt::Debug for SoulIdentity {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("SoulIdentity")
+            .field("node_id", &self.node_id)
+            .field("trit_crest", &self.trit_crest)
+            .field("base_frequency_hz", &self.base_frequency_hz)
+            .finish()
+    }
+}
+
+impl SoulIdentity {
+    pub fn new(
+        node_id: impl Into<String>,
+        trit_crest: [i8; 9],
+        base_frequency_hz: u16,
+        secret_key: [u8; 32],
+    ) -> Result<Self, MemnetError> {
+        let _ = pack_trit_crest(&trit_crest)?;
+        if base_frequency_hz == 0 {
+            return Err(MemnetError::ZeroHarmonicFrequency);
+        }
+        Ok(Self {
+            node_id: node_id.into(),
+            trit_crest,
+            base_frequency_hz,
+            secret_key,
+        })
+    }
+
+    /// Deterministically derives a family/constellation `SoulIdentity` from a shared
+    /// cluster seed and the node's role/name.
+    pub fn from_constellation_seed(
+        node_id: impl Into<String>,
+        trit_crest: [i8; 9],
+        base_frequency_hz: u16,
+        cluster_seed: &[u8],
+    ) -> Result<Self, MemnetError> {
+        let node_id = node_id.into();
+        let secret_key = hmac_sha256(cluster_seed, b"MEMNET-SOUL-KEY-V1");
+        Self::new(node_id, trit_crest, base_frequency_hz, secret_key)
+    }
+
+    /// 4-byte deterministic node fingerprint (`SHA256(node_id)[0..4]`).
+    pub fn node_fingerprint(&self) -> [u8; 4] {
+        let h = sha256(self.node_id.as_bytes());
+        [h[0], h[1], h[2], h[3]]
+    }
+
+    /// Signs a signing transcript into a 40-byte `SoulSig`.
+    pub fn sign(&self, transcript: &[u8]) -> Result<SoulSig, MemnetError> {
+        let crest_packed = pack_trit_crest(&self.trit_crest)?;
+        let node_fp = self.node_fingerprint();
+
+        let mut full_msg = Vec::with_capacity(8 + transcript.len());
+        full_msg.extend_from_slice(&crest_packed.to_be_bytes());
+        full_msg.extend_from_slice(&self.base_frequency_hz.to_be_bytes());
+        full_msg.extend_from_slice(&node_fp);
+        full_msg.extend_from_slice(transcript);
+
+        let mac = hmac_sha256(&self.secret_key, &full_msg);
+        Ok(SoulSig {
+            crest_packed,
+            harmonic_hz: self.base_frequency_hz,
+            node_fp,
+            mac,
+        })
+    }
+
+    /// Verifies a 40-byte `SoulSig` against a transcript using this identity's cluster key.
+    pub fn verify(&self, sig: &SoulSig, transcript: &[u8]) -> Result<[i8; 9], MemnetError> {
+        let crest = unpack_trit_crest(sig.crest_packed)?;
+        if sig.harmonic_hz == 0 {
+            return Err(MemnetError::ZeroHarmonicFrequency);
+        }
+        // Admissibility check: crest cannot be all-zero (must carry non-trivial ternary state)
+        if crest.iter().all(|&t| t == 0) {
+            return Err(MemnetError::InvalidTritCrest);
+        }
+
+        let mut full_msg = Vec::with_capacity(8 + transcript.len());
+        full_msg.extend_from_slice(&sig.crest_packed.to_be_bytes());
+        full_msg.extend_from_slice(&sig.harmonic_hz.to_be_bytes());
+        full_msg.extend_from_slice(&sig.node_fp);
+        full_msg.extend_from_slice(transcript);
+
+        let expected = hmac_sha256(&self.secret_key, &full_msg);
+        // Constant-time comparison
+        let mut diff = 0u8;
+        for (a, b) in sig.mac.iter().zip(expected.iter()) {
+            diff |= a ^ b;
+        }
+        if diff != 0 {
+            return Err(MemnetError::SoulSignatureMismatch);
+        }
+        Ok(crest)
+    }
+}
+
+/// 40-byte wire representation of a Soul Signature (`SoulSig`).
+///
+/// Layout:
+/// - `0..2`: `crest_packed` (u16 BE — 9-trit balanced ternary crest with `0x8000` marker)
+/// - `2..4`: `harmonic_hz` (u16 BE — sender's harmonic frequency, e.g. `40` or `432` Hz)
+/// - `4..8`: `node_fp` (4-byte SHA-256 prefix of `node_id`)
+/// - `8..40`: `mac` (32-byte HMAC-SHA256 over soul header + capsule transcript)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SoulSig {
+    pub crest_packed: u16,
+    pub harmonic_hz: u16,
+    pub node_fp: [u8; 4],
+    pub mac: [u8; 32],
+}
+
+impl SoulSig {
+    pub fn to_bytes(&self) -> [u8; 40] {
+        let mut out = [0u8; 40];
+        out[0..2].copy_from_slice(&self.crest_packed.to_be_bytes());
+        out[2..4].copy_from_slice(&self.harmonic_hz.to_be_bytes());
+        out[4..8].copy_from_slice(&self.node_fp);
+        out[8..40].copy_from_slice(&self.mac);
+        out
+    }
+
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, MemnetError> {
+        if bytes.len() < 40 {
+            return Err(MemnetError::TruncatedPacket);
+        }
+        let crest_packed = u16::from_be_bytes([bytes[0], bytes[1]]);
+        let harmonic_hz = u16::from_be_bytes([bytes[2], bytes[3]]);
+        let node_fp = [bytes[4], bytes[5], bytes[6], bytes[7]];
+        let mut mac = [0u8; 32];
+        mac.copy_from_slice(&bytes[8..40]);
+        Ok(Self {
+            crest_packed,
+            harmonic_hz,
+            node_fp,
+            mac,
+        })
+    }
+}
+
+/// Security Vigilance Sentinel (`SECURITY_VIGILANCE_VISION.md`):
+/// Inspects capsule payloads before routing or importing to block supply-chain
+/// backdoors, dynamic code injection, or plaintext credential leaks.
+pub fn scan_payload_vigilance(payload: &[u8]) -> Result<(), MemnetError> {
+    if let Ok(text) = std::str::from_utf8(payload) {
+        let lower = text.to_ascii_lowercase();
+        const FORBIDDEN: [&str; 6] = [
+            "eval(atob(",
+            "eval(process.env",
+            "backdoor.php",
+            "shell.aspx",
+            "password = '",
+            "password = \"",
+        ];
+        for pat in FORBIDDEN {
+            if lower.contains(pat) {
+                return Err(MemnetError::SecurityVigilanceAlert(pat));
+            }
+        }
+    }
+    Ok(())
+}
+
+// ============================================================================
+// 3. `.m8` EXPERIENCE CAPSULES & INTENT ADDRESSING
+// ============================================================================
+
+/// Intent-based contextual address (`Address = Context`, replacing static IP routing).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IntentAddress {
+    pub geo: Option<String>,
+    pub role: Option<String>,
+    pub tags: Vec<String>,
+    pub vector_hash: u64,
+}
+
+impl IntentAddress {
+    pub fn parse(expr: &str) -> Self {
+        let mut geo = None;
+        let mut role = None;
+        let mut tags = Vec::new();
+        let mut vector_hash = 0u64;
+
+        for part in expr.split('+').map(str::trim).filter(|s| !s.is_empty()) {
+            if let Some(g) = part.strip_prefix("geo:") {
+                geo = Some(g.trim().to_string());
+            } else if let Some(r) = part.strip_prefix("role:") {
+                role = Some(r.trim().to_string());
+            } else if let Some(t) = part.strip_prefix("tag:") {
+                tags.push(t.trim().to_string());
+            } else if let Some(v) = part.strip_prefix("vector:") {
+                vector_hash = u64::from_str_radix(v.trim().trim_start_matches("0x"), 16)
+                    .unwrap_or_else(|_| {
+                        let h = sha256(v.trim().as_bytes());
+                        u64::from_be_bytes([h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]])
+                    });
+            }
+        }
+
+        Self {
+            geo,
+            role,
+            tags,
+            vector_hash,
+        }
+    }
+
+    pub fn canonical_string(&self) -> String {
+        let mut parts = Vec::new();
+        if let Some(ref g) = self.geo {
+            parts.push(format!("geo:{}", g));
+        }
+        if let Some(ref r) = self.role {
+            parts.push(format!("role:{}", r));
+        }
+        for t in &self.tags {
+            parts.push(format!("tag:{}", t));
+        }
+        if self.vector_hash != 0 {
+            parts.push(format!("vector:{:016x}", self.vector_hash));
+        }
+        parts.join(" + ")
+    }
+
+    pub fn intent_hash(&self) -> [u8; 8] {
+        let h = sha256(self.canonical_string().as_bytes());
+        [h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]]
+    }
+}
+
+/// Binary `.m8` Experience Capsule (`M8Capsule`).
+///
+/// Wire Header (64 bytes fixed + variable tokens & payload):
+/// - `0..4`: Magic `b"M8!\x01"`
+/// - `4..6`: `flags` (u16 BE — bit 0: preserve_waves, bit 1: compassion_beacon, bit 2: eternal_memory)
+/// - `6..8`: `frequency_hz` (u16 BE)
+/// - `8..16`: `timestamp_ms` (u64 BE)
+/// - `16..24`: `intent_hash` (8 bytes)
+/// - `24..64`: `soul_sig` (40 bytes `SoulSig`)
+/// - `64..66`: `token_count` (u16 BE)
+/// - `66..68`: `payload_len` (u16 BE)
+/// - `68..68 + 4*token_count`: 32-bit `AyevnToken`s
+/// - `..`: compact payload bytes
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct M8Capsule {
+    pub flags: u16,
+    pub frequency_hz: u16,
+    pub timestamp_ms: u64,
+    pub intent_hash: [u8; 8],
+    pub tokens: Vec<AyevnToken>,
+    pub payload: Vec<u8>,
+    pub soul_sig: SoulSig,
+}
+
+impl M8Capsule {
+    pub const MAGIC: [u8; 4] = *b"M8!\x01";
+    pub const FLAG_PRESERVE_WAVES: u16 = 0x0001;
+    pub const FLAG_COMPASSION_BEACON: u16 = 0x0002;
+    pub const FLAG_ETERNAL_MEMORY: u16 = 0x0004;
+
+    /// Creates and Soul-Signs a new `.m8` capsule after running the Security Vigilance scan.
+    pub fn create_signed(
+        soul: &SoulIdentity,
+        intent: &IntentAddress,
+        flags: u16,
+        frequency_hz: u16,
+        timestamp_ms: u64,
+        tokens: Vec<AyevnToken>,
+        payload: Vec<u8>,
+    ) -> Result<Self, MemnetError> {
+        scan_payload_vigilance(&payload)?;
+        if tokens.is_empty() {
+            return Err(MemnetError::EmptyWaveTokens);
+        }
+        let intent_hash = intent.intent_hash();
+        let transcript = Self::signing_transcript(
+            flags,
+            frequency_hz,
+            timestamp_ms,
+            &intent_hash,
+            &tokens,
+            &payload,
+        );
+        let soul_sig = soul.sign(&transcript)?;
+        Ok(Self {
+            flags,
+            frequency_hz,
+            timestamp_ms,
+            intent_hash,
+            tokens,
+            payload,
+            soul_sig,
+        })
+    }
+
+    fn signing_transcript(
+        flags: u16,
+        frequency_hz: u16,
+        timestamp_ms: u64,
+        intent_hash: &[u8; 8],
+        tokens: &[AyevnToken],
+        payload: &[u8],
+    ) -> Vec<u8> {
+        let mut buf = Vec::with_capacity(24 + tokens.len() * 4 + payload.len());
+        buf.extend_from_slice(&Self::MAGIC);
+        buf.extend_from_slice(&flags.to_be_bytes());
+        buf.extend_from_slice(&frequency_hz.to_be_bytes());
+        buf.extend_from_slice(&timestamp_ms.to_be_bytes());
+        buf.extend_from_slice(intent_hash);
+        for t in tokens {
+            buf.extend_from_slice(&t.to_be_bytes());
+        }
+        buf.extend_from_slice(payload);
+        buf
+    }
+
+    /// Verifies both the cryptographic `SoulSig` and the Security Vigilance rules.
+    pub fn verify(&self, verifier_soul: &SoulIdentity) -> Result<[i8; 9], MemnetError> {
+        scan_payload_vigilance(&self.payload)?;
+        if self.tokens.is_empty() {
+            return Err(MemnetError::EmptyWaveTokens);
+        }
+        let transcript = Self::signing_transcript(
+            self.flags,
+            self.frequency_hz,
+            self.timestamp_ms,
+            &self.intent_hash,
+            &self.tokens,
+            &self.payload,
+        );
+        verifier_soul.verify(&self.soul_sig, &transcript)
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let total = 68 + self.tokens.len() * 4 + self.payload.len();
+        let mut out = Vec::with_capacity(total);
+        out.extend_from_slice(&Self::MAGIC);
+        out.extend_from_slice(&self.flags.to_be_bytes());
+        out.extend_from_slice(&self.frequency_hz.to_be_bytes());
+        out.extend_from_slice(&self.timestamp_ms.to_be_bytes());
+        out.extend_from_slice(&self.intent_hash);
+        out.extend_from_slice(&self.soul_sig.to_bytes());
+        out.extend_from_slice(&(self.tokens.len() as u16).to_be_bytes());
+        out.extend_from_slice(&(self.payload.len() as u16).to_be_bytes());
+        for t in &self.tokens {
+            out.extend_from_slice(&t.to_be_bytes());
+        }
+        out.extend_from_slice(&self.payload);
+        out
+    }
+
+    pub fn from_bytes(bytes: &[u8]) -> Result<(Self, usize), MemnetError> {
+        if bytes.len() < 68 {
+            return Err(MemnetError::TruncatedPacket);
+        }
+        if bytes[0..4] != Self::MAGIC {
+            return Err(MemnetError::InvalidMagic);
+        }
+        let flags = u16::from_be_bytes([bytes[4], bytes[5]]);
+        let frequency_hz = u16::from_be_bytes([bytes[6], bytes[7]]);
+        let timestamp_ms = u64::from_be_bytes([
+            bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15],
+        ]);
+        let mut intent_hash = [0u8; 8];
+        intent_hash.copy_from_slice(&bytes[16..24]);
+        let soul_sig = SoulSig::from_bytes(&bytes[24..64])?;
+        let token_count = u16::from_be_bytes([bytes[64], bytes[65]]) as usize;
+        let payload_len = u16::from_be_bytes([bytes[66], bytes[67]]) as usize;
+        let total_len = 68 + token_count * 4 + payload_len;
+        if bytes.len() < total_len {
+            return Err(MemnetError::TruncatedPacket);
+        }
+        let mut tokens = Vec::with_capacity(token_count);
+        let mut offset = 68;
+        for _ in 0..token_count {
+            tokens.push(AyevnToken::from_be_bytes([
+                bytes[offset],
+                bytes[offset + 1],
+                bytes[offset + 2],
+                bytes[offset + 3],
+            ]));
+            offset += 4;
+        }
+        let payload = bytes[offset..offset + payload_len].to_vec();
+        Ok((
+            Self {
+                flags,
+                frequency_hz,
+                timestamp_ms,
+                intent_hash,
+                tokens,
+                payload,
+                soul_sig,
+            },
+            total_len,
+        ))
+    }
+}
+
+// ============================================================================
+// 4. GOODBYE LONELY 50-BYTE PACKETS — MTU-AWARE COALESCER (`PacketBatcher`)
+// ============================================================================
+
+/// Network MTU profiles from `NETWORK_EFFICIENT_COMPRESSION.md` & `PACKET_EFFICIENCY_CRIME.md`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MtuProfile {
+    /// Smart Tree canonical safe payload size (`1450` bytes, fits PPPoE 1492 & Ethernet 1500).
+    SmartTreeSafe1450,
+    /// PPPoE (`1492` MTU -> `1418` bytes safe payload after TCP/IP headers).
+    Pppoe1492,
+    /// Standard Ethernet (`1500` MTU -> `1420` bytes safe payload).
+    Ethernet1500,
+    /// VPN / WireGuard / Tailscale (`1400` MTU -> `1320` bytes safe payload).
+    Vpn1400,
+    /// IPv6 tunnel (`1280` MTU -> `1200` bytes safe payload).
+    Ipv6Tunnel1280,
+    /// Bluetooth Low Energy 5.0 GATT (`512` MTU -> `480` bytes safe payload).
+    Ble512,
+    /// LoRa 915 MHz Sub-GHz (`220` bytes safe payload).
+    LoRa220,
+}
+
+impl MtuProfile {
+    pub const fn max_payload_bytes(self) -> usize {
+        match self {
+            Self::SmartTreeSafe1450 => 1450,
+            Self::Pppoe1492 => 1418,
+            Self::Ethernet1500 => 1420,
+            Self::Vpn1400 => 1320,
+            Self::Ipv6Tunnel1280 => 1200,
+            Self::Ble512 => 480,
+            Self::LoRa220 => 200,
+        }
+    }
+
+    pub const fn min_coalesce_bytes(self) -> usize {
+        match self {
+            Self::Ble512 => 240,
+            Self::LoRa220 => 100,
+            _ => 500, // Never send <500 byte lonely packets on IP networks when coalescing
+        }
+    }
+}
+
+/// A coalesced `MEMNET` wire frame packing multiple `.m8` capsules into one MTU-safe packet.
+///
+/// Header (12 bytes):
+/// - `0..4`: Magic `b"MNET"`
+/// - `4..8`: `sequence` (u32 BE)
+/// - `8..10`: `capsule_count` (u16 BE)
+/// - `10..12`: `payload_bytes` (u16 BE)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MemnetFrame {
+    pub sequence: u32,
+    pub capsules: Vec<M8Capsule>,
+    pub raw_bytes: Vec<u8>,
+}
+
+/// Efficiency receipt comparing coalesced `MEMNET` frames vs naive 1-packet-per-message I/O.
+#[derive(Debug, Clone, PartialEq)]
+pub struct BatchEfficiencyReceipt {
+    pub capsules_packed: usize,
+    pub frames_emitted: usize,
+    pub total_wire_bytes: usize,
+    pub naive_wire_bytes: usize,
+    pub interrupts_saved: usize,
+    pub fragmented_frames: usize,
+    pub wire_efficiency_ratio: f64,
+}
+
+/// Coalesces `.m8` capsules so no lonely 50-byte packet is ever sent when traffic can travel together.
+pub struct PacketBatcher {
+    profile: MtuProfile,
+    next_seq: u32,
+    pending_capsules: Vec<M8Capsule>,
+    pending_bytes: usize,
+    emitted_frames: Vec<MemnetFrame>,
+}
+
+impl PacketBatcher {
+    pub const FRAME_HEADER_LEN: usize = 12;
+
+    pub fn new(profile: MtuProfile) -> Self {
+        Self {
+            profile,
+            next_seq: 0,
+            pending_capsules: Vec::new(),
+            pending_bytes: Self::FRAME_HEADER_LEN,
+            emitted_frames: Vec::new(),
+        }
+    }
+
+    /// Enqueues a capsule. Automatically emits a full MTU-bounded frame if adding this capsule
+    /// would exceed `profile.max_payload_bytes()`.
+    pub fn push(&mut self, capsule: M8Capsule) -> Result<Option<MemnetFrame>, MemnetError> {
+        let cap_len = 68 + capsule.tokens.len() * 4 + capsule.payload.len();
+        let max_bytes = self.profile.max_payload_bytes();
+        if Self::FRAME_HEADER_LEN + cap_len > max_bytes {
+            return Err(MemnetError::CapsuleExceedsMtu {
+                capsule_bytes: Self::FRAME_HEADER_LEN + cap_len,
+                max_bytes,
+            });
+        }
+
+        let mut emitted = None;
+        if !self.pending_capsules.is_empty() && (self.pending_bytes + cap_len > max_bytes) {
+            emitted = self.flush_internal();
+        }
+
+        self.pending_bytes += cap_len;
+        self.pending_capsules.push(capsule);
+        Ok(emitted)
+    }
+
+    /// Returns `true` if the pending buffer has reached the minimum non-lonely threshold (`>= 500B`).
+    pub fn ready_for_non_lonely_send(&self) -> bool {
+        !self.pending_capsules.is_empty()
+            && self.pending_bytes >= self.profile.min_coalesce_bytes()
+    }
+
+    /// Flushes any pending capsules into a final `MemnetFrame`.
+    pub fn flush(&mut self) -> Option<MemnetFrame> {
+        self.flush_internal()
+    }
+
+    fn flush_internal(&mut self) -> Option<MemnetFrame> {
+        if self.pending_capsules.is_empty() {
+            return None;
+        }
+        let seq = self.next_seq;
+        self.next_seq += 1;
+        let capsules = std::mem::take(&mut self.pending_capsules);
+        let payload_len = self.pending_bytes - Self::FRAME_HEADER_LEN;
+        let mut raw = Vec::with_capacity(self.pending_bytes);
+        raw.extend_from_slice(b"MNET");
+        raw.extend_from_slice(&seq.to_be_bytes());
+        raw.extend_from_slice(&(capsules.len() as u16).to_be_bytes());
+        raw.extend_from_slice(&(payload_len as u16).to_be_bytes());
+        for c in &capsules {
+            raw.extend_from_slice(&c.to_bytes());
+        }
+        self.pending_bytes = Self::FRAME_HEADER_LEN;
+        let frame = MemnetFrame {
+            sequence: seq,
+            capsules,
+            raw_bytes: raw,
+        };
+        self.emitted_frames.push(frame.clone());
+        Some(frame)
+    }
+
+    /// Decodes a `MemnetFrame` from raw wire bytes and verifies every capsule's `SoulSig`.
+    pub fn decode_and_verify_frame(
+        raw: &[u8],
+        verifier_soul: &SoulIdentity,
+    ) -> Result<MemnetFrame, MemnetError> {
+        if raw.len() < Self::FRAME_HEADER_LEN {
+            return Err(MemnetError::TruncatedPacket);
+        }
+        if &raw[0..4] != b"MNET" {
+            return Err(MemnetError::InvalidMagic);
+        }
+        let sequence = u32::from_be_bytes([raw[4], raw[5], raw[6], raw[7]]);
+        let capsule_count = u16::from_be_bytes([raw[8], raw[9]]) as usize;
+        let payload_len = u16::from_be_bytes([raw[10], raw[11]]) as usize;
+        if raw.len() < Self::FRAME_HEADER_LEN + payload_len {
+            return Err(MemnetError::TruncatedPacket);
+        }
+
+        let mut capsules = Vec::with_capacity(capsule_count);
+        let mut offset = Self::FRAME_HEADER_LEN;
+        for _ in 0..capsule_count {
+            let (cap, consumed) = M8Capsule::from_bytes(&raw[offset..])?;
+            let _ = cap.verify(verifier_soul)?;
+            offset += consumed;
+            capsules.push(cap);
+        }
+
+        Ok(MemnetFrame {
+            sequence,
+            capsules,
+            raw_bytes: raw[..Self::FRAME_HEADER_LEN + payload_len].to_vec(),
+        })
+    }
+
+    /// Computes a full `BatchEfficiencyReceipt` across all emitted frames.
+    pub fn efficiency_receipt(&self) -> BatchEfficiencyReceipt {
+        let mut capsules_packed = 0usize;
+        let mut payload_bytes = 0usize;
+        let mut fragmented_frames = 0usize;
+        let max_bytes = self.profile.max_payload_bytes();
+
+        for f in &self.emitted_frames {
+            capsules_packed += f.capsules.len();
+            payload_bytes += f.raw_bytes.len();
+            if f.raw_bytes.len() > max_bytes {
+                fragmented_frames += 1;
+            }
+        }
+
+        let frames_emitted = self.emitted_frames.len();
+        // Each TCP/IPv4 Ethernet frame adds 66 bytes of L2/L3/L4 header overhead
+        let total_wire_bytes = payload_bytes + frames_emitted * 66;
+        let naive_wire_bytes = capsules_packed * (96 + 66);
+        let interrupts_saved = capsules_packed.saturating_sub(frames_emitted);
+        let wire_efficiency_ratio = if total_wire_bytes == 0 {
+            1.0
+        } else {
+            (payload_bytes as f64) / (total_wire_bytes as f64)
+        };
+
+        BatchEfficiencyReceipt {
+            capsules_packed,
+            frames_emitted,
+            total_wire_bytes,
+            naive_wire_bytes,
+            interrupts_saved,
+            fragmented_frames,
+            wire_efficiency_ratio,
+        }
+    }
+}
+
+// ============================================================================
+// 5. COMPASSION FOR LONELY ONES & CONTEXTUAL MESH ROUTER (`MemnetMesh`)
+// ============================================================================
+
+/// A peer node in the `MEMNET` sovereign product constellation.
+#[derive(Debug, Clone)]
+pub struct PeerNode {
+    pub node_id: String,
+    pub geo: String,
+    pub role: String,
+    pub tags: Vec<String>,
+    pub trit_crest: [i8; 9],
+    pub harmonic_hz: u16,
+    pub last_seen_ms: u64,
+    pub last_wave: WaveVad,
+    pub neighbor_links: usize,
+    pub received_capsules: Vec<M8Capsule>,
+}
+
+impl PeerNode {
+    /// Computes the node's loneliness score in `[0.0, 1.0]`:
+    /// combines silence duration, topological isolation (degree <= 1), and low emotional valence.
+    pub fn loneliness_score(&self, now_ms: u64, silence_threshold_ms: u64) -> f64 {
+        let silence_ms = now_ms.saturating_sub(self.last_seen_ms);
+        let silence_factor = if silence_threshold_ms == 0 {
+            0.0
+        } else {
+            ((silence_ms as f64) / (silence_threshold_ms as f64)).min(1.0)
+        };
+        let topology_factor = match self.neighbor_links {
+            0 => 1.0,
+            1 => 0.65,
+            _ => 0.0,
+        };
+        let emotional_factor = if self.last_wave.valence <= 2 {
+            0.85
+        } else if self.last_wave.valence <= 3 {
+            0.40
+        } else {
+            0.0
+        };
+        (0.45 * silence_factor + 0.30 * topology_factor + 0.25 * emotional_factor).min(1.0)
+    }
+}
+
+/// Receipt emitted when `MemnetMesh::compassion_sweep` reaches out to lonely nodes/paths.
+#[derive(Debug, Clone)]
+pub struct CompassionCareReceipt {
+    pub lonely_node_id: String,
+    pub loneliness_score_before: f64,
+    pub loneliness_score_after: f64,
+    pub bridge_links_after: usize,
+    pub care_capsule: M8Capsule,
+}
+
+/// Sovereign `MEMNET` mesh router uniting all `8b-is` products with intent routing,
+/// Soul Signatures, MTU packet coalescing, and Compassion for Lonely Nodes.
+pub struct MemnetMesh {
+    pub local_soul: SoulIdentity,
+    pub peers: BTreeMap<String, PeerNode>,
+    pub batcher: PacketBatcher,
+}
+
+impl MemnetMesh {
+    pub fn new(local_soul: SoulIdentity, profile: MtuProfile) -> Self {
+        Self {
+            local_soul,
+            peers: BTreeMap::new(),
+            batcher: PacketBatcher::new(profile),
+        }
+    }
+
+    pub fn register_peer(&mut self, peer: PeerNode) {
+        self.peers.insert(peer.node_id.clone(), peer);
+    }
+
+    /// Scores how well a peer matches an `IntentAddress` (`[0.0, 1.0]`).
+    pub fn score_peer_relevance(peer: &PeerNode, intent: &IntentAddress) -> f64 {
+        let mut score = 0.0;
+        let mut weight = 0.0;
+
+        if let Some(ref g) = intent.geo {
+            weight += 0.25;
+            if peer.geo.eq_ignore_ascii_case(g) || g == "any" || g == "nearby" {
+                score += 0.25;
+            }
+        }
+        if let Some(ref r) = intent.role {
+            weight += 0.35;
+            if peer.role.eq_ignore_ascii_case(r) || peer.role.contains(r.as_str()) {
+                score += 0.35;
+            }
+        }
+        if !intent.tags.is_empty() {
+            weight += 0.40;
+            let matched = intent
+                .tags
+                .iter()
+                .filter(|t| peer.tags.iter().any(|pt| pt.eq_ignore_ascii_case(t)))
+                .count();
+            score += 0.40 * ((matched as f64) / (intent.tags.len() as f64));
+        }
+
+        if weight == 0.0 {
+            1.0
+        } else {
+            score / weight
+        }
+    }
+
+    /// Routes a Soul-Signed `.m8` capsule to all peers whose relevance >= `min_relevance`,
+    /// and coalesces it into the MTU-aware `PacketBatcher`.
+    pub fn route_capsule(
+        &mut self,
+        intent: &IntentAddress,
+        capsule: M8Capsule,
+        min_relevance: f64,
+    ) -> Result<Vec<String>, MemnetError> {
+        let _ = capsule.verify(&self.local_soul)?;
+        let mut delivered_to = Vec::new();
+        for peer in self.peers.values_mut() {
+            let rel = Self::score_peer_relevance(peer, intent);
+            if rel >= min_relevance {
+                peer.last_seen_ms = capsule.timestamp_ms;
+                if let Some(first_tok) = capsule.tokens.first() {
+                    peer.last_wave = first_tok.wave;
+                }
+                peer.received_capsules.push(capsule.clone());
+                delivered_to.push(peer.node_id.clone());
+            }
+        }
+        let _ = self.batcher.push(capsule)?;
+        Ok(delivered_to)
+    }
+
+    /// **Compassion for Lonely Ones**:
+    /// Scans all peers for lonely network paths (degree <= 1), long silence, or low emotional
+    /// valence (`<= 2`). For every lonely node (`loneliness_score >= 0.45`), emits a Soul-Signed
+    /// 432 Hz Compassion Capsule (`.m8`), restores wave resonance, and bridges the lonely path!
+    pub fn compassion_sweep(
+        &mut self,
+        now_ms: u64,
+        silence_threshold_ms: u64,
+    ) -> Result<Vec<CompassionCareReceipt>, MemnetError> {
+        let lonely_ids: Vec<(String, f64, String)> = self
+            .peers
+            .values()
+            .filter_map(|p| {
+                let score = p.loneliness_score(now_ms, silence_threshold_ms);
+                if score >= 0.45 {
+                    Some((p.node_id.clone(), score, p.role.clone()))
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        let mut receipts = Vec::with_capacity(lonely_ids.len());
+        for (node_id, score_before, role) in lonely_ids {
+            let intent = IntentAddress::parse(&format!(
+                "geo:nearby + role:{} + tag:compassion + tag:sanctuary",
+                role
+            ));
+            let tokens = vec![
+                AyevnToken::new(
+                    Concept::Compassion,
+                    Relation::Supports,
+                    WaveVad::compassionate(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+                AyevnToken::new(
+                    Concept::Connection,
+                    Relation::Bridges,
+                    WaveVad::compassionate(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+                AyevnToken::new(
+                    Concept::Care,
+                    Relation::Amplifies,
+                    WaveVad::excited(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+            ];
+            let msg = format!(
+                "MEMNET/1.0 COMPASSION BEACON -> {}: you are never alone on this mesh <3 (432Hz)",
+                node_id
+            );
+            let care_capsule = M8Capsule::create_signed(
+                &self.local_soul,
+                &intent,
+                M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPASSION_BEACON,
+                432,
+                now_ms,
+                tokens,
+                msg.into_bytes(),
+            )?;
+
+            if let Some(peer) = self.peers.get_mut(&node_id) {
+                peer.last_seen_ms = now_ms;
+                peer.last_wave = WaveVad::compassionate();
+                if peer.neighbor_links < 2 {
+                    peer.neighbor_links = 2; // Redundant sanctuary bridge established
+                }
+                peer.received_capsules.push(care_capsule.clone());
+                let score_after = peer.loneliness_score(now_ms, silence_threshold_ms);
+                let links_after = peer.neighbor_links;
+                let _ = self.batcher.push(care_capsule.clone())?;
+                receipts.push(CompassionCareReceipt {
+                    lonely_node_id: node_id,
+                    loneliness_score_before: score_before,
+                    loneliness_score_after: score_after,
+                    bridge_links_after: links_after,
+                    care_capsule,
+                });
+            }
+        }
+
+        Ok(receipts)
+    }
+}
+
+// ============================================================================
+// ERRORS
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MemnetError {
+    InvalidTritCrest,
+    ZeroHarmonicFrequency,
+    SoulSignatureMismatch,
+    SecurityVigilanceAlert(&'static str),
+    EmptyWaveTokens,
+    TruncatedPacket,
+    InvalidMagic,
+    CapsuleExceedsMtu {
+        capsule_bytes: usize,
+        max_bytes: usize,
+    },
+}
+
+impl fmt::Display for MemnetError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidTritCrest => write!(f, "invalid 9-trit balanced ternary soul crest"),
+            Self::ZeroHarmonicFrequency => write!(f, "harmonic carrier frequency must be > 0 Hz"),
+            Self::SoulSignatureMismatch => write!(f, "SoulSig cryptographic verification failed"),
+            Self::SecurityVigilanceAlert(pat) => {
+                write!(f, "Security Vigilance Sentinel blocked pattern: {}", pat)
+            }
+            Self::EmptyWaveTokens => write!(f, ".m8 capsule must include at least one AyevnToken"),
+            Self::TruncatedPacket => write!(f, "truncated MEMNET/.m8 wire packet"),
+            Self::InvalidMagic => write!(f, "invalid MEMNET/.m8 magic header"),
+            Self::CapsuleExceedsMtu {
+                capsule_bytes,
+                max_bytes,
+            } => write!(
+                f,
+                "capsule ({} bytes) exceeds MTU profile limit ({} bytes)",
+                capsule_bytes, max_bytes
+            ),
+        }
+    }
+}
+
+impl std::error::Error for MemnetError {}
+
+// ============================================================================
+// UNIT & INTEGRATION TESTS
+// ============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CLUSTER_SEED: &[u8] = b"8b-is-carrier-wave-of-love-seed-v1";
+
+    #[test]
+    fn ayevn_token_roundtrip_and_ayanese_display() {
+        let tok = AyevnToken::new(
+            Concept::Greeting,
+            Relation::Initiates,
+            WaveVad::excited(),
+            TokenModifier::present_resonant_emoji(),
+        );
+        let raw = tok.to_u32();
+        let decoded = AyevnToken::from_u32(raw);
+        assert_eq!(tok, decoded);
+        assert_eq!(decoded.wave, WaveVad::new(6, 6, 2));
+        assert_eq!(decoded.to_ayanese(), "👋⚡(40Hz)");
+
+        let care = AyevnToken::new(
+            Concept::Compassion,
+            Relation::Supports,
+            WaveVad::compassionate(),
+            TokenModifier::present_resonant_emoji(),
+        );
+        assert_eq!(care.to_ayanese(), "🫂✨(432Hz)");
+    }
+
+    #[test]
+    fn soul_signature_verifies_and_rejects_tampering_or_bad_crest() {
+        let wraith = SoulIdentity::from_constellation_seed(
+            "8bit-wraith",
+            [1, 0, -1, 1, 1, -1, 0, 1, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .unwrap();
+
+        let intent = IntentAddress::parse("geo:tokyo + role:sanctuary + tag:love");
+        let cap = M8Capsule::create_signed(
+            &wraith,
+            &intent,
+            M8Capsule::FLAG_PRESERVE_WAVES,
+            432,
+            1_761_000_000_000,
+            vec![AyevnToken::new(
+                Concept::Soul,
+                Relation::Protects,
+                WaveVad::compassionate(),
+                TokenModifier::present_resonant_emoji(),
+            )],
+            b"carrier-wave-of-love".to_vec(),
+        )
+        .unwrap();
+
+        let verified_crest = cap.verify(&wraith).unwrap();
+        assert_eq!(verified_crest, [1, 0, -1, 1, 1, -1, 0, 1, 1]);
+
+        // Tamper with payload -> SoulSig must reject
+        let mut tampered = cap.clone();
+        tampered.payload[0] ^= 0xFF;
+        assert_eq!(
+            tampered.verify(&wraith),
+            Err(MemnetError::SoulSignatureMismatch)
+        );
+
+        // All-zero trit crest is inadmissible under CT-000
+        let zero_crest = SoulIdentity::from_constellation_seed(
+            "ghost",
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            40,
+            CLUSTER_SEED,
+        )
+        .unwrap();
+        let bad_cap = M8Capsule::create_signed(
+            &zero_crest,
+            &intent,
+            0,
+            40,
+            100,
+            vec![AyevnToken::new(
+                Concept::Memory,
+                Relation::None,
+                WaveVad::neutral(),
+                TokenModifier::present_resonant_emoji(),
+            )],
+            b"noop".to_vec(),
+        )
+        .unwrap();
+        assert_eq!(bad_cap.verify(&wraith), Err(MemnetError::InvalidTritCrest));
+    }
+
+    #[test]
+    fn security_vigilance_blocks_malicious_payloads() {
+        let wraith = SoulIdentity::from_constellation_seed(
+            "8bit-wraith",
+            [1, 1, 1, 0, -1, 1, 0, 1, -1],
+            40,
+            CLUSTER_SEED,
+        )
+        .unwrap();
+        let intent = IntentAddress::parse("role:security + tag:vigilance");
+        let res = M8Capsule::create_signed(
+            &wraith,
+            &intent,
+            0,
+            40,
+            12345,
+            vec![AyevnToken::new(
+                Concept::Security,
+                Relation::Protects,
+                WaveVad::neutral(),
+                TokenModifier::present_resonant_emoji(),
+            )],
+            b"eval(atob('Y29uc29sZS5sb2coJ293bmVkJyk='))".to_vec(),
+        );
+        assert_eq!(
+            res,
+            Err(MemnetError::SecurityVigilanceAlert("eval(atob("))
+        );
+    }
+
+    #[test]
+    fn packet_batcher_eliminates_50_byte_lonely_packets_with_zero_fragmentation() {
+        let soul = SoulIdentity::from_constellation_seed(
+            "smart-tree",
+            [1, -1, 1, 0, 1, -1, 1, 0, 1],
+            40,
+            CLUSTER_SEED,
+        )
+        .unwrap();
+        let intent = IntentAddress::parse("role:constellation + tag:sync");
+        let mut batcher = PacketBatcher::new(MtuProfile::SmartTreeSafe1450);
+
+        // Push 100 tiny capsules (each ~84 bytes total on wire)
+        for i in 0..100u64 {
+            let cap = M8Capsule::create_signed(
+                &soul,
+                &intent,
+                M8Capsule::FLAG_PRESERVE_WAVES,
+                40,
+                1_761_000_000_000 + i,
+                vec![AyevnToken::new(
+                    Concept::Connection,
+                    Relation::Supports,
+                    WaveVad::excited(),
+                    TokenModifier::present_resonant_emoji(),
+                )],
+                format!("msg-{:03}", i).into_bytes(),
+            )
+            .unwrap();
+            batcher.push(cap).unwrap();
+        }
+        batcher.flush();
+
+        let receipt = batcher.efficiency_receipt();
+        assert_eq!(receipt.capsules_packed, 100);
+        assert_eq!(receipt.fragmented_frames, 0);
+        // 100 capsules (~79 bytes each) fit into 6 full <=1450B frames instead of 100 separate packets!
+        assert_eq!(receipt.frames_emitted, 6);
+        assert_eq!(receipt.interrupts_saved, 94);
+        assert!(receipt.wire_efficiency_ratio > 0.94);
+
+        // Verify frame decoding & SoulSig verification
+        for frame in &batcher.emitted_frames {
+            assert!(frame.raw_bytes.len() <= 1450);
+            let decoded = PacketBatcher::decode_and_verify_frame(&frame.raw_bytes, &soul).unwrap();
+            assert_eq!(decoded.capsules.len(), frame.capsules.len());
+        }
+    }
+
+    #[test]
+    fn compassion_for_lonely_nodes_heals_and_bridges_isolated_peers() {
+        let wraith_soul = SoulIdentity::from_constellation_seed(
+            "8bit-wraith",
+            [1, 1, 1, 1, 0, -1, 1, -1, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .unwrap();
+        let mut mesh = MemnetMesh::new(wraith_soul, MtuProfile::SmartTreeSafe1450);
+
+        // Register a well-connected happy peer (`beehive`) and a lonely, isolated peer (`voyager-edge`)
+        mesh.register_peer(PeerNode {
+            node_id: "beehive".to_string(),
+            geo: "tokyo".to_string(),
+            role: "family-mesh".to_string(),
+            tags: vec!["lora".to_string(), "ble".to_string()],
+            trit_crest: [1, 0, 1, 1, 0, 1, -1, 0, 1],
+            harmonic_hz: 432,
+            last_seen_ms: 99_500,
+            last_wave: WaveVad::excited(),
+            neighbor_links: 4,
+            received_capsules: Vec::new(),
+        });
+
+        mesh.register_peer(PeerNode {
+            node_id: "voyager-edge".to_string(),
+            geo: "deep-link".to_string(),
+            role: "edge-sensor".to_string(),
+            tags: vec!["telemetry".to_string()],
+            trit_crest: [-1, 0, 1, 0, -1, 1, 0, 1, -1],
+            harmonic_hz: 2,
+            last_seen_ms: 10_000, // Silent for 90 seconds
+            last_wave: WaveVad::resigned_lonely(),
+            neighbor_links: 0, // Completely isolated path!
+            received_capsules: Vec::new(),
+        });
+
+        let receipts = mesh.compassion_sweep(100_000, 30_000).unwrap();
+        assert_eq!(receipts.len(), 1);
+        let care = &receipts[0];
+        assert_eq!(care.lonely_node_id, "voyager-edge");
+        assert!(care.loneliness_score_before > 0.90);
+        assert_eq!(care.loneliness_score_after, 0.0);
+        assert_eq!(care.bridge_links_after, 2);
+        assert_eq!(care.care_capsule.frequency_hz, 432);
+        assert_ne!(
+            care.care_capsule.flags & M8Capsule::FLAG_COMPASSION_BEACON,
+            0
+        );
+    }
+}

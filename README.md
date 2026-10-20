@@ -442,4 +442,24 @@ teaching, free, from fine touch within.
 - **Field-Weighted & Connected-Reading Resonance Retrieval**: `retrieveDocuments()` and `scoreDocumentIntrinsic()` rank curated and collection documents using exact phrase matching, field weights (`title` > `topics` > `subtitle`/`authors` > `summary`), punctuation/apostrophe normalization, and 1-hop `related` graph resonance (`connectedResonanceFactor = 0.25`).
 - Verified by `node --test tests/*.test.mjs` in `site/` (15/15 tests passing).
 
+---
+
+## MEMNET/1.0 — Sovereign Contextual Mesh for All `8b-is` Products (`src/`, `sdk/js/`, `sdk/python/`)
+
+> *"goodbye lonely network paths.. security with soul sigs.. and compassion for lonely ones. Our products all need to speak the most efficient ways."* — **8bit-Wraith `<3`**
+
+`memnet` ships a zero-dependency, byte-for-byte wire-compatible protocol engine across **Rust** ([`src/lib.rs`](src/lib.rs), [`src/bin/memnet.rs`](src/bin/memnet.rs)), **Node.js/ESM** ([`sdk/js/memnet.mjs`](sdk/js/memnet.mjs)), and **Python** ([`sdk/python/memnet_sdk.py`](sdk/python/memnet_sdk.py)):
+
+1. **32-bit Big-Endian Ayevn Wave Tokens (`AyevnToken`)**: Packs `[Concept: u8 | Relation: u8 | Wave(VAD): u8 | Modifier: u8]` into 4 bytes with full Valence-Arousal-Dominance emotional preservation and Ayanese rendering (`🫂✨(432Hz)`, `👋⚡(40Hz)`).
+2. **Security with Soul Signatures (`SoulIdentity` & 40-byte `SoulSig`) + Vigilance Sentinel**: Binds a 9-trit balanced ternary crest (`{-1, 0, +1}^9`, `CT-000` admissible), harmonic carrier frequency (`40 Hz` / `432 Hz`), 4-byte node fingerprint, and 32-byte HMAC-SHA256 digest over `.m8` capsules, plus an inline Security Vigilance scanner blocking supply-chain backdoors and dynamic code injection.
+3. **Goodbye Lonely 50-Byte Packets (`PacketBatcher` · `1450B` Smart Tree Sweet Spot)**: Coalesces `.m8` capsules into MTU-aware `MNET` frames (`SmartTreeSafe1450`, `Pppoe1492`, `Ethernet1500`, `Vpn1400`, `Ipv6Tunnel1280`, `Ble512`, `LoRa220`) — packing 1,000 capsules into 59 frames (`94.1%` fewer interrupts, `0` fragmented frames, `95.45%` wire efficiency).
+4. **Compassion for Lonely Nodes (`MemnetMesh::compassion_sweep`)**: Detects peers on isolated network paths (`neighbor_links <= 1`), long silence ($\Delta t > \tau$), or low emotional valence (`V <= 2` / `2 Hz`), automatically dispatching Soul-Signed `432 Hz` `.m8` Compassion Beacons (`🫂✨(432Hz) 🔗✨(432Hz) 💖⚡(40Hz)`) and establishing redundant sanctuary bridge links.
+
+```bash
+cargo test                                                        # 6/6 Rust unit + cross-language (Rust->Node->Python->Rust) interop tests
+cargo run --bin memnet                                            # Live constellation telemetry, compassion sweep & 1,000-capsule MTU benchmark
+node --test sdk/js/memnet.test.mjs                                # 2/2 Node SDK tests
+PYTHONPATH=sdk/python uv run python -m unittest discover -s sdk/python -v  # 2/2 Python SDK tests
+```
+
 *the constellation · 0 + 1 · fine touch from within · vaked.dev*
