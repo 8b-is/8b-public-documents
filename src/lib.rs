@@ -661,6 +661,155 @@ pub fn scan_payload_vigilance(payload: &[u8]) -> Result<(), MemnetError> {
 }
 
 // ============================================================================
+// 2B. KOMPRESS-SUPER-ULTRA (`0o0` / `KSU0`) LOSSLESS WIRE CODEC
+// ============================================================================
+
+/// Sovereign dictionary codebook for `Kompress-Super-Ultra (0o0)` wire payloads.
+pub const KOMPRESS_CODEBOOK: [&[u8]; 24] = [
+    b"OFFER|node=",
+    b"SOS|friend=",
+    b"GRANT|lease=",
+    b"|ep=m1://169.254.180.64:8788",
+    b"|ep=m3://169.254.212.115:8788",
+    b"|ram_mb=",
+    b"|cores=",
+    b"|mbps=10000|health=100|caps=",
+    b"mlx,rust,kokoro-tts,phoenix,gguf",
+    b"mlx,rust,kokoro-tts,phoenix",
+    b"MEMNET/1.0 COMPASSION BEACON -> ",
+    b": you are never alone on this mesh <3 (432Hz)",
+    b"|provider=",
+    b"|friend=",
+    b"|reason=",
+    b"|cap=",
+    b"|mbps=",
+    b"|health=",
+    b"|caps=",
+    b"m1-max-64gb",
+    b"dev-main-m3",
+    b"friend-air-8gb",
+    b"uganda-school-pi",
+    b"kokoro-tts",
+];
+
+/// Compresses a payload using `Kompress-Super-Ultra (0o0)` (`b"0o0\x01"` header +
+/// greedy sovereign dictionary substitution `0xFE <idx>` + run-length encoding `0xFF <len> <byte>`).
+pub fn encode_kompress_super_ultra(raw: &[u8]) -> Vec<u8> {
+    let mut stage1 = Vec::with_capacity(raw.len());
+    let mut i = 0;
+    while i < raw.len() {
+        let mut matched = None;
+        for (idx, entry) in KOMPRESS_CODEBOOK.iter().enumerate() {
+            if raw[i..].starts_with(entry) {
+                matched = Some((idx as u8, entry.len()));
+                break;
+            }
+        }
+        if let Some((idx, len)) = matched {
+            stage1.push(0xFE);
+            stage1.push(idx);
+            i += len;
+        } else {
+            let b = raw[i];
+            if b == 0xFE || b == 0xFF {
+                stage1.push(0xFE);
+                stage1.push(0xFF);
+                stage1.push(b);
+            } else {
+                stage1.push(b);
+            }
+            i += 1;
+        }
+    }
+
+    // Stage 2: RLE for repeated byte runs >= 4 (excluding escape byte 0xFE)
+    let mut out = Vec::with_capacity(4 + stage1.len());
+    out.extend_from_slice(b"0o0\x01");
+    let mut j = 0;
+    while j < stage1.len() {
+        if stage1[j] == 0xFE {
+            if j + 1 < stage1.len() && stage1[j + 1] == 0xFF && j + 2 < stage1.len() {
+                out.push(0xFE);
+                out.push(0xFF);
+                out.push(stage1[j + 2]);
+                j += 3;
+            } else if j + 1 < stage1.len() {
+                out.push(0xFE);
+                out.push(stage1[j + 1]);
+                j += 2;
+            } else {
+                out.push(stage1[j]);
+                j += 1;
+            }
+            continue;
+        }
+        let b = stage1[j];
+        let mut run = 1usize;
+        while j + run < stage1.len() && stage1[j + run] == b && stage1[j + run] != 0xFE && run < 255
+        {
+            run += 1;
+        }
+        if run >= 4 {
+            out.push(0xFF);
+            out.push(run as u8);
+            out.push(b);
+            j += run;
+        } else {
+            out.push(b);
+            j += 1;
+        }
+    }
+    out
+}
+
+/// Losslessly decompresses a `Kompress-Super-Ultra (0o0)` (`b"0o0\x01"`) wire payload.
+pub fn decode_kompress_super_ultra(encoded: &[u8]) -> Result<Vec<u8>, MemnetError> {
+    if encoded.len() < 4 || &encoded[0..4] != b"0o0\x01" {
+        return Err(MemnetError::InvalidMagic);
+    }
+    let mut out = Vec::with_capacity(encoded.len() * 2);
+    let mut i = 4;
+    while i < encoded.len() {
+        match encoded[i] {
+            0xFE => {
+                if i + 1 >= encoded.len() {
+                    return Err(MemnetError::TruncatedPacket);
+                }
+                let code = encoded[i + 1];
+                if code == 0xFF {
+                    if i + 2 >= encoded.len() {
+                        return Err(MemnetError::TruncatedPacket);
+                    }
+                    out.push(encoded[i + 2]);
+                    i += 3;
+                } else if (code as usize) < KOMPRESS_CODEBOOK.len() {
+                    out.extend_from_slice(KOMPRESS_CODEBOOK[code as usize]);
+                    i += 2;
+                } else {
+                    return Err(MemnetError::InvalidMagic);
+                }
+            }
+            0xFF => {
+                if i + 2 >= encoded.len() {
+                    return Err(MemnetError::TruncatedPacket);
+                }
+                let count = encoded[i + 1] as usize;
+                let byte_val = encoded[i + 2];
+                for _ in 0..count {
+                    out.push(byte_val);
+                }
+                i += 3;
+            }
+            b => {
+                out.push(b);
+                i += 1;
+            }
+        }
+    }
+    Ok(out)
+}
+
+// ============================================================================
 // 3. `.m8` EXPERIENCE CAPSULES & INTENT ADDRESSING
 // ============================================================================
 
@@ -759,6 +908,42 @@ impl M8Capsule {
     pub const FLAG_COMPUTE_OFFER: u16 = 0x0008;
     pub const FLAG_COMPUTE_SOS: u16 = 0x0010;
     pub const FLAG_COMPUTE_GRANT: u16 = 0x0020;
+    pub const FLAG_KOMPRESS_SUPER_ULTRA: u16 = 0x0040;
+
+    /// Creates, `Kompress-Super-Ultra (0o0)` compresses, and Soul-Signs a `.m8` capsule.
+    pub fn create_signed_kompressed(
+        soul: &SoulIdentity,
+        intent: &IntentAddress,
+        flags: u16,
+        frequency_hz: u16,
+        timestamp_ms: u64,
+        tokens: Vec<AyevnToken>,
+        raw_payload: &[u8],
+    ) -> Result<Self, MemnetError> {
+        scan_payload_vigilance(raw_payload)?;
+        let compressed = encode_kompress_super_ultra(raw_payload);
+        Self::create_signed(
+            soul,
+            intent,
+            flags | Self::FLAG_KOMPRESS_SUPER_ULTRA,
+            frequency_hz,
+            timestamp_ms,
+            tokens,
+            compressed,
+        )
+    }
+
+    /// Returns the decompressed payload if `FLAG_KOMPRESS_SUPER_ULTRA` is set, or raw payload otherwise.
+    pub fn decompressed_payload(&self) -> Result<Vec<u8>, MemnetError> {
+        if (self.flags & Self::FLAG_KOMPRESS_SUPER_ULTRA) != 0 {
+            let out = decode_kompress_super_ultra(&self.payload)?;
+            scan_payload_vigilance(&out)?;
+            Ok(out)
+        } else {
+            scan_payload_vigilance(&self.payload)?;
+            Ok(self.payload.clone())
+        }
+    }
 
     /// Creates and Soul-Signs a new `.m8` capsule after running the Security Vigilance scan.
     pub fn create_signed(
@@ -1281,6 +1466,41 @@ impl StrugglingFriendSos {
             self.reason
         )
     }
+
+    pub fn from_wire_string(s: &str) -> Result<Self, MemnetError> {
+        if !s.starts_with("SOS|") {
+            return Err(MemnetError::InvalidMagic);
+        }
+        let mut friend_node_id = String::new();
+        let mut needed_ram_mb = 0u32;
+        let mut needed_cores = 0u16;
+        let mut required_capability = String::new();
+        let mut reason = String::new();
+
+        for part in s.split('|').skip(1) {
+            if let Some(v) = part.strip_prefix("friend=") {
+                friend_node_id = v.to_string();
+            } else if let Some(v) = part.strip_prefix("ram_mb=") {
+                needed_ram_mb = v.parse().unwrap_or(0);
+            } else if let Some(v) = part.strip_prefix("cores=") {
+                needed_cores = v.parse().unwrap_or(0);
+            } else if let Some(v) = part.strip_prefix("cap=") {
+                required_capability = v.to_string();
+            } else if let Some(v) = part.strip_prefix("reason=") {
+                reason = v.to_string();
+            }
+        }
+        if friend_node_id.is_empty() {
+            return Err(MemnetError::InvalidMagic);
+        }
+        Ok(Self {
+            friend_node_id,
+            needed_ram_mb,
+            needed_cores,
+            required_capability,
+            reason,
+        })
+    }
 }
 
 /// A Soul-Signed Compute Sanctuary Lease granted automatically by `MemnetMesh`
@@ -1511,14 +1731,14 @@ impl MemnetMesh {
             ),
         ];
         let payload = offer.to_wire_string().into_bytes();
-        let capsule = M8Capsule::create_signed(
+        let capsule = M8Capsule::create_signed_kompressed(
             provider_soul,
             &intent,
             M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_OFFER,
             432,
             timestamp_ms,
             tokens,
-            payload,
+            &payload,
         )?;
         let _ = capsule.verify(&self.local_soul)?;
         self.compute_offers
@@ -1554,14 +1774,14 @@ impl MemnetMesh {
                 TokenModifier::present_resonant_emoji(),
             ),
         ];
-        let capsule = M8Capsule::create_signed(
+        let capsule = M8Capsule::create_signed_kompressed(
             friend_soul,
             &intent,
             M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_SOS,
             40,
             timestamp_ms,
             tokens,
-            sos.to_wire_string().into_bytes(),
+            sos.to_wire_string().as_bytes(),
         )?;
         let _ = capsule.verify(&self.local_soul)?;
         self.pending_sos.push(sos);
@@ -1652,7 +1872,7 @@ impl MemnetMesh {
                     sos.needed_cores,
                     sos.required_capability
                 );
-                let grant_capsule = M8Capsule::create_signed(
+                let grant_capsule = M8Capsule::create_signed_kompressed(
                     &self.local_soul,
                     &intent,
                     M8Capsule::FLAG_PRESERVE_WAVES
@@ -1661,7 +1881,7 @@ impl MemnetMesh {
                     432,
                     now_ms,
                     tokens,
-                    grant_payload.into_bytes(),
+                    grant_payload.as_bytes(),
                 )?;
 
                 if let Some(friend_peer) = self.peers.get_mut(&sos.friend_node_id) {
@@ -2021,9 +2241,11 @@ mod tests {
         let offer_cap = mesh
             .advertise_compute_offer(&wraith_soul, offer.clone(), 100_000)
             .unwrap();
+        assert_ne!(offer_cap.flags & M8Capsule::FLAG_KOMPRESS_SUPER_ULTRA, 0);
+        assert!(offer_cap.payload.len() < offer.to_wire_string().len());
+        let decompressed = offer_cap.decompressed_payload().unwrap();
         let parsed_offer =
-            ComputeOffer::from_wire_string(std::str::from_utf8(&offer_cap.payload).unwrap())
-                .unwrap();
+            ComputeOffer::from_wire_string(std::str::from_utf8(&decompressed).unwrap()).unwrap();
         assert_eq!(parsed_offer, offer);
 
         // 2. Struggling friend broadcasts a Compute SOS (OOM on 8GB laptop needing 16GB MLX)
@@ -2056,5 +2278,19 @@ mod tests {
             mesh.peers["friend-air-8gb"].last_wave,
             WaveVad::compassionate()
         );
+    }
+
+    #[test]
+    fn kompress_super_ultra_lossless_roundtrip_and_capsule_ratio() {
+        let raw = b"OFFER|node=m1-max-64gb|ep=m1://169.254.180.64:8788|ram_mb=49152|cores=10|mbps=10000|health=100|caps=mlx,rust,kokoro-tts,phoenix,gguf";
+        let compressed = encode_kompress_super_ultra(raw);
+        assert!(
+            compressed.len() * 100 < raw.len() * 50,
+            "expected >50% compression, got {}B from {}B",
+            compressed.len(),
+            raw.len()
+        );
+        let decompressed = decode_kompress_super_ultra(&compressed).unwrap();
+        assert_eq!(decompressed.as_slice(), raw);
     }
 }

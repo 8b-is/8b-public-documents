@@ -1,9 +1,20 @@
 use memnet::{
-    AyevnToken, ComputeOffer, Concept, IntentAddress, M8Capsule, MemnetMesh, MtuProfile,
-    PacketBatcher, PeerNode, Relation, SoulIdentity, StrugglingFriendSos, TokenModifier, WaveVad,
+    encode_kompress_super_ultra, AyevnToken, ComputeOffer, Concept, IntentAddress, M8Capsule,
+    MemnetMesh, MtuProfile, PacketBatcher, PeerNode, Relation, SoulIdentity, StrugglingFriendSos,
+    TokenModifier, WaveVad,
 };
+use std::io::{Read, Write};
+use std::net::{TcpListener, TcpStream};
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 const CLUSTER_SEED: &[u8] = b"8b-is-carrier-wave-of-love-seed-v1";
+
+fn now_epoch_ms() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(1_761_000_000_000)
+}
 
 fn default_constellation_mesh() -> MemnetMesh {
     let wraith_soul = SoulIdentity::from_constellation_seed(
@@ -125,13 +136,267 @@ fn default_constellation_mesh() -> MemnetMesh {
     mesh
 }
 
+fn serve_sanctuary(bind_addr: &str, once: bool) {
+    let m1_soul = SoulIdentity::from_constellation_seed(
+        "m1-max-64gb",
+        [1, 1, 1, 0, 1, -1, 1, 0, 1],
+        432,
+        CLUSTER_SEED,
+    )
+    .expect("m1 soul");
+
+    let mut mesh = MemnetMesh::new(m1_soul.clone(), MtuProfile::SmartTreeSafe1450);
+    let offer = ComputeOffer {
+        provider_node_id: "m1-max-64gb".to_string(),
+        endpoint: format!("m1://{}", bind_addr),
+        available_ram_mb: 49_152,
+        available_cores: 10,
+        link_mbps: 10_000,
+        maintained_health: 100,
+        capabilities: vec![
+            "mlx".to_string(),
+            "rust".to_string(),
+            "kokoro-tts".to_string(),
+            "phoenix".to_string(),
+            "gguf".to_string(),
+            "kompress-0o0".to_string(),
+        ],
+    };
+    let offer_cap = mesh
+        .advertise_compute_offer(&m1_soul, offer.clone(), now_epoch_ms())
+        .expect("advertise offer");
+
+    let listener = TcpListener::bind(bind_addr).expect("bind sanctuary TCP listener");
+    println!(
+        "⚡ [MEMNET/1.0 SANCTUARY DAEMON] Listening on {} (Kompress-Super-Ultra 0o0 active)",
+        bind_addr
+    );
+    println!(
+        "  • Offer payload: {}B raw -> {}B 0o0 compressed ({:.1}% saved)",
+        offer.to_wire_string().len(),
+        offer_cap.payload.len(),
+        (1.0 - (offer_cap.payload.len() as f64 / offer.to_wire_string().len() as f64)) * 100.0
+    );
+
+    for stream_res in listener.incoming() {
+        if let Ok(mut stream) = stream_res {
+            let peer_addr = stream
+                .peer_addr()
+                .map(|a| a.to_string())
+                .unwrap_or_else(|_| "unknown".to_string());
+            let mut buf = [0u8; 2048];
+            if let Ok(n) = stream.read(&mut buf) {
+                if n >= 68 {
+                    if let Ok((sos_cap, _)) = M8Capsule::from_bytes(&buf[..n]) {
+                        if sos_cap.verify(&m1_soul).is_ok() {
+                            if let Ok(decompressed) = sos_cap.decompressed_payload() {
+                                if let Ok(text) = std::str::from_utf8(&decompressed) {
+                                    if let Ok(sos) = StrugglingFriendSos::from_wire_string(text) {
+                                        println!(
+                                            "  🆘 Received verified 0o0 SOS from {} ({}) -> need {}MB RAM + {} cores ({})",
+                                            sos.friend_node_id,
+                                            peer_addr,
+                                            sos.needed_ram_mb,
+                                            sos.needed_cores,
+                                            sos.required_capability
+                                        );
+                                        mesh.pending_sos.push(sos);
+                                        if let Ok(leases) =
+                                            mesh.match_compute_for_friends(now_epoch_ms())
+                                        {
+                                            let mut reply_batcher =
+                                                PacketBatcher::new(MtuProfile::SmartTreeSafe1450);
+                                            let _ = reply_batcher.push(offer_cap.clone());
+                                            for lease in &leases {
+                                                println!(
+                                                    "  🎁 Granted {} -> {} ({}MB RAM + {} cores @ {})",
+                                                    lease.lease_id,
+                                                    lease.friend_node_id,
+                                                    lease.granted_ram_mb,
+                                                    lease.granted_cores,
+                                                    lease.endpoint
+                                                );
+                                                let _ =
+                                                    reply_batcher.push(lease.grant_capsule.clone());
+                                            }
+                                            if let Some(frame) = reply_batcher.flush() {
+                                                let _ = stream.write_all(&frame.raw_bytes);
+                                                let _ = stream.flush();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if once {
+                break;
+            }
+        }
+    }
+}
+
+fn request_sanctuary(
+    connect_addr: &str,
+    friend_id: &str,
+    ram_mb: u32,
+    cores: u16,
+    cap: &str,
+    reason: &str,
+) {
+    let friend_soul = SoulIdentity::from_constellation_seed(
+        friend_id,
+        [1, 0, -1, 0, 1, 0, -1, 0, 1],
+        40,
+        CLUSTER_SEED,
+    )
+    .expect("friend soul");
+
+    let sos = StrugglingFriendSos {
+        friend_node_id: friend_id.to_string(),
+        needed_ram_mb: ram_mb,
+        needed_cores: cores,
+        required_capability: cap.to_string(),
+        reason: reason.to_string(),
+    };
+    let raw_sos = sos.to_wire_string();
+    let intent = IntentAddress::parse(&format!("geo:any + role:compute-sanctuary + tag:{}", cap));
+    let sos_cap = M8Capsule::create_signed_kompressed(
+        &friend_soul,
+        &intent,
+        M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_SOS,
+        40,
+        now_epoch_ms(),
+        vec![AyevnToken::new(
+            Concept::ComputeSos,
+            Relation::Initiates,
+            WaveVad::resigned_lonely(),
+            TokenModifier::present_resonant_emoji(),
+        )],
+        raw_sos.as_bytes(),
+    )
+    .expect("signed kompressed SOS");
+
+    let wire_bytes = sos_cap.to_bytes();
+    let t0 = Instant::now();
+    let mut stream = TcpStream::connect(connect_addr).expect("connect to MEMNET sanctuary");
+    stream.write_all(&wire_bytes).expect("send SOS capsule");
+    stream.flush().expect("flush SOS");
+
+    let mut reply = Vec::new();
+    stream.read_to_end(&mut reply).expect("read MNET reply");
+    let rtt = t0.elapsed();
+
+    let frame = PacketBatcher::decode_and_verify_frame(&reply, &friend_soul)
+        .expect("verify MNET frame & SoulSig");
+
+    println!(
+        "========================================================================\n  MEMNET/1.0 LIVE WIRE + KOMPRESS-SUPER-ULTRA (0o0) SANCTUARY RECEIPT\n========================================================================"
+    );
+    println!(
+        "  • Target Sanctuary : {} (RTT: {:.3} ms)",
+        connect_addr,
+        rtt.as_secs_f64() * 1000.0
+    );
+    println!(
+        "  • SOS Payload (0o0): {}B raw -> {}B compressed ({:.1}% saved) | Wire packet: {}B",
+        raw_sos.len(),
+        sos_cap.payload.len(),
+        (1.0 - (sos_cap.payload.len() as f64 / raw_sos.len() as f64)) * 100.0,
+        wire_bytes.len()
+    );
+    println!(
+        "  • Reply MNET Frame : seq={} | {} Soul-Verified capsules in {}B (<=1450B MTU)",
+        frame.sequence,
+        frame.capsules.len(),
+        frame.raw_bytes.len()
+    );
+    for (idx, c) in frame.capsules.iter().enumerate() {
+        let decompressed = c.decompressed_payload().expect("decompress 0o0 payload");
+        let text = String::from_utf8_lossy(&decompressed);
+        let ayanese: Vec<String> = c.tokens.iter().map(|t| t.to_ayanese()).collect();
+        println!(
+            "  • Capsule #{:<2}      : {}B 0o0 -> {}B raw | {} | {}",
+            idx + 1,
+            c.payload.len(),
+            decompressed.len(),
+            ayanese.join(" "),
+            text
+        );
+    }
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let cmd = args.first().map(String::as_str).unwrap_or("all");
 
+    if cmd == "serve-sanctuary" {
+        let mut bind_addr = "0.0.0.0:8788".to_string();
+        let mut once = false;
+        let mut i = 1;
+        while i < args.len() {
+            match args[i].as_str() {
+                "--bind" if i + 1 < args.len() => {
+                    bind_addr = args[i + 1].clone();
+                    i += 2;
+                }
+                "--once" => {
+                    once = true;
+                    i += 1;
+                }
+                _ => i += 1,
+            }
+        }
+        serve_sanctuary(&bind_addr, once);
+        return;
+    }
+
+    if cmd == "request-sanctuary" {
+        let mut connect_addr = "169.254.180.64:8788".to_string();
+        let mut friend_id = "friend-air-8gb".to_string();
+        let mut ram_mb = 16_384u32;
+        let mut cores = 4u16;
+        let mut cap = "mlx".to_string();
+        let mut reason = "OOM running 7B ternary quantizer on 8GB laptop".to_string();
+        let mut i = 1;
+        while i < args.len() {
+            match args[i].as_str() {
+                "--connect" if i + 1 < args.len() => {
+                    connect_addr = args[i + 1].clone();
+                    i += 2;
+                }
+                "--friend" if i + 1 < args.len() => {
+                    friend_id = args[i + 1].clone();
+                    i += 2;
+                }
+                "--ram-mb" if i + 1 < args.len() => {
+                    ram_mb = args[i + 1].parse().unwrap_or(16_384);
+                    i += 2;
+                }
+                "--cores" if i + 1 < args.len() => {
+                    cores = args[i + 1].parse().unwrap_or(4);
+                    i += 2;
+                }
+                "--cap" if i + 1 < args.len() => {
+                    cap = args[i + 1].clone();
+                    i += 2;
+                }
+                "--reason" if i + 1 < args.len() => {
+                    reason = args[i + 1].clone();
+                    i += 2;
+                }
+                _ => i += 1,
+            }
+        }
+        request_sanctuary(&connect_addr, &friend_id, ram_mb, cores, &cap, &reason);
+        return;
+    }
+
     println!("========================================================================");
     println!("  MEMNET/1.0 — Sovereign Contextual Mesh for All 8b-is Products  8> <3");
-    println!("  Soul Signatures · 1450B MTU Coalescing · Compassion & Compute Sanctuary");
+    println!("  Soul Signatures · 1450B MTU · Kompress-Super-Ultra (0o0) · Sanctuary");
     println!("========================================================================");
 
     let mut mesh = default_constellation_mesh();
@@ -231,25 +496,29 @@ fn main() {
             ),
         ];
 
-        println!("\n[3] Compute Sanctuary Advertisements on MEMNET (Seed 001 Maintained Stock):");
+        println!(
+            "\n[3] Compute Sanctuary Advertisements on MEMNET (Seed 001 + Kompress-Super-Ultra 0o0):"
+        );
         for (soul, offer) in offers {
+            let raw_len = offer.to_wire_string().len();
             let cap = mesh
                 .advertise_compute_offer(soul, offer.clone(), now_ms)
                 .expect("advertise offer");
             let ayanese: Vec<String> = cap.tokens.iter().map(|t| t.to_ayanese()).collect();
             println!(
-                "  ⚡ {:<16} ep={:<26} ram={}MB cores={} link={}Mbps caps=[{}] {}",
+                "  ⚡ {:<14} ep={:<25} ram={}MB cores={} 0o0={}B/{}B ({:.0}% saved) caps=[{}] {}",
                 offer.provider_node_id,
                 offer.endpoint,
                 offer.available_ram_mb,
                 offer.available_cores,
-                offer.link_mbps,
+                cap.payload.len(),
+                raw_len,
+                (1.0 - (cap.payload.len() as f64 / raw_len as f64)) * 100.0,
                 offer.capabilities.join(","),
                 ayanese.join(" ")
             );
         }
 
-        // Struggling friends broadcast SOS capsules
         let friend_soul = SoulIdentity::from_constellation_seed(
             "friend-air-8gb",
             [1, 0, -1, 0, 1, 0, -1, 0, 1],
@@ -295,7 +564,7 @@ fn main() {
             .match_compute_for_friends(now_ms + 5)
             .expect("match compute");
         println!(
-            "\n[4] Struggling Friends Matched & Granted Soul-Signed Compute Leases ({} grants):",
+            "\n[4] Struggling Friends Matched & Granted 0o0 Soul-Signed Compute Leases ({} grants):",
             leases.len()
         );
         for lease in &leases {
@@ -305,14 +574,17 @@ fn main() {
                 .iter()
                 .map(|t| t.to_ayanese())
                 .collect();
+            let decompressed = lease.grant_capsule.decompressed_payload().unwrap();
             println!(
-                "  🎁 {:<16} <- {:<14} [{}] granted {}MB RAM + {} cores ({}) @ {} {}",
+                "  🎁 {:<16} <- {:<12} [{}] granted {}MB + {}c ({}) 0o0={}B/{}B @ {} {}",
                 lease.friend_node_id,
                 lease.provider_node_id,
                 lease.lease_id,
                 lease.granted_ram_mb,
                 lease.granted_cores,
                 lease.capability,
+                lease.grant_capsule.payload.len(),
+                decompressed.len(),
                 lease.endpoint,
                 ayanese.join(" ")
             );
@@ -331,7 +603,11 @@ fn main() {
         let mut batcher = PacketBatcher::new(MtuProfile::SmartTreeSafe1450);
 
         for i in 0..1000u64 {
-            let cap = M8Capsule::create_signed(
+            let raw = format!(
+                "OFFER|node=m1-max-64gb|ep=m1://169.254.180.64:8788|ram_mb=49152|cores=10|mbps=10000|health=100|caps=mlx,rust,kokoro-tts,phoenix,gguf|seq={}",
+                i
+            );
+            let cap = M8Capsule::create_signed_kompressed(
                 &soul,
                 &intent,
                 M8Capsule::FLAG_PRESERVE_WAVES,
@@ -343,14 +619,24 @@ fn main() {
                     WaveVad::excited(),
                     TokenModifier::present_resonant_emoji(),
                 )],
-                format!("delta-{}", i).into_bytes(),
+                raw.as_bytes(),
             )
             .expect("signed capsule");
             batcher.push(cap).expect("batch push");
         }
         batcher.flush();
         let rec = batcher.efficiency_receipt();
-        println!("\n[5] Packet Efficiency Receipt (1,000 capsules · SmartTreeSafe 1450B):");
+        let sample_raw = b"OFFER|node=m1-max-64gb|ep=m1://169.254.180.64:8788|ram_mb=49152|cores=10|mbps=10000|health=100|caps=mlx,rust,kokoro-tts,phoenix,gguf|seq=0";
+        let sample_0o0 = encode_kompress_super_ultra(sample_raw);
+        println!(
+            "\n[5] Wire + Kompress-Super-Ultra (0o0) Efficiency Receipt (1,000 capsules · 1450B MTU):"
+        );
+        println!(
+            "  • 0o0 Payload ratio : {}B raw -> {}B compressed ({:.1}% payload reduction)",
+            sample_raw.len(),
+            sample_0o0.len(),
+            (1.0 - (sample_0o0.len() as f64 / sample_raw.len() as f64)) * 100.0
+        );
         println!("  • Capsules packed   : {}", rec.capsules_packed);
         println!(
             "  • Frames emitted    : {} (vs 1,000 naive packets)",
