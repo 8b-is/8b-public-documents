@@ -2290,6 +2290,108 @@ impl MemnetMesh {
         self.pending_sos = unfulfilled;
         Ok(leases)
     }
+
+    /// Naive term-overlap retrieval baseline over stored `.m8` capsules (unweighted token count).
+    pub fn retrieve_capsules_naive_overlap<'a>(
+        capsules: &'a [M8Capsule],
+        query_text: &str,
+    ) -> Vec<(usize, f64, &'a M8Capsule)> {
+        let q_terms: Vec<String> = query_text
+            .split(|c: char| !c.is_alphanumeric() && c != '-' && c != '_')
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_ascii_lowercase())
+            .collect();
+        let mut hits: Vec<(usize, f64, &'a M8Capsule)> = capsules
+            .iter()
+            .enumerate()
+            .map(|(idx, cap)| {
+                let text = cap
+                    .decompressed_payload()
+                    .ok()
+                    .and_then(|b| String::from_utf8(b).ok())
+                    .unwrap_or_default()
+                    .to_ascii_lowercase();
+                let mut overlap = 0usize;
+                for qt in &q_terms {
+                    if text.contains(qt.as_str()) {
+                        overlap += 1;
+                    }
+                }
+                (idx, overlap as f64, cap)
+            })
+            .collect();
+        hits.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+        hits
+    }
+
+    /// BM25 IDF-weighted + `AyevnToken` concept/wave-resonance + `IntentAddress` hash
+    /// semantic retrieval over `.m8` Experience Capsules.
+    pub fn retrieve_capsules_ranked<'a>(
+        capsules: &'a [M8Capsule],
+        query_text: &str,
+        query_intent: Option<&IntentAddress>,
+        query_concept: Option<Concept>,
+        target_hz: Option<u16>,
+    ) -> Vec<(usize, f64, &'a M8Capsule)> {
+        let tokenize = |s: &str| -> Vec<String> {
+            s.split(|c: char| !c.is_alphanumeric() && c != '-' && c != '_')
+                .filter(|t| !t.is_empty())
+                .map(|t| t.to_ascii_lowercase())
+                .collect()
+        };
+        let q_terms = tokenize(query_text);
+        let docs: Vec<Vec<String>> = capsules
+            .iter()
+            .map(|cap| {
+                let body = cap
+                    .decompressed_payload()
+                    .ok()
+                    .and_then(|b| String::from_utf8(b).ok())
+                    .unwrap_or_default();
+                tokenize(&body)
+            })
+            .collect();
+        let n_docs = capsules.len().max(1) as f64;
+        let avg_dl = (docs.iter().map(|d| d.len()).sum::<usize>() as f64 / n_docs).max(1.0);
+        let k1 = 1.5_f64;
+        let b = 0.75_f64;
+        let expected_intent_hash = query_intent.map(|i| i.intent_hash());
+
+        let mut scored: Vec<(usize, f64, &'a M8Capsule)> = capsules
+            .iter()
+            .enumerate()
+            .map(|(idx, cap)| {
+                let doc = &docs[idx];
+                let dl = doc.len() as f64;
+                let mut bm25 = 0.0_f64;
+                for qt in &q_terms {
+                    let tf = doc.iter().filter(|t| *t == qt).count() as f64;
+                    if tf > 0.0 {
+                        let df = docs.iter().filter(|d| d.iter().any(|t| t == qt)).count() as f64;
+                        let idf = ((n_docs - df + 0.5) / (df + 0.5) + 1.0).ln();
+                        let num = tf * (k1 + 1.0);
+                        let den = tf + k1 * (1.0 - b + b * (dl / avg_dl));
+                        bm25 += idf * (num / den);
+                    }
+                }
+                let intent_boost = match expected_intent_hash {
+                    Some(ref h) if &cap.intent_hash == h => 2.5,
+                    _ => 0.0,
+                };
+                let concept_boost = match query_concept {
+                    Some(c) if cap.tokens.iter().any(|t| t.concept == c) => 1.75,
+                    _ => 0.0,
+                };
+                let hz_boost = match target_hz {
+                    Some(hz) if cap.frequency_hz == hz => 0.85,
+                    _ => 0.0,
+                };
+                (idx, bm25 + intent_boost + concept_boost + hz_boost, cap)
+            })
+            .collect();
+        scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+        scored
+    }
 }
 
 // ============================================================================
@@ -2746,5 +2848,114 @@ mod tests {
         assert!(sp_compressed.len() < sp_expr.len());
         let sp_decompressed = decode_kompress_super_ultra(&sp_compressed).unwrap();
         assert_eq!(sp_decompressed, sp_expr.as_bytes());
+    }
+
+    #[test]
+    fn mem8_retrieval_quality_bm25_wave_alignment_beats_naive_overlap() {
+        let soul = SoulIdentity::from_constellation_seed(
+            "m1-max-64gb",
+            [1, 1, 1, 0, 1, -1, 1, 0, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .unwrap();
+
+        let intent_noise = IntentAddress::parse("geo:any + role:chatter + tag:general");
+        let intent_mlx = IntentAddress::parse("geo:nearby + role:compute-sanctuary + tag:mlx");
+        let intent_care = IntentAddress::parse("geo:tokyo + role:sanctuary + tag:compassion");
+
+        // 0: Verbose distractor repeating common words ("node", "status", "report", "mlx", "care")
+        let cap0 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_noise,
+            0,
+            40,
+            100,
+            vec![AyevnToken::new(
+                Concept::Greeting,
+                Relation::Initiates,
+                WaveVad::neutral(),
+                TokenModifier::present_resonant_emoji(),
+            )],
+            b"general node status report: mlx care lonely node general log entry with many words",
+        )
+        .unwrap();
+
+        // 1: True target for Query A (ComputeOffer MLX 49152MB)
+        let cap1 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_mlx,
+            M8Capsule::FLAG_COMPUTE_OFFER,
+            432,
+            101,
+            vec![AyevnToken::new(
+                Concept::ComputeOffer,
+                Relation::Supports,
+                WaveVad::compassionate(),
+                TokenModifier::present_resonant_emoji(),
+            )],
+            b"OFFER|node=m1-max-64gb|ram_mb=49152|cores=10|caps=mlx,kokoro-tts",
+        )
+        .unwrap();
+
+        // 2: True target for Query B (Compassion beacon for voyager-edge)
+        let cap2 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_care,
+            M8Capsule::FLAG_COMPASSION_BEACON,
+            432,
+            102,
+            vec![AyevnToken::new(
+                Concept::Compassion,
+                Relation::Bridges,
+                WaveVad::compassionate(),
+                TokenModifier::present_resonant_emoji(),
+            )],
+            b"CARE|target=voyager-edge|bridge=432hz-sanctuary-link",
+        )
+        .unwrap();
+
+        let corpus = vec![cap0, cap1, cap2];
+
+        // Query A: Looking for MLX compute offer (target index = 1)
+        let q1_naive = MemnetMesh::retrieve_capsules_naive_overlap(&corpus, "node mlx report");
+        let q1_ranked = MemnetMesh::retrieve_capsules_ranked(
+            &corpus,
+            "node mlx report",
+            Some(&intent_mlx),
+            Some(Concept::ComputeOffer),
+            Some(432),
+        );
+
+        // Query B: Looking for compassion bridge for lonely node (target index = 2)
+        let q2_naive = MemnetMesh::retrieve_capsules_naive_overlap(&corpus, "care lonely node");
+        let q2_ranked = MemnetMesh::retrieve_capsules_ranked(
+            &corpus,
+            "care lonely node",
+            Some(&intent_care),
+            Some(Concept::Compassion),
+            Some(432),
+        );
+
+        let naive_p1 = ((q1_naive[0].0 == 1) as usize + (q2_naive[0].0 == 2) as usize) as f64 / 2.0;
+        let ranked_p1 =
+            ((q1_ranked[0].0 == 1) as usize + (q2_ranked[0].0 == 2) as usize) as f64 / 2.0;
+
+        let rr = |hits: &[(usize, f64, &M8Capsule)], target: usize| -> f64 {
+            hits.iter()
+                .position(|(idx, _, _)| *idx == target)
+                .map(|pos| 1.0 / ((pos + 1) as f64))
+                .unwrap_or(0.0)
+        };
+        let naive_mrr = (rr(&q1_naive, 1) + rr(&q2_naive, 2)) / 2.0;
+        let ranked_mrr = (rr(&q1_ranked, 1) + rr(&q2_ranked, 2)) / 2.0;
+
+        println!(
+            "MEM8_RETRIEVAL_RECEIPT: naive_P@1={:.3}, naive_MRR={:.3} -> ranked_P@1={:.3}, ranked_MRR={:.3}",
+            naive_p1, naive_mrr, ranked_p1, ranked_mrr
+        );
+        assert_eq!(naive_p1, 0.0);
+        assert_eq!(ranked_p1, 1.0);
+        assert!(ranked_mrr > naive_mrr);
     }
 }
