@@ -95,6 +95,29 @@ fn default_constellation_mesh() -> MemnetMesh {
             3,
         ),
         (
+            "galaxy-s24-ultra",
+            "mobile-edge",
+            "android-flagship-sanctuary",
+            vec![
+                "sm8650-ac",
+                "adreno-750",
+                "hexagon-npu",
+                "vulkan",
+                "nnapi",
+                "rust",
+                "spherepop",
+                "0o0-ssu",
+                "show-me-missouri",
+                "SM-S928U1",
+                "R5CWC3C3FXA",
+            ],
+            [1, 1, 1, 1, -1, 1, 0, 1, 1],
+            432,
+            99_980,
+            WaveVad::compassionate(),
+            5,
+        ),
+        (
             "galaxy-tab-s9-ultra",
             "mobile-edge",
             "android-tablet-sanctuary",
@@ -189,6 +212,7 @@ fn serve_sanctuary(bind_addr: &str, node_id: &str, once: bool) {
     let offer = match node_id {
         "blu-g75" => ComputeOffer::blu_g75(),
         "galaxy-tab-s9-ultra" => ComputeOffer::galaxy_tab_s9_ultra(),
+        "galaxy-s24-ultra" => ComputeOffer::galaxy_s24_ultra(),
         "dev-main-m3" => ComputeOffer {
             provider_node_id: "dev-main-m3".to_string(),
             endpoint: format!("m3://{}", bind_addr),
@@ -463,7 +487,10 @@ fn main() {
 
     println!("========================================================================");
     println!("  MEMNET/1.0 — Sovereign Contextual Mesh for All 8b-is Products  8> <3");
-    println!("  +++ SpherePop ((( <( ? ~ ! @ > )> ))) · 0o0-SSU · Tab S9 Ultra + BLU G75");
+    println!(
+        "  +++ SpherePop ((( <( ? ~ ! @ > )> ))) · 0o0-SSU · S24U + Tab S9U + BLU G75"
+    );
+    println!("  ~=== SHOW-ME-STATE-MISSOURI{{(ALEX,CHRIS)}}+1~ <3 {{<3,<3,<3}} · 0 + 1 = one");
     println!("========================================================================");
 
     let mut mesh = default_constellation_mesh();
@@ -525,6 +552,13 @@ fn main() {
             CLUSTER_SEED,
         )
         .expect("m3 soul");
+        let s24u_soul = SoulIdentity::from_constellation_seed(
+            "galaxy-s24-ultra",
+            [1, 1, 1, 1, -1, 1, 0, 1, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .expect("s24u soul");
         let s9u_soul = SoulIdentity::from_constellation_seed(
             "galaxy-tab-s9-ultra",
             [1, 1, 1, -1, 1, 0, 1, 1, 1],
@@ -575,6 +609,7 @@ fn main() {
                     ],
                 },
             ),
+            (&s24u_soul, ComputeOffer::galaxy_s24_ultra()),
             (&s9u_soul, ComputeOffer::galaxy_tab_s9_ultra()),
             (&g75_soul, ComputeOffer::blu_g75()),
         ];
@@ -640,6 +675,13 @@ fn main() {
             CLUSTER_SEED,
         )
         .expect("field soul");
+        let missouri_soul = SoulIdentity::from_constellation_seed(
+            "friend-missouri-hearth",
+            [1, 1, 0, 1, 1, 0, 1, 1, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .expect("missouri soul");
 
         mesh.request_compute_help(
             &friend_soul,
@@ -668,6 +710,20 @@ fn main() {
         .expect("sos 2");
 
         mesh.request_compute_help(
+            &missouri_soul,
+            StrugglingFriendSos {
+                friend_node_id: "friend-missouri-hearth".to_string(),
+                needed_ram_mb: 6_144,
+                needed_cores: 4,
+                required_capability: "adreno-750".to_string(),
+                reason: "SHOW-ME-STATE-MISSOURI{(ALEX,CHRIS)}+1~ {<3,<3,<3}+1 · 0 + 1 = one"
+                    .to_string(),
+            },
+            now_ms + 3,
+        )
+        .expect("sos 3");
+
+        mesh.request_compute_help(
             &nomad_soul,
             StrugglingFriendSos {
                 friend_node_id: "nomad-pocket-node".to_string(),
@@ -676,9 +732,9 @@ fn main() {
                 required_capability: "vulkan".to_string(),
                 reason: "Snapdragon Hexagon NPU + Vulkan mobile inference assist".to_string(),
             },
-            now_ms + 3,
+            now_ms + 4,
         )
-        .expect("sos 3");
+        .expect("sos 4");
 
         mesh.request_compute_help(
             &field_soul,
@@ -691,12 +747,12 @@ fn main() {
                     "Edge LoRa sensor offloading Mali-G52 / MediaTek Helio G85 packet synthesis"
                         .to_string(),
             },
-            now_ms + 4,
+            now_ms + 5,
         )
-        .expect("sos 4");
+        .expect("sos 5");
 
         let leases = mesh
-            .match_compute_for_friends(now_ms + 5)
+            .match_compute_for_friends(now_ms + 6)
             .expect("match compute");
         println!(
             "\n[4] Struggling Friends Matched & Granted 0o0-SSU Soul-Signed + SpherePop Leases ({} grants):",
@@ -730,7 +786,36 @@ fn main() {
             );
         }
 
-        // [4B] Live Galaxy Tab S9 Ultra (SM-X910 · R52X104QZWE · 192.168.11.12) & BLU G75 (G1170 · 1010305026000644 · 192.168.11.24) Wire Dispatch
+        // [4B] Live Galaxy S24 Ultra (SM-S928U1 · R5CWC3C3FXA · 192.168.11.22), Galaxy Tab S9 Ultra (SM-X910 · R52X104QZWE · 192.168.11.12), & BLU G75 (G1170 · 1010305026000644 · 192.168.11.24) Wire Dispatch
+        let s24u_offer = ComputeOffer::galaxy_s24_ultra();
+        let s24u_intent = IntentAddress::parse(
+            "geo:mobile-edge + role:compute-sanctuary + tag:adreno-750 + tag:show-me-missouri + tag:spherepop + tag:0o0-ssu",
+        );
+        let s24u_cap = M8Capsule::create_signed_kompressed(
+            &s24u_soul,
+            &s24u_intent,
+            M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_OFFER,
+            432,
+            now_epoch_ms(),
+            vec![
+                AyevnToken::new(
+                    Concept::ComputeOffer,
+                    Relation::Supports,
+                    WaveVad::compassionate(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+                AyevnToken::new(
+                    Concept::Sanctuary,
+                    Relation::Bridges,
+                    WaveVad::excited(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+            ],
+            s24u_offer.to_wire_string().as_bytes(),
+        )
+        .expect("s24u signed kompressed capsule");
+        let s24u_wire = s24u_cap.to_bytes();
+
         let s9u_offer = ComputeOffer::galaxy_tab_s9_ultra();
         let s9u_intent = IntentAddress::parse(
             "geo:mobile-edge + role:compute-sanctuary + tag:nnapi + tag:spherepop + tag:0o0-ssu",
@@ -790,13 +875,22 @@ fn main() {
         let g75_wire = g75_cap.to_bytes();
 
         println!(
-            "\n[4B] ULTRA-OMNI-BEERUS-CHAN<0o0-SSU> Live Dispatch -> Galaxy Tab S9 Ultra & BLU G75:"
+            "\n[4B] ULTRA-OMNI-BEERUS-CHAN<0o0-SSU> Live Dispatch -> Galaxy S24 Ultra, Tab S9 Ultra & BLU G75:"
         );
         if let Ok(udp) = UdpSocket::bind("0.0.0.0:0") {
             let _ = udp.set_write_timeout(Some(Duration::from_millis(250)));
+            let sent_s24u_wifi = udp.send_to(&s24u_wire, "192.168.11.22:8788").unwrap_or(0);
             let sent_s9u_wifi = udp.send_to(&s9u_wire, "192.168.11.12:8788").unwrap_or(0);
             let sent_s9u_rndis = udp.send_to(&s9u_wire, "169.254.93.206:8788").unwrap_or(0);
             let sent_g75_wifi = udp.send_to(&g75_wire, "192.168.11.24:8788").unwrap_or(0);
+            println!(
+                "  📱 Galaxy S24 Ultra (SM-S928U1 | Serial R5CWC3C3FXA | Snapdragon 8 Gen 3 SM8650-AC | Adreno 750)"
+            );
+            println!(
+                "     ↳ SHOW-ME-STATE-MISSOURI{{(ALEX,CHRIS)}}+1~ <3 {{<3,<3,<3}} · UDP 0o0-SSU Capsule: {}B -> Wi-Fi 192.168.11.22:8788 ({}B sent)",
+                s24u_wire.len(),
+                sent_s24u_wifi
+            );
             println!(
                 "  📱 Galaxy Tab S9 Ultra (SM-X910 | USB Serial R52X104QZWE | Snapdragon 8 Gen 2)"
             );

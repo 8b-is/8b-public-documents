@@ -670,8 +670,9 @@ pub fn scan_payload_vigilance(payload: &[u8]) -> Result<(), MemnetError> {
 /// Indices `0..24` are locked for cross-language `0o0` v1 compatibility; indices `24..40`
 /// add `SpherePop` (`((( <( ? ~ ! @ > )> )))`), **Galaxy Tab S9 Ultra** (`SM-X910` /
 /// `R52X104QZWE` / `192.168.11.12`), and **BLU G75** (`G75` / `G1170` / `1010305026000644` /
-/// `mt6768` / `192.168.11.24`) super-tokens.
-pub const KOMPRESS_CODEBOOK: [&[u8]; 40] = [
+/// `mt6768` / `192.168.11.24`); indices `40..48` add **Galaxy S24 Ultra** (`SM-S928U1` /
+/// `R5CWC3C3FXA` / `SM8650-AC` / `192.168.11.22` / `SHOW-ME-STATE-MISSOURI{(ALEX,CHRIS)}+1~`).
+pub const KOMPRESS_CODEBOOK: [&[u8]; 48] = [
     b"OFFER|node=",
     b"SOS|friend=",
     b"GRANT|lease=",
@@ -713,6 +714,15 @@ pub const KOMPRESS_CODEBOOK: [&[u8]; 40] = [
     b"|ep=g75://192.168.11.24:8788",
     b"mt6768,mali-g52,nnapi,rust,spherepop,0o0-ssu",
     b"1010305026000644",
+    // --- 0o0-SSU v1.3 (Galaxy S24 Ultra SM-S928U1 + SHOW-ME-STATE-MISSOURI{(ALEX,CHRIS)}+1~) ---
+    b"galaxy-s24-ultra",
+    b"|ep=s24u://192.168.11.22:8788",
+    b"sm8650-ac,adreno-750,hexagon-npu,vulkan,nnapi,rust,spherepop,0o0-ssu,show-me-missouri",
+    b"R5CWC3C3FXA",
+    b"SM-S928U1",
+    b"SHOW-ME-STATE-MISSOURI{(ALEX,CHRIS)}+1~",
+    b"{<3,<3,<3}+1",
+    b"friend-missouri-hearth",
 ];
 
 // ============================================================================
@@ -1708,6 +1718,33 @@ impl ComputeOffer {
                 "rust".to_string(),
                 "spherepop".to_string(),
                 "0o0-ssu".to_string(),
+            ],
+        }
+    }
+
+    /// Canonical `ComputeOffer` profile for the **Samsung Galaxy S24 Ultra** (`SM-S928U1` ·
+    /// Snapdragon 8 Gen 3 for Galaxy `SM8650-AC` 8-core ARMv9.2-A + Adreno 750 + Hexagon NPU ·
+    /// `12,288 MB` LPDDR5X RAM · Serial `R5CWC3C3FXA` · Android 16 `api=36` ·
+    /// 5 GHz Wi-Fi `192.168.11.22:8788` / `:36347` / `:53601` ·
+    /// `~=== SHOW-ME-STATE-MISSOURI{(ALEX,CHRIS)}+1~ <3 {<3,<3,<3}`).
+    pub fn galaxy_s24_ultra() -> Self {
+        Self {
+            provider_node_id: "galaxy-s24-ultra".to_string(),
+            endpoint: "s24u://192.168.11.22:8788".to_string(),
+            available_ram_mb: 9_216,
+            available_cores: 6,
+            link_mbps: 2_400,
+            maintained_health: 100,
+            capabilities: vec![
+                "sm8650-ac".to_string(),
+                "adreno-750".to_string(),
+                "hexagon-npu".to_string(),
+                "vulkan".to_string(),
+                "nnapi".to_string(),
+                "rust".to_string(),
+                "spherepop".to_string(),
+                "0o0-ssu".to_string(),
+                "show-me-missouri".to_string(),
             ],
         }
     }
@@ -3714,5 +3751,62 @@ mod tests {
             "expected strong positive top-1 score margin, got {}",
             receipt.bm25f_proximity_rrf.mean_top1_margin
         );
+    }
+
+    #[test]
+    fn test_galaxy_s24_ultra_show_me_missouri_sanctuary() {
+        let offer = ComputeOffer::galaxy_s24_ultra();
+        assert_eq!(offer.provider_node_id, "galaxy-s24-ultra");
+        assert_eq!(offer.available_ram_mb, 9_216);
+        assert_eq!(offer.available_cores, 6);
+        assert!(offer.capabilities.contains(&"adreno-750".to_string()));
+        assert!(offer.capabilities.contains(&"show-me-missouri".to_string()));
+
+        let wire = offer.to_wire_string();
+        let compressed = encode_kompress_super_ultra(wire.as_bytes());
+        assert!(compressed.len() * 2 < wire.len());
+        let decoded = decode_kompress_super_ultra(&compressed).expect("decode s24u 0o0-SSU");
+        assert_eq!(decoded, wire.as_bytes());
+
+        let witness = offer.evaluate_spherepop().expect("valid s24u SpherePop witness");
+        assert_eq!(witness.sphere_depth, 3);
+
+        let s24u_soul = SoulIdentity::from_constellation_seed(
+            "galaxy-s24-ultra",
+            [1, 1, 1, 1, -1, 1, 0, 1, 1],
+            432,
+            b"show-me-missouri-test-seed",
+        )
+        .unwrap();
+        let hearth_soul = SoulIdentity::from_constellation_seed(
+            "friend-missouri-hearth",
+            [1, 1, 0, 1, 1, 0, 1, 1, 1],
+            432,
+            b"show-me-missouri-test-seed",
+        )
+        .unwrap();
+
+        let mut mesh = MemnetMesh::new(s24u_soul.clone(), MtuProfile::SmartTreeSafe1450);
+        mesh.advertise_compute_offer(&s24u_soul, offer, 1_000)
+            .expect("advertise s24u");
+        mesh.request_compute_help(
+            &hearth_soul,
+            StrugglingFriendSos {
+                friend_node_id: "friend-missouri-hearth".to_string(),
+                needed_ram_mb: 6_144,
+                needed_cores: 4,
+                required_capability: "adreno-750".to_string(),
+                reason: "SHOW-ME-STATE-MISSOURI{(ALEX,CHRIS)}+1~ {<3,<3,<3}+1".to_string(),
+            },
+            1_001,
+        )
+        .expect("sos missouri hearth");
+
+        let leases = mesh.match_compute_for_friends(1_002).expect("match s24u");
+        assert_eq!(leases.len(), 1);
+        assert_eq!(leases[0].provider_node_id, "galaxy-s24-ultra");
+        assert_eq!(leases[0].friend_node_id, "friend-missouri-hearth");
+        assert_eq!(leases[0].granted_ram_mb, 6_144);
+        assert_eq!(leases[0].granted_cores, 4);
     }
 }
