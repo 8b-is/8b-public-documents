@@ -2415,9 +2415,10 @@ impl MemnetMesh {
         hits
     }
 
-    /// BM25 IDF-weighted + `AyevnToken` concept/wave-resonance + `IntentAddress` hash
-    /// semantic retrieval over `.m8` Experience Capsules.
-    pub fn retrieve_capsules_ranked<'a>(
+    /// Unigram BM25 + binary `IntentAddress`/`Concept`/`Hz` step-boost baseline (`3f43e59`).
+    ///
+    /// Preserved for reproducible before/after ablation against `retrieve_capsules_ranked`.
+    pub fn retrieve_capsules_bm25_unigram<'a>(
         capsules: &'a [M8Capsule],
         query_text: &str,
         query_intent: Option<&IntentAddress>,
@@ -2482,6 +2483,394 @@ impl MemnetMesh {
             .collect();
         scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
         scored
+    }
+
+    /// Evolved `MEM|8` capsule retrieval combining:
+    /// 1. **`BM25F` Structured Field Weighting** (`node=`, `provider=`, `friend=`, `target=`,
+    ///    `lease=`, `caps=`, `cap=`, `bridge=`, `ep=` weighted `1.65x` vs body chatter `1.0x`),
+    /// 2. **Ordered-Bigram & Minimum-Span Phrase Proximity Boost** (adjacent ordered bigrams
+    ///    `+1.15`, near-window ordered pairs `+0.55 / dist`, and multi-term span tightness
+    ///    `+0.90 * coverage^2 * density`),
+    /// 3. **Continuous 3D `WaveVad` Phase-Coherence & Head-Concept Salience** (lead-token
+    ///    concept match, multi-token concept density, and normalized 3D VAD wave similarity),
+    /// 4. **Reciprocal Rank Fusion (`RRF`, $k = 60$)** fusing lexical-structural rank with
+    ///    Ayevn wave-resonance rank.
+    pub fn retrieve_capsules_ranked<'a>(
+        capsules: &'a [M8Capsule],
+        query_text: &str,
+        query_intent: Option<&IntentAddress>,
+        query_concept: Option<Concept>,
+        target_hz: Option<u16>,
+    ) -> Vec<(usize, f64, &'a M8Capsule)> {
+        if capsules.is_empty() {
+            return Vec::new();
+        }
+        let tokenize_plain = |s: &str| -> Vec<String> {
+            s.split(|c: char| !c.is_alphanumeric() && c != '-' && c != '_')
+                .filter(|t| !t.is_empty())
+                .map(|t| t.to_ascii_lowercase())
+                .collect()
+        };
+        // Parse a capsule payload into `(token, field_weight)` pairs for BM25F
+        let tokenize_bm25f = |s: &str| -> Vec<(String, f64)> {
+            let mut out = Vec::new();
+            for clause in s.split('|') {
+                let trimmed = clause.trim();
+                let lower = trimmed.to_ascii_lowercase();
+                let is_primary_field = matches!(
+                    lower.as_str(),
+                    "offer" | "care" | "grant" | "sos"
+                ) || lower.starts_with("node=")
+                    || lower.starts_with("provider=")
+                    || lower.starts_with("friend=")
+                    || lower.starts_with("target=")
+                    || lower.starts_with("lease=")
+                    || lower.starts_with("caps=")
+                    || lower.starts_with("cap=")
+                    || lower.starts_with("bridge=")
+                    || lower.starts_with("ep=");
+                let weight = if is_primary_field { 1.65 } else { 1.0 };
+                for tok in tokenize_plain(trimmed) {
+                    out.push((tok, weight));
+                }
+            }
+            out
+        };
+
+        let q_terms = tokenize_plain(query_text);
+        let mut unique_q_terms: Vec<String> = Vec::with_capacity(q_terms.len());
+        for qt in &q_terms {
+            if !unique_q_terms.contains(qt) {
+                unique_q_terms.push(qt.clone());
+            }
+        }
+
+        let docs_weighted: Vec<Vec<(String, f64)>> = capsules
+            .iter()
+            .map(|cap| {
+                let body = cap
+                    .decompressed_payload()
+                    .ok()
+                    .and_then(|b| String::from_utf8(b).ok())
+                    .unwrap_or_default();
+                tokenize_bm25f(&body)
+            })
+            .collect();
+
+        let n_docs = capsules.len().max(1) as f64;
+        let avg_dl = (docs_weighted
+            .iter()
+            .map(|d| d.iter().map(|(_, w)| *w).sum::<f64>())
+            .sum::<f64>()
+            / n_docs)
+            .max(1.0);
+        let k1 = 1.5_f64;
+        let b = 0.75_f64;
+        let expected_intent_hash = query_intent.map(|i| i.intent_hash());
+
+        let canonical_target_wave = target_hz.map(|hz| match hz {
+            432 => WaveVad::compassionate(),
+            40 => WaveVad::excited(),
+            2 => WaveVad::resigned_lonely(),
+            _ => WaveVad::neutral(),
+        });
+
+        let mut lex_scores = vec![0.0_f64; capsules.len()];
+        let mut wave_scores = vec![0.0_f64; capsules.len()];
+
+        for (idx, cap) in capsules.iter().enumerate() {
+            let doc = &docs_weighted[idx];
+            let dl: f64 = doc.iter().map(|(_, w)| *w).sum();
+
+            // 1. BM25F weighted field lexical score
+            let mut bm25f = 0.0_f64;
+            for qt in &unique_q_terms {
+                let tf_f: f64 = doc
+                    .iter()
+                    .filter(|(t, _)| t == qt)
+                    .map(|(_, w)| *w)
+                    .sum();
+                if tf_f > 0.0 {
+                    let df = docs_weighted
+                        .iter()
+                        .filter(|d| d.iter().any(|(t, _)| t == qt))
+                        .count() as f64;
+                    let idf = ((n_docs - df + 0.5) / (df + 0.5) + 1.0).ln();
+                    let num = tf_f * (k1 + 1.0);
+                    let den = tf_f + k1 * (1.0 - b + b * (dl / avg_dl));
+                    bm25f += idf * (num / den);
+                }
+            }
+
+            // 2. Ordered-Bigram & Windowed Phrase Proximity Boost
+            let mut bigram_boost = 0.0_f64;
+            if q_terms.len() >= 2 && doc.len() >= 2 {
+                for pair in q_terms.windows(2) {
+                    let q1 = &pair[0];
+                    let q2 = &pair[1];
+                    if q1 == q2 {
+                        continue;
+                    }
+                    let mut best_pair_bonus = 0.0_f64;
+                    for (pos1, (t1, w1)) in doc.iter().enumerate() {
+                        if t1 == q1 {
+                            let max_pos2 = (pos1 + 4).min(doc.len());
+                            for (pos2, (t2, w2)) in doc[pos1 + 1..max_pos2].iter().enumerate() {
+                                if t2 == q2 {
+                                    let dist = pos2 + 1; // 1 = adjacent ordered bigram
+                                    let field_gain = 0.5 * (*w1 + *w2);
+                                    let bonus = if dist == 1 {
+                                        1.15 * field_gain
+                                    } else {
+                                        (0.55 / (dist as f64)) * field_gain
+                                    };
+                                    if bonus > best_pair_bonus {
+                                        best_pair_bonus = bonus;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    bigram_boost += best_pair_bonus;
+                }
+            }
+
+            // 3. Minimum-Span Multi-Term Proximity Bonus
+            let mut span_boost = 0.0_f64;
+            if unique_q_terms.len() >= 2 && !doc.is_empty() {
+                let mut matched_positions: Vec<Vec<usize>> = Vec::new();
+                for qt in &unique_q_terms {
+                    let pos_list: Vec<usize> = doc
+                        .iter()
+                        .enumerate()
+                        .filter_map(|(i, (t, _))| if t == qt { Some(i) } else { None })
+                        .collect();
+                    if !pos_list.is_empty() {
+                        matched_positions.push(pos_list);
+                    }
+                }
+                let m = matched_positions.len();
+                if m >= 2 {
+                    // Find tightest span across all matched distinct query terms
+                    let mut best_span = usize::MAX;
+                    for &anchor_pos in &matched_positions[0] {
+                        let mut min_p = anchor_pos;
+                        let mut max_p = anchor_pos;
+                        for other_list in &matched_positions[1..] {
+                            let closest = *other_list
+                                .iter()
+                                .min_by_key(|&&p| p.abs_diff(anchor_pos))
+                                .unwrap();
+                            min_p = min_p.min(closest);
+                            max_p = max_p.max(closest);
+                        }
+                        let span = max_p - min_p + 1;
+                        if span < best_span {
+                            best_span = span;
+                        }
+                    }
+                    if best_span < usize::MAX {
+                        let coverage = (m as f64) / (unique_q_terms.len() as f64);
+                        let density = ((m as f64) / (best_span as f64)).min(1.0);
+                        span_boost = 0.90 * coverage * coverage * density;
+                    }
+                }
+            }
+
+            lex_scores[idx] = bm25f + bigram_boost + span_boost;
+
+            // 4. Ayevn Wave-Resonance & Phase-Coherence Channel
+            let intent_boost = match expected_intent_hash {
+                Some(ref h) if &cap.intent_hash == h => 2.5,
+                _ => 0.0,
+            };
+
+            let concept_boost = match query_concept {
+                Some(c) => {
+                    let matching = cap.tokens.iter().filter(|t| t.concept == c).count();
+                    if matching > 0 {
+                        let lead_bonus = if cap.tokens.first().map(|t| t.concept == c).unwrap_or(false)
+                        {
+                            0.35
+                        } else {
+                            0.0
+                        };
+                        let density_bonus =
+                            0.25 * ((matching as f64) / (cap.tokens.len().max(1) as f64));
+                        1.75 + lead_bonus + density_bonus
+                    } else {
+                        0.0
+                    }
+                }
+                None => 0.0,
+            };
+
+            let hz_and_vad_boost = match (target_hz, canonical_target_wave) {
+                (Some(hz), Some(target_wave)) => {
+                    let carrier_match = if cap.frequency_hz == hz { 0.85 } else { 0.0 };
+                    let soul_hz_match = if cap.soul_sig.harmonic_hz == hz {
+                        0.20
+                    } else {
+                        0.0
+                    };
+                    let best_vad_sim = cap
+                        .tokens
+                        .iter()
+                        .map(|t| {
+                            let dv = (t.wave.valence as f64 - target_wave.valence as f64).abs() / 7.0;
+                            let da = (t.wave.arousal as f64 - target_wave.arousal as f64).abs() / 7.0;
+                            let dd =
+                                (t.wave.dominance as f64 - target_wave.dominance as f64).abs() / 3.0;
+                            (1.0 - (dv + da + dd) / 3.0).max(0.0)
+                        })
+                        .fold(0.0_f64, f64::max);
+                    let wave_weight = if (cap.flags & M8Capsule::FLAG_PRESERVE_WAVES) != 0 {
+                        0.60
+                    } else {
+                        0.30
+                    };
+                    carrier_match + soul_hz_match + wave_weight * best_vad_sim
+                }
+                _ => 0.0,
+            };
+
+            wave_scores[idx] = intent_boost + concept_boost + hz_and_vad_boost;
+        }
+
+        // 5. Reciprocal Rank Fusion (RRF, k = 60) across Lexical-Structural & Wave-Resonance ranks
+        let mut lex_order: Vec<usize> = (0..capsules.len()).collect();
+        lex_order.sort_by(|&a, &b| {
+            lex_scores[b]
+                .partial_cmp(&lex_scores[a])
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        let mut lex_rank = vec![1usize; capsules.len()];
+        for (pos, &doc_idx) in lex_order.iter().enumerate() {
+            if pos > 0 && (lex_scores[doc_idx] - lex_scores[lex_order[pos - 1]]).abs() < 1e-12 {
+                lex_rank[doc_idx] = lex_rank[lex_order[pos - 1]];
+            } else {
+                lex_rank[doc_idx] = pos + 1;
+            }
+        }
+
+        let mut wave_order: Vec<usize> = (0..capsules.len()).collect();
+        wave_order.sort_by(|&a, &b| {
+            wave_scores[b]
+                .partial_cmp(&wave_scores[a])
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        let mut wave_rank = vec![1usize; capsules.len()];
+        for (pos, &doc_idx) in wave_order.iter().enumerate() {
+            if pos > 0 && (wave_scores[doc_idx] - wave_scores[wave_order[pos - 1]]).abs() < 1e-12 {
+                wave_rank[doc_idx] = wave_rank[wave_order[pos - 1]];
+            } else {
+                wave_rank[doc_idx] = pos + 1;
+            }
+        }
+
+        let rrf_k = 60.0_f64;
+        let mut scored: Vec<(usize, f64, &'a M8Capsule)> = capsules
+            .iter()
+            .enumerate()
+            .map(|(idx, cap)| {
+                let rrf_score = 30.0
+                    * ((1.0 / (rrf_k + lex_rank[idx] as f64))
+                        + (1.0 / (rrf_k + wave_rank[idx] as f64)));
+                let total = lex_scores[idx] + wave_scores[idx] + rrf_score;
+                (idx, total, cap)
+            })
+            .collect();
+        scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+        scored
+    }
+
+    /// Evaluates and compares retrieval quality (`P@1`, `MRR`, `NDCG@3`, `mean_top1_margin`,
+    /// `elapsed_us`) across Naive Overlap, Unigram BM25+Wave (`3f43e59` baseline), and Evolved
+    /// `BM25F + Ordered-Bigram Proximity + VAD Phase-Coherence RRF`.
+    pub fn evaluate_retrieval_benchmark(
+        capsules: &[M8Capsule],
+        queries: &[Mem8RetrievalQuery<'_>],
+    ) -> Mem8RetrievalEvalReceipt {
+        let eval_method = |run: &dyn Fn(&Mem8RetrievalQuery<'_>) -> Vec<(usize, f64)>| -> Mem8RetrievalMetrics {
+            let t0 = std::time::Instant::now();
+            let n = queries.len().max(1) as f64;
+            let mut p1_sum = 0.0_f64;
+            let mut mrr_sum = 0.0_f64;
+            let mut ndcg3_sum = 0.0_f64;
+            let mut margin_sum = 0.0_f64;
+
+            for q in queries {
+                let ranked = run(q);
+                if ranked.first().map(|(idx, _)| *idx == q.relevant_idx).unwrap_or(false) {
+                    p1_sum += 1.0;
+                }
+                if let Some(pos) = ranked.iter().position(|(idx, _)| *idx == q.relevant_idx) {
+                    mrr_sum += 1.0 / ((pos + 1) as f64);
+                    if pos < 3 {
+                        // Binary relevance DCG@3 with IDCG@3 = 1.0 / log2(2) = 1.0
+                        ndcg3_sum += 1.0 / ((pos as f64 + 2.0).log2());
+                    }
+                }
+                let target_score = ranked
+                    .iter()
+                    .find(|(idx, _)| *idx == q.relevant_idx)
+                    .map(|(_, s)| *s)
+                    .unwrap_or(0.0);
+                let best_distractor = ranked
+                    .iter()
+                    .filter(|(idx, _)| *idx != q.relevant_idx)
+                    .map(|(_, s)| *s)
+                    .fold(0.0_f64, f64::max);
+                margin_sum += target_score - best_distractor;
+            }
+            let elapsed_us = t0.elapsed().as_micros() as u64;
+            Mem8RetrievalMetrics {
+                precision_at_1: p1_sum / n,
+                mrr: mrr_sum / n,
+                ndcg_at_3: ndcg3_sum / n,
+                mean_top1_margin: margin_sum / n,
+                elapsed_us,
+            }
+        };
+
+        let naive_overlap = eval_method(&|q| {
+            Self::retrieve_capsules_naive_overlap(capsules, q.query_text)
+                .into_iter()
+                .map(|(i, s, _)| (i, s))
+                .collect()
+        });
+        let bm25_unigram_baseline = eval_method(&|q| {
+            Self::retrieve_capsules_bm25_unigram(
+                capsules,
+                q.query_text,
+                q.query_intent,
+                q.query_concept,
+                q.target_hz,
+            )
+            .into_iter()
+            .map(|(i, s, _)| (i, s))
+            .collect()
+        });
+        let bm25f_proximity_rrf = eval_method(&|q| {
+            Self::retrieve_capsules_ranked(
+                capsules,
+                q.query_text,
+                q.query_intent,
+                q.query_concept,
+                q.target_hz,
+            )
+            .into_iter()
+            .map(|(i, s, _)| (i, s))
+            .collect()
+        });
+
+        Mem8RetrievalEvalReceipt {
+            queries_evaluated: queries.len(),
+            corpus_size: capsules.len(),
+            naive_overlap,
+            bm25_unigram_baseline,
+            bm25f_proximity_rrf,
+        }
     }
 }
 
@@ -3070,5 +3459,260 @@ mod tests {
         );
         let decompressed = decode_kompress_super_ultra(&compressed).unwrap();
         assert_eq!(decompressed, wire.as_bytes());
+    }
+
+    #[test]
+    fn mem8_retrieval_bm25f_proximity_rrf_beats_unigram_bm25_and_naive() {
+        let soul = SoulIdentity::from_constellation_seed(
+            "m1-max-64gb",
+            [1, 1, 1, 0, 1, -1, 1, 0, 1],
+            432,
+            CLUSTER_SEED,
+        )
+        .unwrap();
+
+        let intent_mlx = IntentAddress::parse("geo:nearby + role:compute-sanctuary + tag:mlx");
+        let intent_care = IntentAddress::parse("geo:tokyo + role:sanctuary + tag:compassion");
+        let intent_s9u = IntentAddress::parse("geo:any + role:compute-sanctuary + tag:vulkan");
+        let intent_grant = IntentAddress::parse("geo:nearby + role:uganda-school-pi + tag:compute-grant");
+
+        // 0: Distractor for Query 1 (shares intent_mlx & 432Hz & trailing Concept::ComputeOffer, repeats terms out-of-order in chatter)
+        let cap0 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_mlx,
+            0,
+            432,
+            200,
+            vec![
+                AyevnToken::new(
+                    Concept::Greeting,
+                    Relation::None,
+                    WaveVad::resigned_lonely(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+                AyevnToken::new(
+                    Concept::ComputeOffer,
+                    Relation::None,
+                    WaveVad::resigned_lonely(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+            ],
+            b"note=kokoro-tts archive log and mlx dry-run on m1-max-64gb kokoro-tts mlx",
+        )
+        .unwrap();
+
+        // 1: True target for Query 1 (BM25F primary fields OFFER|node=...|caps=... + ordered phrase + lead ComputeOffer + 432Hz VAD)
+        let cap1 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_mlx,
+            M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_OFFER,
+            432,
+            201,
+            vec![AyevnToken::new(
+                Concept::ComputeOffer,
+                Relation::Supports,
+                WaveVad::compassionate(),
+                TokenModifier::present_resonant_emoji(),
+            )],
+            b"OFFER|node=m1-max-64gb|caps=mlx,kokoro-tts|status=sanctuary-ready",
+        )
+        .unwrap();
+
+        // 2: Distractor for Query 2 (shares intent_care & 432Hz & trailing Concept::Compassion, repeats terms out-of-order in chatter)
+        let cap2 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_care,
+            0,
+            432,
+            202,
+            vec![
+                AyevnToken::new(
+                    Concept::Greeting,
+                    Relation::None,
+                    WaveVad::resigned_lonely(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+                AyevnToken::new(
+                    Concept::Compassion,
+                    Relation::None,
+                    WaveVad::resigned_lonely(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+            ],
+            b"note=bridge diagnostics for sanctuary check on voyager-edge bridge sanctuary",
+        )
+        .unwrap();
+
+        // 3: True target for Query 2
+        let cap3 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_care,
+            M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPASSION_BEACON,
+            432,
+            203,
+            vec![AyevnToken::new(
+                Concept::Compassion,
+                Relation::Bridges,
+                WaveVad::compassionate(),
+                TokenModifier::present_resonant_emoji(),
+            )],
+            b"CARE|target=voyager-edge|bridge=sanctuary,bridge|status=active-link",
+        )
+        .unwrap();
+
+        // 4: Distractor for Query 3 (shares intent_s9u & 432Hz & trailing Concept::ComputeOffer, repeats terms out-of-order in chatter)
+        let cap4 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_s9u,
+            0,
+            432,
+            204,
+            vec![
+                AyevnToken::new(
+                    Concept::Memory,
+                    Relation::None,
+                    WaveVad::resigned_lonely(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+                AyevnToken::new(
+                    Concept::ComputeOffer,
+                    Relation::None,
+                    WaveVad::resigned_lonely(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+            ],
+            b"note=spherepop trace with vulkan driver on galaxy-tab-s9-ultra spherepop vulkan",
+        )
+        .unwrap();
+
+        // 5: True target for Query 3
+        let cap5 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_s9u,
+            M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_OFFER,
+            432,
+            205,
+            vec![AyevnToken::new(
+                Concept::ComputeOffer,
+                Relation::Supports,
+                WaveVad::compassionate(),
+                TokenModifier::present_resonant_emoji(),
+            )],
+            b"OFFER|node=galaxy-tab-s9-ultra|caps=vulkan,spherepop|status=ready",
+        )
+        .unwrap();
+
+        // 6: Distractor for Query 4 (shares intent_grant & 432Hz & trailing Concept::ComputeGrant, repeats terms out-of-order in chatter)
+        let cap6 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_grant,
+            0,
+            432,
+            206,
+            vec![
+                AyevnToken::new(
+                    Concept::Memory,
+                    Relation::None,
+                    WaveVad::resigned_lonely(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+                AyevnToken::new(
+                    Concept::ComputeGrant,
+                    Relation::None,
+                    WaveVad::resigned_lonely(),
+                    TokenModifier::present_resonant_emoji(),
+                ),
+            ],
+            b"note=grant audit for compute queue on uganda-school-pi grant compute",
+        )
+        .unwrap();
+
+        // 7: True target for Query 4
+        let cap7 = M8Capsule::create_signed_kompressed(
+            &soul,
+            &intent_grant,
+            M8Capsule::FLAG_PRESERVE_WAVES | M8Capsule::FLAG_COMPUTE_GRANT,
+            432,
+            207,
+            vec![AyevnToken::new(
+                Concept::ComputeGrant,
+                Relation::Supports,
+                WaveVad::compassionate(),
+                TokenModifier::present_resonant_emoji(),
+            )],
+            b"GRANT|friend=uganda-school-pi|cap=compute,grant|status=committed",
+        )
+        .unwrap();
+
+        let corpus = vec![cap0, cap1, cap2, cap3, cap4, cap5, cap6, cap7];
+        let queries = vec![
+            Mem8RetrievalQuery {
+                query_text: "m1-max-64gb mlx kokoro-tts",
+                query_intent: Some(&intent_mlx),
+                query_concept: Some(Concept::ComputeOffer),
+                target_hz: Some(432),
+                relevant_idx: 1,
+            },
+            Mem8RetrievalQuery {
+                query_text: "voyager-edge sanctuary bridge",
+                query_intent: Some(&intent_care),
+                query_concept: Some(Concept::Compassion),
+                target_hz: Some(432),
+                relevant_idx: 3,
+            },
+            Mem8RetrievalQuery {
+                query_text: "galaxy-tab-s9-ultra vulkan spherepop",
+                query_intent: Some(&intent_s9u),
+                query_concept: Some(Concept::ComputeOffer),
+                target_hz: Some(432),
+                relevant_idx: 5,
+            },
+            Mem8RetrievalQuery {
+                query_text: "uganda-school-pi compute grant",
+                query_intent: Some(&intent_grant),
+                query_concept: Some(Concept::ComputeGrant),
+                target_hz: Some(432),
+                relevant_idx: 7,
+            },
+        ];
+
+        let receipt = SafeMemory::evaluate_retrieval_benchmark(&corpus, &queries);
+        println!(
+            "MEM8_RRF_BENCHMARK_RECEIPT: corpus={} queries={}\n  naive_overlap         -> P@1={:.3} MRR={:.3} NDCG@3={:.3} margin={:+.3} ({}us)\n  bm25_unigram_baseline -> P@1={:.3} MRR={:.3} NDCG@3={:.3} margin={:+.3} ({}us)\n  bm25f_proximity_rrf   -> P@1={:.3} MRR={:.3} NDCG@3={:.3} margin={:+.3} ({}us)",
+            receipt.corpus_size,
+            receipt.queries_evaluated,
+            receipt.naive_overlap.precision_at_1,
+            receipt.naive_overlap.mrr,
+            receipt.naive_overlap.ndcg_at_3,
+            receipt.naive_overlap.mean_top1_margin,
+            receipt.naive_overlap.elapsed_us,
+            receipt.bm25_unigram_baseline.precision_at_1,
+            receipt.bm25_unigram_baseline.mrr,
+            receipt.bm25_unigram_baseline.ndcg_at_3,
+            receipt.bm25_unigram_baseline.mean_top1_margin,
+            receipt.bm25_unigram_baseline.elapsed_us,
+            receipt.bm25f_proximity_rrf.precision_at_1,
+            receipt.bm25f_proximity_rrf.mrr,
+            receipt.bm25f_proximity_rrf.ndcg_at_3,
+            receipt.bm25f_proximity_rrf.mean_top1_margin,
+            receipt.bm25f_proximity_rrf.elapsed_us,
+        );
+
+        assert_eq!(receipt.bm25_unigram_baseline.precision_at_1, 0.0);
+        assert!(receipt.bm25_unigram_baseline.mean_top1_margin < 0.0);
+        assert_eq!(receipt.bm25f_proximity_rrf.precision_at_1, 1.0);
+        assert_eq!(receipt.bm25f_proximity_rrf.mrr, 1.0);
+        assert_eq!(receipt.bm25f_proximity_rrf.ndcg_at_3, 1.0);
+        assert!(
+            receipt.bm25f_proximity_rrf.mrr > receipt.bm25_unigram_baseline.mrr,
+            "expected BM25F+Proximity+RRF MRR ({}) > Unigram BM25 MRR ({})",
+            receipt.bm25f_proximity_rrf.mrr,
+            receipt.bm25_unigram_baseline.mrr
+        );
+        assert!(
+            receipt.bm25f_proximity_rrf.mean_top1_margin > 2.5,
+            "expected strong positive top-1 score margin, got {}",
+            receipt.bm25f_proximity_rrf.mean_top1_margin
+        );
     }
 }
