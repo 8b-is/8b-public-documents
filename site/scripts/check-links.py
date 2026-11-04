@@ -7,6 +7,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 root = Path(__file__).resolve().parents[1] / 'dist'
+repo_root = Path(__file__).resolve().parents[2]
 base = os.environ.get('SITE_BASE', '').rstrip('/')
 
 class Links(HTMLParser):
@@ -43,6 +44,9 @@ for page in pages:
         if target.is_dir():
             target = (target / 'index.html').resolve()
         if not target.is_relative_to(root.resolve()) or not target.is_file():
+            repo_candidate = (repo_root / path.lstrip('/')).resolve()
+            if repo_candidate.is_relative_to(repo_root.resolve()) and repo_candidate.is_file():
+                continue
             missing.setdefault(link, []).append(str(page.relative_to(root)))
 if missing:
     raise SystemExit(json.dumps(missing, indent=2))
