@@ -209,3 +209,6 @@ site/public/collection-catalog.json
 site/src/content/docs/library/
 site/test-results/
 site/playwright-report/
+
+# Local materialized LFS media inside whatsup-archive (INDEX.md stays tracked)
+whatsup-archive/*/*
